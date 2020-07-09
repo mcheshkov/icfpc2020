@@ -1,4 +1,4 @@
 #!/bin/sh
 
 cd app
-cargo build --release --offline --color=never
+CI=true cargo build --release --offline --color=never
