@@ -5,31 +5,28 @@ use std::str::FromStr;
 use pitch_detection::{PitchDetector, McLeodDetector};
 use wav::BitDepth;
 use clap::{Arg, App, SubCommand};
+use rayon::prelude::*;
 
 const SAMPLE_RATE : usize = 500;
 const POWER_THRESHOLD : f32 = 0.0;
 const CLARITY_THRESHOLD : f32 = 0.0;
 
+fn calculate<'a, T: rayon::iter::ParallelIterator<Item=&'a [f32]>>(parts: T, window_size: usize) -> Vec<f32> {
+    parts.map_with(
+        || McLeodDetector::new(window_size, window_size / 2),
+        |create_detector, window| {
+        create_detector()
+            .get_pitch(window, SAMPLE_RATE, POWER_THRESHOLD, CLARITY_THRESHOLD)
+            .map(|pitch_res| pitch_res.frequency)
+    }).flatten().collect()
+}
+
 fn use_pitch_detector(data: &[f32], window_size: usize, use_windows: bool) -> Vec<f32> {
-    let mut detector = McLeodDetector::new(window_size, window_size / 2);
-
-    let mut res = vec!();
-    let parts: Box<dyn Iterator<Item=&[f32]>> = if use_windows {
-        Box::new(data.windows(window_size))
+    if use_windows {
+        calculate(data.par_windows(window_size), window_size)
     } else {
-        Box::new(data.chunks(window_size).filter(|x| x.len() == window_size))
-    };
-
-    for window in parts {
-        match detector.get_pitch(window, SAMPLE_RATE, POWER_THRESHOLD, CLARITY_THRESHOLD) {
-            Some(pitch_res) => {
-                res.push(pitch_res.frequency);
-            }
-            None => {}
-        }
+        calculate(data.par_chunks(window_size).filter(|x| x.len() == window_size), window_size)
     }
-
-    res
 }
 
 fn output_pitch_frequencies(input: &str, window_size: usize, use_windows: bool) -> Result<(), Error> {
