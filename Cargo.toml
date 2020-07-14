@@ -11,3 +11,4 @@ path = "app/main.rs"
 [dependencies]
 pitch-detection = "0.1.0"
 wav = "0.4.0"
+clap = "2.3.1"
