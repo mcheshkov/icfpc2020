@@ -11,7 +11,7 @@ async fn send_to_aliens(client: &Client<HttpConnector>, url: &str, body: String)
 
     let req = Request::builder()
         .method(Method::POST)
-        .uri(url.to_owned() + "/aliens/send")
+        .uri(url.to_owned() + "/aliens/send?apiKey=4b5b59dead9e42fbbf203df4e634a2da")
         .body(Body::from(body))?;
 
     match client.request(req).await {
