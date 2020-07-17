@@ -7,7 +7,7 @@ use wav::BitDepth;
 use clap::{Arg, App, SubCommand};
 use rayon::prelude::*;
 
-const SAMPLE_RATE : usize = 500;
+const SAMPLE_RATE : usize = 44100;
 const POWER_THRESHOLD : f32 = 0.0;
 const CLARITY_THRESHOLD : f32 = 0.0;
 
