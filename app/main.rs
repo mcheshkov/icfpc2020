@@ -1,24 +1,22 @@
 use http_body::Body as _;
+use hyper::client::HttpConnector;
 use hyper::{Body, Client, Method, Request, StatusCode};
 use std::env;
 use std::process;
+use std::thread;
+use std::time;
 
 mod modulation;
 
-#[tokio::main]
-async fn main() -> Result<(), Box<dyn std::error::Error + Send + Sync>> {
-    let args: Vec<String> = env::args().collect();
-
-    let server_url = &args[1];
-    let player_key = &args[2];
-
-    println!("ServerUrl: {}; PlayerKey: {}", server_url, player_key);
-
-    let client = Client::new();
+async fn send_to_aliens(
+    client: &Client<HttpConnector>,
+    url: &str,
+    body: String,
+) -> Result<(), Box<dyn std::error::Error + Send + Sync>> {
     let req = Request::builder()
         .method(Method::POST)
-        .uri(server_url)
-        .body(Body::from(format!("{}", player_key)))?;
+        .uri(url.to_owned() + "/aliens/send?apiKey=4b5b59dead9e42fbbf203df4e634a2da")
+        .body(Body::from(body))?;
 
     match client.request(req).await {
         Ok(mut res) => match res.status() {
@@ -49,6 +47,27 @@ async fn main() -> Result<(), Box<dyn std::error::Error + Send + Sync>> {
             process::exit(1);
         }
     }
+
+    Ok(())
+}
+
+#[tokio::main]
+async fn main() -> Result<(), Box<dyn std::error::Error + Send + Sync>> {
+    let args: Vec<String> = env::args().collect();
+
+    // let server_url = &args[1];
+    const server_url: &str = "https://icfpc2020-api.testkontur.ru";
+    let player_key = &args[2];
+
+    println!("ServerUrl: {}; PlayerKey: {}", server_url, player_key);
+
+    let client = Client::new();
+
+    send_to_aliens(&client, &server_url, "1101000\n".to_owned()).await?;
+    thread::sleep(time::Duration::from_secs(12));
+    send_to_aliens(&client, &server_url, "1101000\n".to_owned()).await?;
+    thread::sleep(time::Duration::from_secs(6));
+    send_to_aliens(&client, &server_url, "1101000\n".to_owned()).await?;
 
     Ok(())
 }
