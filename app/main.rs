@@ -1,3 +1,5 @@
+mod parser;
+
 use http_body::Body as _;
 use hyper::client::HttpConnector;
 use hyper::{Body, Client, Method, Request, StatusCode};

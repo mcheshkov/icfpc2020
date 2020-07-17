@@ -84,7 +84,7 @@ impl<'a> Action<'a> {
     pub fn reduce_args(self) -> Action<'a> {
         match self {
             Self::SingleArgApplication(func, operand) => {
-                let mut first_reduced = func.reduce_args();
+                let first_reduced = func.reduce_args();
                 match first_reduced {
                     Action::Value(_) | Action::List(_) => {
                         Action::multi_application(first_reduced, vec![operand.reduce_args()])
@@ -107,7 +107,7 @@ impl<'a> Action<'a> {
         }
     }
 
-    fn reduce_lists(self) -> Action<'a> {
+    pub fn reduce_lists(self) -> Action<'a> {
         match self {
             Self::MultipleArgApplication(val, mut args)
                 if *val == Self::Value("cons") && args.len() == 2 =>
@@ -131,8 +131,15 @@ impl<'a> Action<'a> {
         }
     }
 
-    fn application<'b>(func: Action<'b>, operand: Action<'b>) -> Action<'b> {
-        Action::SingleArgApplication(Box::new(func), Box::new(operand))
+    pub fn reduce_all(self) -> Action<'a> {
+        self.reduce_args().reduce_lists()
+    }
+
+    pub fn parse_reduced(stream: &str) -> Vec<Action> {
+        Self::parse(stream)
+            .into_iter()
+            .map(|a| a.reduce_all())
+            .collect()
     }
 
     fn multi_application<'b>(func: Action<'b>, operands: Vec<Action<'b>>) -> Action<'b> {
