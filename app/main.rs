@@ -1,12 +1,13 @@
 use http_body::Body as _;
 use hyper::{Client, Request, Method, Body, StatusCode};
 use hyper::client::HttpConnector;
+use hyper_tls::HttpsConnector;
 use std::env;
 use std::process;
 use std::thread;
 use std::time;
 
-async fn send_to_aliens(client: &Client<HttpConnector>, url: &str, body: String) ->
+async fn send_to_aliens(client: &Client<HttpsConnector<HttpConnector>>, url: &str, body: String) ->
     Result<(), Box<dyn std::error::Error + Send + Sync>> {
 
     let req = Request::builder()
@@ -59,7 +60,8 @@ async fn main() -> Result<(), Box<dyn std::error::Error + Send + Sync>> {
 
     println!("ServerUrl: {}; PlayerKey: {}", server_url, player_key);
 
-    let client = Client::new();
+    let https = HttpsConnector::new();
+    let client = Client::builder().build::<_, Body>(https);
     
     send_to_aliens(&client, &server_url, "1101000\n".to_owned()).await?;
     thread::sleep(time::Duration::from_secs(12));
