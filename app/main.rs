@@ -17,7 +17,7 @@ async fn send_to_aliens(
 ) -> Result<(), Box<dyn std::error::Error + Send + Sync>> {
     let req = Request::builder()
         .method(Method::POST)
-        .uri(url.to_owned() + "/aliens/send?apiKey=" + &player_key.to_owned())
+        .uri(url.to_owned() + "/aliens/send?playerKey=" + &player_key.to_owned())
         .body(Body::from(body))?;
 
     match client.request(req).await {
