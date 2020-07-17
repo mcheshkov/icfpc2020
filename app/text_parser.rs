@@ -7,7 +7,14 @@ enum Token<'a> {
 impl<'token> Token<'token> {
     fn parse_next<'s, 'a>(stream: &'s [Token<'a>]) -> Option<(Action<'a>, &'s [Token<'a>])> {
         stream.split_first().map(|(token, rest)| match token {
-            Token::Operand(val) => (Action::Value(val), rest),
+            Token::Operand(val) => {
+                let v = if let Ok(num) = i64::from_str_radix(val, 10) {
+                    Action::Number(num)
+                } else {
+                    Action::Value(val)
+                };
+                (v, rest)
+            }
             Token::Apply() => {
                 let (first, rest) =
                     Token::parse_next(rest).expect("Could not parse first argument for ap");
@@ -25,6 +32,7 @@ impl<'token> Token<'token> {
 #[derive(Debug, Eq, PartialEq)]
 pub enum Action<'a> {
     Value(&'a str),
+    Number(i64),
     SingleArgApplication(Box<Action<'a>>, Box<Action<'a>>),
     MultipleArgApplication(Box<Action<'a>>, Vec<Action<'a>>),
     List(Vec<Action<'a>>),
@@ -58,6 +66,7 @@ impl<'a> Action<'a> {
     pub fn to_string(&self) -> String {
         match self {
             Self::Value(s) => String::from(*s),
+            Self::Number(val) => val.to_string(),
             Self::SingleArgApplication(func, operand) => {
                 format!("{}({})", func.to_string(), operand.to_string())
             }
@@ -86,7 +95,7 @@ impl<'a> Action<'a> {
             Self::SingleArgApplication(func, operand) => {
                 let first_reduced = func.reduce_args();
                 match first_reduced {
-                    Action::Value(_) | Action::List(_) => {
+                    Action::Value(_) | Action::List(_) | Action::Number(_) => {
                         Action::multi_application(first_reduced, vec![operand.reduce_args()])
                     }
                     Action::MultipleArgApplication(func, mut args) => {
@@ -98,7 +107,7 @@ impl<'a> Action<'a> {
                     }
                 }
             }
-            Self::Value(_) => self,
+            Self::Value(_) | Self::Number(_) => self,
             Self::MultipleArgApplication(func, operands) => Self::multi_application(
                 func.reduce_args(),
                 operands.into_iter().map(|x| x.reduce_args()).collect(),
