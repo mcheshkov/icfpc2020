@@ -53,7 +53,8 @@ async fn send_to_aliens(client: &Client<HttpConnector>, url: &str, body: String)
 async fn main() -> Result<(), Box<dyn std::error::Error + Send + Sync>> {
     let args: Vec<String> = env::args().collect();
 
-    let server_url = &args[1];
+    // let server_url = &args[1];
+    const server_url: &str = "https://icfpc2020-api.testkontur.ru";
     let player_key = &args[2];
 
     println!("ServerUrl: {}; PlayerKey: {}", server_url, player_key);
