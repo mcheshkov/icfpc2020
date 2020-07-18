@@ -1,5 +1,5 @@
 const messages = require("./messages");
-const send = require("./send").send;
+const {send, real_send} = require("./send");
 
 function main() {
     console.log("Fn test");
@@ -21,6 +21,8 @@ function main() {
     messages.message[18]();
 
     console.log("Test ok");
+
+    // real_send();
 }
 
 main();
