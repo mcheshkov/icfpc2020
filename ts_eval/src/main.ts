@@ -56,7 +56,7 @@ export function main(ctx: CanvasRenderingContext2D | null) {
     console.log("first_iter", first_iter);
     console.log("first_iter unthunk", unthunk(first_iter));
 
-    const collectConsList = (list: LamCons): Lam & LamList => {
+    const collectConsList = (list: LamCons): (Lam & LamList) | null => {
         const res = [];
         while (true) {
             res.push(list.left);
@@ -66,26 +66,90 @@ export function main(ctx: CanvasRenderingContext2D | null) {
             } else if (tail.type == "cons") {
                 list = tail;
             } else {
-                throw new Error("Not a cons");
+                return null;
             }
         }
         return ListCons(res);
     }
 
-    const collectList = (list: Lam): Lam & LamList => {
+    const collectList = (list: Lam): Lam & (LamList|LamCons) => {
         const l = unthunk(list);
         if (l.type === "list") {
             return l;
         } else if (l.type === "cons") {
-            return collectConsList(l);
+            const collected = collectConsList(l);
+            return collected != null ? collected : l;
         } else {
             throw new Error("Not a list");
         }
     }
 
+    const consMap = (list: LamCons, fn: (l:Lam) => Lam): Lam & LamCons => {
+        return cons(fn(list.left))(fn(list.right)) as any;
+    }
+
+    type LamData = LamCons|LamList|LamNumber;
+
+    const collectData = (data: Lam): Lam & (LamData) => {
+        const l = unthunk(data);
+        if (l.type === "list") {
+            return ListCons(l.items.map(collectData));
+        } else if (l.type === "cons") {
+            let list = collectList(l);
+            if (list.type === "list") {
+                return collectData(list);
+            } else {
+                return consMap(list, collectData);
+            }
+        } else if (l.type === "number") {
+            return l;
+        } else {
+            throw new Error(`Not a data ${l}`);
+        }
+    }
+
+    function dataToString(data: LamData): string {
+        function isData(l: Lam): l is Lam & LamData {
+            return l.type === "number" || l.type === "list" || l.type === "cons";
+        }
+
+        switch (data.type) {
+            case "list":
+                return "[" + data.items
+                        .map(i => {
+                            if (!isData(i)) {
+                                throw new Error(`Bad type in data: ${i}`);
+                            }
+                            return i;
+                        })
+                        .filter(i => isData(i))
+                        .map(i => dataToString(i))
+                        .join(", ")
+                    + "]";
+            case "number":
+                return data.value.toString(10);
+            case "cons": {
+                const left = data.left;
+                if (! isData(left)) {
+                    throw new Error(`Left in cons is not data: ${left}`);
+                }
+
+                const right = data.right;
+                if (! isData(right)) {
+                    throw new Error(`Right in cons is not data: ${right}`);
+                }
+
+                return `(${dataToString(left)},${dataToString(right)})`;
+            }
+        }
+    }
+
     // (flag, newState, data)
-    const parseProtocolResponse = (response: Lam): [Lam & LamNumber, Lam & LamList, Lam & LamList] => {
+    const parseProtocolResponse = (response: Lam): [Lam & LamNumber, Lam & LamData, Lam & LamData] => {
         const respList = collectList(response);
+        if (respList.type !== "list") {
+            throw new Error("Not a list in response");
+        }
         if (respList.items.length < 3) {
             throw new Error("Not enough elems in response");
         }
@@ -96,16 +160,17 @@ export function main(ctx: CanvasRenderingContext2D | null) {
             throw new Error("Flag is not a number");
         }
 
-        // TODO maybe single number?
-        const state = collectList(stateLam);
-
-        // TODO maybe single number?
-        const data = collectList(dataLam);
+        const state = collectData(stateLam);
+        const data = collectData(dataLam);
 
         return [flag, state, data];
     };
 
-    console.log(parseProtocolResponse(first_iter));
+    const parsed = parseProtocolResponse(first_iter);
+
+    console.log("parsed", parsed);
+    console.log("newState", dataToString(parsed[1]));
+    console.log("data", dataToString(parsed[2]));
 }
 
 main(null);
