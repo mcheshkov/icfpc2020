@@ -81,7 +81,7 @@ fn main() -> () {
             println!("{}", binding_as_ts(binding));
         } else {
             for action in actions {
-                print!("{} ", print_as_ts(&action));
+                print!("{} ", action_as_ts(&action));
             }
         }
     }
