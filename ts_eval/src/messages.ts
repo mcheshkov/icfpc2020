@@ -1,5 +1,5 @@
 import * as _ from "./symbols";
-import {assertNum, NumCons} from "./common";
+import {assertNum, assertNumNum, NumCons} from "./common";
 
 let message: any[] = [];
 
@@ -37,7 +37,7 @@ message[6] = () => {
     assertNum(_.dec(NumCons(-2n)), -3n);
 }
 
-/*
+
 exports.message[7] = () => {
     // ap ap _.add 1 2   =   3
     assertNum(_.add(NumCons(1n))(NumCons(2n)), 3n);
@@ -51,29 +51,31 @@ exports.message[7] = () => {
     assertNum(_.add(NumCons(3n))(NumCons(5n)), 8n);
 }
 
+
 exports.message[8] = () => {
-    let x0 = 100;
-    let x1 = 1337;
-    let x2 = 1488;
+    let x0 = NumCons(100n);
+    let x1 = NumCons(1337n);
+    let x2 = NumCons(1488n);
 
     // ap ap _.add 0 x0   =   x0
-    assertNum(_.add(NumCons(0n))(x0n), x0n);
+    assertNumNum(_.add(NumCons(0n))(x0), x0);
     // ap ap _.add 0 x1   =   x1
-    assertNum(_.add(NumCons(0n))(x1n), x1n);
+    assertNumNum(_.add(NumCons(0n))(x1), x1);
     // ap ap _.add 0 x2   =   x2
-    assertNum(_.add(NumCons(0n))(x2n), x2n);
+    assertNumNum(_.add(NumCons(0n))(x2), x2);
 
     // ap ap _.add x0 0   =   x0
-    assertNum(_.add(x0n)(NumCons(0n)), x0n);
+    assertNumNum(_.add(x0)(NumCons(0n)), x0);
     // ap ap _.add x1 0   =   x1
-    assertNum(_.add(x1n)(NumCons(0n)), x1n);
+    assertNumNum(_.add(x1)(NumCons(0n)), x1);
     // ap ap _.add x2 0   =   x2
-    assertNum(_.add(x2n)(NumCons(0n)), x2n);
+    assertNumNum(_.add(x2)(NumCons(0n)), x2);
 
     // ap ap _.add x0 x1   =   ap ap _.add x1 x0
-    assertNum(_.add(x0n)(x1n), _.add(x1n)(x0n));
+    assertNumNum(_.add(x0)(x1), _.add(x1)(x0));
 }
 
+/*
 exports.message[9] = () => {
     let x0 = -255;
     let x1 = 100500;

@@ -5,9 +5,9 @@ function main() {
     console.log("Fn test");
     message[5]();
     message[6]();
-    /*
     message[7]();
     message[8]();
+    /*
     message[9]();
     message[10]();
     message[11]();

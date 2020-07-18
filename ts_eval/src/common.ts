@@ -83,6 +83,13 @@ export function assertNum(l:Lam, n: bigint) {
     assert.strictEqual(l.value, n);
 }
 
+export function assertNumNum(l:Lam, n: Lam) {
+    if (l.type !== "number" || n.type !== "number") {
+        throw new Error("NUmber expected");
+    }
+    assert.strictEqual(l.value, n.value);
+}
+
 export function assertLit(l:Lam, ident: string) {
     if (l.type !== "literal") {
         throw new Error("Literal expected");
