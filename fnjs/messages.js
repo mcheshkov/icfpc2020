@@ -277,18 +277,49 @@ exports.message[17] = () => {
     _.assert_eq(_.dec(_.add(x0)(1)), x0);
     // ap ap add ap ap add 2 3 4   =   9
     _.assert_eq(_.add(_.add(2)(3))(4), 9);
+
     // ap ap add 2 ap ap add 3 4   =   9
-    let a = _.add(3)(4);
-    let b = _.add(2)(a);
-    _.assert_eq(b, 9);
-    /*
+    {
+        let b = _.add(3)(4);
+        let a = _.add(2)(b);
+        _.assert_eq(a, 9);
+    }
+
     // ap ap add ap ap mul 2 3 4   =   10
-    _.assert_eq(_.inc(_.inc(0)), 2);
-    // ap ap mul 2 ap ap add 3 4   =   14
-    _.assert_eq(_.inc(_.inc(0)), 2);
-    // inc   =   ap add 1
-    _.assert_eq(_.inc(_.inc(0)), 2);
-    // dec   =   ap add ap neg 1
-    _.assert_eq(_.inc(_.inc(0)), 2);
+    {
+        let c = _.mul(2)(3);
+        let b = _.add(c);
+        let a = b(4);
+        _.assert_eq(a, 10);
+    }
+
+    /*
+    ap ap mul 2 ap ap add 3 4   =   14
+
+    a: ap
+        b: ap
+            mul
+            2
+        c: ap
+            d: ap
+                add
+                3
+            4
+    =   14
     */
+    {
+        let d = _.add(3);
+        let c = d(4);
+        let b = _.mul(2);
+        let a = b(c);
+        _.assert_eq(a, 14);
+    }
+
+    // inc and dec used as function-definition
+}
+
+exports.message[18] = () => {
+    // ap ap ap s x0 x1 x2   =   ap ap x0 x2 ap x1 x2
+    // ap ap ap s add inc 1   =   3
+    // ap ap ap s mul ap add 1 6   =   42
 }
