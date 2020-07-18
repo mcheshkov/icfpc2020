@@ -118,11 +118,11 @@ async fn main() -> Result<(), Box<dyn std::error::Error + Send + Sync>> {
         send_player_key(&client, server_url, key).await?;
     }
 
-    send_to_aliens(&client, &server_url, "1101000\n".to_owned()).await?;
+    send_to_aliens(&client, &server_url, "1101000".to_owned()).await?;
     thread::sleep(time::Duration::from_secs(12));
-    send_to_aliens(&client, &server_url, "1101000\n".to_owned()).await?;
+    send_to_aliens(&client, &server_url, "1101000".to_owned()).await?;
     thread::sleep(time::Duration::from_secs(6));
-    send_to_aliens(&client, &server_url, "1101000\n".to_owned()).await?;
+    send_to_aliens(&client, &server_url, "1101000".to_owned()).await?;
 
     Ok(())
 }
