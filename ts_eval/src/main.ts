@@ -14,11 +14,11 @@ function main() {
     message[12]();
     message[13]();
 
-    /*
     message[14]();
 
     // console.log("send result:", send(42));
 
+    /*
     message[16]();
     message[17]();
     message[18]();

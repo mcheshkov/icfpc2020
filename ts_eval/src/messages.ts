@@ -245,18 +245,19 @@ exports.message[13] = () => {
     assertModulate(_.mod(NumCons(-256n)), NewModulate(-256n));
 }
 
-/*
+
 exports.message[14] = () => {
-    let x0 = 100500;
+    let x0 = NumCons(100500n);
     // пришлось добавить особую переменую, потому что dem не работает с числами
-    let x1 = NewModulate(100500});
+    let x1 = NewModulate(100500n);
 
     // ap dem ap mod x0   =   x0
-    assertNum(_.dem(_.mod(x0n)), x0n);
+    assertNumNum(_.dem(_.mod(x0)), x0);
     // ap mod ap dem x0   =   x0
-    assertNum(_.mod(_.dem(x1n)), x1n);
+    assertModulate(_.mod(_.dem(x1)), x1);
 }
 
+/*
 exports.message[16] = () => {
     // ap neg 0   =   0
     assertNum(_.neg(NumCons(0n)), 0n);
