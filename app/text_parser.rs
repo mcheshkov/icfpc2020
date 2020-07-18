@@ -111,7 +111,25 @@ impl<'a> Action<'a> {
                     }
                     Action::MultipleArgApplication(func, mut args) => {
                         args.push(operand.reduce_args());
-                        Action::MultipleArgApplication(func, args)
+                        Action::multi_application(func.reduce_args(), args)
+                    }
+                    Action::SingleArgApplication(_, _) => {
+                        unreachable!("cannot be SingleArgApplication")
+                    }
+                }
+            }
+            Self::MultipleArgApplication(func, operands) => {
+                let first_reduced = func.reduce_args();
+                match first_reduced {
+                    Action::Value(_) | Action::List(_) | Action::Number(_) => {
+                        Action::multi_application(
+                            first_reduced,
+                            operands.into_iter().map(|o| o.reduce_args()).collect(),
+                        )
+                    }
+                    Action::MultipleArgApplication(func, mut other_operands) => {
+                        other_operands.extend(operands.into_iter().map(|o| o.reduce_args()));
+                        Action::multi_application(func.reduce_args(), other_operands)
                     }
                     Action::SingleArgApplication(_, _) => {
                         unreachable!("cannot be SingleArgApplication")
@@ -220,13 +238,13 @@ impl<'a> Action<'a> {
                         return Self::apply_combinator(operands, Self::s_combinator);
                     }
                 } else if *func == Self::Value("c") {
-                    if operands.len() == 3 {
+                    if operands.len() >= 3 {
                         // https://message-from-space.readthedocs.io/en/latest/message19.html#c-combinator
                         return Self::apply_combinator(operands, Self::c_combinator);
                     }
                 } else if *func == Self::Value("b") {
                     // https://message-from-space.readthedocs.io/en/latest/message20.html#b-combinator
-                    if operands.len() == 3 {
+                    if operands.len() >= 3 {
                         return Self::apply_combinator(operands, Self::b_combinator);
                     }
                 } else if *func == Self::Value("i") {
@@ -319,5 +337,19 @@ fn test_reduce_lists() {
     let exp1 = Action::List(vec![Action::Value("7"), Action::Value("123229502148636")]);
 
     let res = multi_token.reduce_lists();
+    assert_eq!(res, exp1);
+}
+
+#[test]
+fn test_reduce_more_args() {
+    let test1 = "ap ap ap ap c 1 2 3 4";
+    // ap ap ap 1 3 2 4
+    let token = Action::parse(test1).pop().unwrap();
+    let exp1 = Action::multi_application(
+        Action::Number(1),
+        vec![Action::Number(3), Action::Number(2), Action::Number(4)],
+    );
+
+    let res = token.reduce_all().reduce_all();
     assert_eq!(res, exp1);
 }
