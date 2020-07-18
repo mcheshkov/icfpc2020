@@ -13,9 +13,15 @@ export type LamObj = LamNumber | LamLit | LamUnknown;
 export type LamFn = (a: Lam) => Lam;
 export type Lam = LamFn & LamObj;
 
+const bindings = new Map<string, Lam>();
+
 export function Lit(ident: string) : Lam {
-    const res: Lam & LamLit = function literal(): Lam {
-        throw new Error("Literal evaluation unimplemented");
+    const res: Lam & LamLit = function literal(x: Lam): Lam {
+        const body = bindings.get(ident);
+        if (body === undefined) {
+            throw new Error(`Literal ${ident} body not found`);
+        }
+        return body(x);
     } as any;
     res.type = "literal";
     res.ident = ident;
