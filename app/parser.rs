@@ -1,3 +1,5 @@
+use crate::text_parser::Action;
+use std::collections::HashMap;
 use std::fs::File;
 use std::io::Read;
 use std::io::Write;
@@ -5,27 +7,36 @@ use std::path::Path;
 
 mod text_parser;
 
-use crate::text_parser::Action;
-
-fn is_known(actions: &[Action]) -> bool {
-    if let [first, eq, rest] = actions {
-        match first {
-            Action::Value(_) => {}
-            _ => return false,
-        }
-        match eq {
-            Action::Value("=") => {}
-            _ => return false,
-        }
-        match rest {
-            Action::List(args) => args.iter().all(|a| match a {
-                Action::Number(_) => true,
-                _ => false,
-            }),
+fn is_known(action: &Action) -> bool {
+    match action {
+        Action::List(args) => args.iter().all(|a| match a {
+            Action::Number(_) => true,
             _ => false,
-        }
+        }),
+        _ => false,
+    }
+}
+
+fn parse_binding<'a, 'b>(actions: &'a [Action<'b>]) -> (&'b str, Action<'b>) {
+    if let [Action::Value(id), Action::Value("="), rest] = actions {
+        (id, rest.clone())
     } else {
-        false
+        panic!("Could not parse binding");
+    }
+}
+
+fn should_substitute(action: &Action) -> bool {
+    match action {
+        Action::Number(_) | Action::Value(_) => true,
+        _ => false,
+    }
+}
+
+fn write_to_file(collection: &HashMap<&str, Action>, file: &mut File) {
+    let mut items = collection.iter().collect::<Vec<_>>();
+    items.sort();
+    for (ident, body) in items {
+        writeln!(file, "{} = {}", ident, body.to_string()).expect("Could not write line");
     }
 }
 
@@ -36,23 +47,50 @@ fn main() -> () {
         .read_to_string(&mut data)
         .expect("Could not read galaxy.txt to string");
 
-    let mut full_file = File::create(Path::new("full.txt")).expect("Could not open full.txt");
     let mut known_file = File::create(Path::new("known.txt")).expect("Could not open known.txt");
     let mut unknown_file =
         File::create(Path::new("unknown.txt")).expect("Could not open unknown.txt");
+    let mut removed_file =
+        File::create(Path::new("removed.txt")).expect("Could not open removed.txt");
+
+    let mut all_bindings = HashMap::new();
 
     for line in data.lines() {
         let actions = Action::parse_reduced(line);
-        let repr = actions
-            .iter()
-            .map(|a| a.to_string())
-            .collect::<Vec<_>>()
-            .join(" ");
-        writeln!(full_file, "{}", repr);
-        if (is_known(&actions)) {
-            writeln!(known_file, "{}", repr);
-        } else {
-            writeln!(unknown_file, "{}", repr);
-        }
+        let (ident, body) = parse_binding(&actions);
+        all_bindings.insert(ident, body);
     }
+
+    let mut removed: HashMap<&str, Action> = HashMap::new();
+
+    loop {
+        let (substitutki, new_all_bindings) = all_bindings
+            .into_iter()
+            .partition::<HashMap<_, _>, _>(|(_, value)| should_substitute(value));
+        if substitutki.is_empty() {
+            all_bindings = new_all_bindings;
+            break;
+        }
+        println!("Substitutki {:?}", substitutki);
+
+        all_bindings = new_all_bindings
+            .into_iter()
+            .map(|(k, mut value)| {
+                for (ident, body) in substitutki.iter() {
+                    value = value.substitute_value(ident, body);
+                }
+                value = value.reduce_all();
+                (k, value)
+            })
+            .collect();
+
+        removed.extend(substitutki);
+    }
+
+    write_to_file(&removed, &mut removed_file);
+    let (known, unknown) = all_bindings
+        .into_iter()
+        .partition::<HashMap<_, _>, _>(|(_, body)| is_known(body));
+    write_to_file(&known, &mut known_file);
+    write_to_file(&unknown, &mut unknown_file);
 }

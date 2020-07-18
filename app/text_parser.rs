@@ -29,7 +29,7 @@ impl<'token> Token<'token> {
     }
 }
 
-#[derive(Debug, Eq, PartialEq)]
+#[derive(Debug, Eq, PartialEq, Clone, Ord, PartialOrd)]
 pub enum Action<'a> {
     Value(&'a str),
     Number(i64),
@@ -140,6 +140,31 @@ impl<'a> Action<'a> {
         }
     }
 
+    pub fn substitute_value(self, ident: &str, with: &Action<'a>) -> Action<'a> {
+        match self {
+            Self::Number(_) => self,
+            Self::Value(i) if i == ident => with.clone(),
+            Self::Value(_) => self,
+            Self::SingleArgApplication(func, operand) => Self::application(
+                func.substitute_value(ident, with),
+                operand.substitute_value(ident, with),
+            ),
+            Self::MultipleArgApplication(func, operand) => Self::multi_application(
+                func.substitute_value(ident, with),
+                operand
+                    .into_iter()
+                    .map(|o| o.substitute_value(ident, with))
+                    .collect(),
+            ),
+            Self::List(items) => Self::List(
+                items
+                    .into_iter()
+                    .map(|i| i.substitute_value(ident, with))
+                    .collect(),
+            ),
+        }
+    }
+
     pub fn reduce_all(self) -> Action<'a> {
         self.reduce_args().reduce_lists()
     }
@@ -149,6 +174,10 @@ impl<'a> Action<'a> {
             .into_iter()
             .map(|a| a.reduce_all())
             .collect()
+    }
+
+    fn application<'b>(func: Action<'b>, operand: Action<'b>) -> Action<'b> {
+        Action::SingleArgApplication(Box::new(func), Box::new(operand))
     }
 
     fn multi_application<'b>(func: Action<'b>, operands: Vec<Action<'b>>) -> Action<'b> {
