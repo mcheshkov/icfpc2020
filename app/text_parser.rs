@@ -1,3 +1,5 @@
+use lamcal::{lam, Enumerate};
+
 #[derive(Debug)]
 enum Token<'a> {
     Operand(&'a str),
@@ -87,6 +89,15 @@ impl<'a> Action<'a> {
                     .collect::<Vec<String>>()
                     .join(",")
             ),
+        }
+    }
+
+    pub fn to_lc(&self) -> lamcal::Term {
+        match self {
+            Self::Number(n) => lamcal::var(format!("{}", n)),
+            Self::Value(name) => lamcal::var(*name),
+            Self::SingleArgApplication(func, operand) => lamcal::app(func.to_lc(), operand.to_lc()),
+            _ => panic!("Not supported"),
         }
     }
 

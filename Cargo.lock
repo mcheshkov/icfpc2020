@@ -6,6 +6,7 @@ version = "0.1.0"
 dependencies = [
  "http-body",
  "hyper",
+ "lamcal",
  "tokio",
 ]
 
@@ -197,6 +198,12 @@ dependencies = [
  "winapi 0.2.8",
  "winapi-build",
 ]
+
+[[package]]
+name = "lamcal"
+version = "0.4.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "c622ca80da41f6ca1331746c5f0989039596120f561454b8dd00228dab9625ca"
 
 [[package]]
 name = "lazy_static"
