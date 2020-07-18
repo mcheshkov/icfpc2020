@@ -14,6 +14,11 @@ fn mul(x: i64) -> impl Fn(i64) -> i64 {
     return move |y| x * y;
 }
 
+fn div(x: i64) -> impl Fn(i64) -> i64 {
+    return move |y| x / y;
+}
+
+
 fn message5() {
     assert_eq!(inc(0), 1);
     assert_eq!(inc(1), 2);
@@ -104,6 +109,31 @@ fn message9() {
     assert_eq!(mul(x0)(1), x0);
 }
 
+fn message10() {
+    let x0: i64 = 1008;
+
+    // ap ap div 4 2   =   2
+    assert_eq!(div(4)(2), 2);
+    // ap ap div 4 3   =   1
+    assert_eq!(div(4)(3), 1);
+    // ap ap div 4 4   =   1
+    assert_eq!(div(4)(4), 1);
+    // ap ap div 4 5   =   0
+    assert_eq!(div(4)(5), 0);
+    // ap ap div 5 2   =   2
+    assert_eq!(div(5)(2), 2);
+    // ap ap div 6 -2   =   -3
+    assert_eq!(div(6)(-2), -3);
+    // ap ap div 5 -3   =   -1
+    assert_eq!(div(5)(-3), -1);
+    // ap ap div -5 3   =   -1
+    assert_eq!(div(-5)(3), -1);
+    // ap ap div -5 -3   =   1
+    assert_eq!(div(-5)(-3), 1);
+    // ap ap div x0 1   =   x0
+    assert_eq!(div(x0)(1), x0);
+}
+
 pub fn main() {
     println!("Fn test");
     message5();
@@ -111,4 +141,5 @@ pub fn main() {
     message7();
     message8();
     message9();
+    message10();
 }
