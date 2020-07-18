@@ -139,7 +139,7 @@ export function NumUnOp(_name:string, fn:(x: bigint) => bigint) : Lam {
         return thunk(() => {
             let xx = unthunk(x);
             if (xx.type !== "number") {
-                throw new Error("Bad binop left arg");
+                throw new Error("Bad unop left arg " + xx.type);
             }
 
             return NumCons(fn(xx.value));
@@ -155,11 +155,11 @@ export function NumBinOp(_name:string, fn:(x: bigint, y: bigint) => bigint) : La
             return thunk(() => {
                 let xx = unthunk(x);
                 if (xx.type !== "number") {
-                    throw new Error("Bad binop left arg");
+                    throw new Error("Bad binop left arg " + xx.type + " " + xx + " " + fn);
                 }
                 let yy = unthunk(y);
                 if (yy.type !== "number") {
-                    throw new Error("Bad binop left arg");
+                    throw new Error("Bad binop right arg " + yy.type + " " + yy + " " + fn);
                 }
 
                 return NumCons(fn(xx.value, yy.value));
