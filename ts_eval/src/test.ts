@@ -1,4 +1,5 @@
-import {Lam, Lit, ListCons, NumCons, assertNum, assertLit} from "./common";
+import {Lam, Lit, NumCons, assertNum, assertLit} from "./common";
+import {ListCons} from "./list";
 import {add, b, c, car, cdr, cons, dec, inc, mul, s, t, i} from "./symbols";
 import assert from "assert";
 
