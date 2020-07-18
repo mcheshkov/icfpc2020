@@ -149,17 +149,18 @@ export function NumUnOp(_name:string, fn:(x: bigint) => bigint) : Lam {
     return unk(res);
 }
 
-export function NumBinOp(_name:string, fn:(x: bigint, y: bigint) => bigint) : Lam {
+export function NumBinOp(name:string, fn:(x: bigint, y: bigint) => bigint) : Lam {
     let res = unk(function (x: Lam): Lam {
         let res1 = function sum1(y: Lam): Lam {
             return thunk(() => {
                 let xx = unthunk(x);
-                if (xx.type !== "number") {
-                    throw new Error("Bad binop left arg " + xx.type + " " + xx + " " + fn);
-                }
                 let yy = unthunk(y);
+
+                if (xx.type !== "number") {
+                    throw new Error(`Bad binop ${name} left arg; left arg ${xx.type} ${xx}; right arg ${yy.type} ${yy}`);
+                }
                 if (yy.type !== "number") {
-                    throw new Error("Bad binop right arg " + yy.type + " " + yy + " " + fn);
+                    throw new Error(`Bad binop ${name} right arg; left arg ${xx.type} ${xx}; right arg ${yy.type} ${yy}`);
                 }
 
                 return NumCons(fn(xx.value, yy.value));
