@@ -248,3 +248,16 @@ exports.message[14] = () => {
     // ap mod ap dem x0   =   x0
     _.assert_eq(_.mod(_.dem(x1)), x1);
 }
+
+exports.message[16] = () => {
+    // ap neg 0   =   0
+    _.assert_eq(_.neg(0), 0);
+    // ap neg 1   =   -1
+    _.assert_eq(_.neg(1), -1);
+    // ap neg -1   =   1
+    _.assert_eq(_.neg(-1), 1);
+    // ap neg 2   =   -2
+    _.assert_eq(_.neg(2), -2);
+    // ap neg -2   =   2
+    _.assert_eq(_.neg(-2), 2);
+}

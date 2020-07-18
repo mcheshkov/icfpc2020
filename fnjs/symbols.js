@@ -40,4 +40,6 @@ _.mod = (x) => {
 
 _.dem = (x) => JSON.parse(x).signal;
 
+_.neg = (x) => -x;
+
 exports.fn = _;

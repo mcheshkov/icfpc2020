@@ -15,7 +15,9 @@ function main() {
     messages.message[14]();
 
     console.log("send result:", send(42));
-    
+
+    messages.message[16]();
+
     console.log("Test ok");
 }
 
