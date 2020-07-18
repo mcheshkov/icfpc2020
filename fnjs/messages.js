@@ -261,3 +261,33 @@ exports.message[16] = () => {
     // ap neg -2   =   2
     _.assert_eq(_.neg(-2), 2);
 }
+
+exports.message[17] = () => {
+    let x0 = -42;
+
+    // ap inc ap inc 0   =   2
+    _.assert_eq(_.inc(_.inc(0)), 2);
+    // ap inc ap inc ap inc 0   =   3
+    _.assert_eq(_.inc(_.inc(_.inc(0))), 3);
+    // ap inc ap dec x0   =   x0
+    _.assert_eq(_.dec(_.inc(x0)), x0);
+    
+    /*
+    // ap dec ap inc x0   =   x0
+    _.assert_eq(_.inc(_.inc(0)), 2);
+    // ap dec ap ap add x0 1   =   x0
+    _.assert_eq(_.inc(_.inc(0)), 2);
+    // ap ap add ap ap add 2 3 4   =   9
+    _.assert_eq(_.inc(_.inc(0)), 2);
+    // ap ap add 2 ap ap add 3 4   =   9
+    _.assert_eq(_.inc(_.inc(0)), 2);
+    // ap ap add ap ap mul 2 3 4   =   10
+    _.assert_eq(_.inc(_.inc(0)), 2);
+    // ap ap mul 2 ap ap add 3 4   =   14
+    _.assert_eq(_.inc(_.inc(0)), 2);
+    // inc   =   ap add 1
+    _.assert_eq(_.inc(_.inc(0)), 2);
+    // dec   =   ap add ap neg 1
+    _.assert_eq(_.inc(_.inc(0)), 2);
+    */
+}

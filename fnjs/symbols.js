@@ -1,7 +1,5 @@
 let _ = {};
 
-_.inc = (x) => x + 1;
-_.dec = (x) => x  - 1;
 _.add  = (x) => ((y) => x + y);
 _.mul = (x) => ((y) => x * y);
 _.div = (x) => ((y) => {
@@ -41,5 +39,11 @@ _.mod = (x) => {
 _.dem = (x) => JSON.parse(x).signal;
 
 _.neg = (x) => -x;
+
+// inc   =   ap add 1
+_.inc = _.add(1);
+
+// dec   =   ap add ap neg 1
+_.dec = _.add(_.neg(1));
 
 exports.fn = _;
