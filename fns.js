@@ -19,19 +19,10 @@ const assert_eq = (x, y) => {
     }
 }
 
-/*
-fn t(x) -> impl Fn(i64) -> i64 {
-    return move |y| x;
-}
+const t = (x) => ((y) => x);
+const f = (x) => ((y) => y);
 
-fn f(x) -> impl Fn(i64) -> i64 {
-    return move |y| y;
-}
-
-fn eq(x) -> impl Fn(i64) -> dyn Fn(i64) {
-    return move |y| if x == y {t} else {f};
-}
-*/
+const eq = (x) => ((y) => (x === y ? t : f));
 
 
 const message5 = () => {
@@ -153,29 +144,50 @@ const message11 = () => {
     let x0 = 42;
 
     // ap ap eq x0 x0   =   t
-    // assert_eq(eq(x0)(x0), t);
+    assert_eq(eq(x0)(x0), t);
 
     // ap ap eq 0 -2   =   f
+    assert_eq(eq(0)(-2), f);
     // ap ap eq 0 -1   =   f
+    assert_eq(eq(0)(-1), f);
     // ap ap eq 0 0   =   t
+    assert_eq(eq(0)(0), t);
     // ap ap eq 0 1   =   f
+    assert_eq(eq(0)(1), f);
     // ap ap eq 0 2   =   f
+    assert_eq(eq(0)(2), f);
     // ap ap eq 1 -1   =   f
+    assert_eq(eq(1)(-1), f);
     // ap ap eq 1 0   =   f
+    assert_eq(eq(1)(0), f);
     // ap ap eq 1 1   =   t
+    assert_eq(eq(1)(1), t);
     // ap ap eq 1 2   =   f
+    assert_eq(eq(1)(2), f);
     // ap ap eq 1 3   =   f
+    assert_eq(eq(1)(3), f);
     // ap ap eq 2 0   =   f
+    assert_eq(eq(2)(0), f);
     // ap ap eq 2 1   =   f
+    assert_eq(eq(2)(1), f);
     // ap ap eq 2 2   =   t
+    assert_eq(eq(2)(2), t);
     // ap ap eq 2 3   =   f
+    assert_eq(eq(2)(3), f);
     // ap ap eq 2 4   =   f
+    assert_eq(eq(2)(4), f);
     // ap ap eq 19 20   =   f
+    assert_eq(eq(19)(20), f);
     // ap ap eq 20 20   =   t
+    assert_eq(eq(20)(20), t);
     // ap ap eq 21 20   =   f
+    assert_eq(eq(21)(20), f);
     // ap ap eq -19 -20   =   f
+    assert_eq(eq(-19)(-20), f);
     // ap ap eq -20 -20   =   t
+    assert_eq(eq(-20)(-20), t);
     // ap ap eq -21 -20   =   f
+    assert_eq(eq(-21)(-20), f);
 }
 
 function main() {
