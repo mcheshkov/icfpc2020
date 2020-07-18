@@ -1,5 +1,5 @@
 import {Lam, Lit, NumCons, assertNum, assertLit} from "./common";
-import {add, b, c, dec, inc, mul, s, t, i} from "./symbols";
+import {add, b, c, car, cdr, cons, dec, inc, mul, s, t, i} from "./symbols";
 import assert from "assert";
 
 function test_s() {
@@ -43,12 +43,25 @@ function test_i(){
 //     assert.strictEqual(i(add(1)), add);
 }
 
+function test_car(){
+    // ap car ap ap cons x0 x1   =   x0
+    assertLit(car(cons(Lit("x0"))(Lit("x1"))), "x0");
+}
+
+
+function test_cdr(){
+    // ap cdr ap ap cons x0 x1   =   x1
+    assertLit(cdr(cons(Lit("x0"))(Lit("x1"))), "x1");
+}
+
 function test() {
     test_s();
     test_c();
     test_b();
     test_t();
     test_i();
+    test_car();
+    test_cdr();
 }
 
 test();

@@ -1,4 +1,4 @@
-import {Lam, NumUnOp, NumBinOp, NewModulate, NumCons, unk} from "./common";
+import {Lam, NumUnOp, NumBinOp, NewModulate, NumCons, unk, LamCons} from "./common";
 
 export const add = NumBinOp("add", (x,y) => x+y);
 export const mul = NumBinOp("mul", (x,y) => x*y);
@@ -110,4 +110,33 @@ export const b = unk(function b(x0: Lam): Lam {
             return x0(b);
         });
     });
+});
+
+// ap ap ap cons x0 x1 x2   =   ap ap x2 x0 x1
+export const cons = unk(function cons(x0: Lam): Lam {
+    return unk(function cons1(x1) {
+        const cons2 : Lam & LamCons = function cons2(x2: Lam): Lam {
+            return x2(x0)(x1);
+        } as any;
+        cons2.type = "cons";
+        cons2.left = x0;
+        cons2.right = x1;
+
+        return cons2;
+    });
+});
+
+// ap car x2   =   ap x2 t
+export const car = unk(function car(x0: Lam): Lam {
+    return x0(t);
+});
+
+// ap cdr x2   =   ap x2 f
+export const cdr = unk(function cdr(x0: Lam): Lam {
+    return x0(f);
+});
+
+// ap nil x0   =   t
+export const nil = unk(function nil(): Lam {
+    return t;
 });

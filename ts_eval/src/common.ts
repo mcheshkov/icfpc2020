@@ -10,10 +10,15 @@ export type LamLit = {
     type: "literal",
     ident: string,
 }
+export type LamCons = {
+    type: "cons",
+    left: Lam,
+    right: Lam,
+}
 export type LamUnknown = {
     type: "unknown",
 }
-export type LamObj = LamNumber | LamLit | LamUnknown | LamModulate;
+export type LamObj = LamNumber | LamLit | LamCons | LamUnknown | LamModulate;
 export type LamFn = (a: Lam) => Lam;
 export type Lam = LamFn & LamObj;
 
