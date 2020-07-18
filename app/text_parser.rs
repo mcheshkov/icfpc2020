@@ -146,16 +146,56 @@ impl<'a> Action<'a> {
         }
     }
 
+    fn apply_combinator<F: FnMut(Self, Self, Self) -> Self>(
+        operands: Vec<Self>,
+        mut combinator: F,
+    ) -> Action<'a> {
+        let mut it = operands.into_iter().map(|i| i.reduce_calls());
+        let first = it.next().unwrap();
+        let second = it.next().unwrap();
+        let third = it.next().unwrap();
+        let rest: Vec<Action> = it.collect();
+        return Self::multi_application(combinator(first, second, third), rest);
+    }
+
+    fn s_combinator<'b>(a: Action<'b>, b: Action<'b>, c: Action<'b>) -> Action<'b> {
+        Self::application(Self::application(a, c.clone()), Self::application(b, c))
+    }
+
+    fn c_combinator<'b>(a: Action<'b>, b: Action<'b>, c: Action<'b>) -> Action<'b> {
+        Self::application(Self::application(a, c), b)
+    }
+
+    fn b_combinator<'b>(a: Action<'b>, b: Action<'b>, c: Action<'b>) -> Action<'b> {
+        Self::application(a, Self::application(b, c))
+    }
+
     pub fn reduce_calls(self) -> Action<'a> {
         match self {
-            Self::SingleArgApplication(func, operand) if *func == Self::Value("neg") => {
-                if let Self::Number(n) = *operand {
-                    return Self::Number(-n);
+            Self::SingleArgApplication(func, operand) => {
+                if *func == Self::Value("inc") {
+                    // https://message-from-space.readthedocs.io/en/latest/message5.html#successor
+                    if let Self::Number(n) = *operand {
+                        return Self::Number(n + 1);
+                    }
+                } else if *func == Self::Value("neg") {
+                    if let Self::Number(n) = *operand {
+                        return Self::Number(-n);
+                    }
+                } else if *func == Self::Value("i") {
+                    return operand.reduce_calls();
                 }
                 Self::application(func.reduce_calls(), operand.reduce_calls())
             }
-            Self::MultipleArgApplication(func, operands) => {
-                if *func == Self::Value("neg") {
+            Self::MultipleArgApplication(func, mut operands) => {
+                if *func == Self::Value("inc") {
+                    // https://message-from-space.readthedocs.io/en/latest/message5.html#successor
+                    if operands.len() == 1 {
+                        if let Self::Number(n) = operands[0] {
+                            return Self::Number(n);
+                        }
+                    }
+                } else if *func == Self::Value("neg") {
                     if operands.len() == 1 {
                         if let Self::Number(n) = operands[0] {
                             return Self::Number(-n);
@@ -166,6 +206,33 @@ impl<'a> Action<'a> {
                         if let [Self::Number(a), Self::Number(b)] = operands.as_slice() {
                             return Self::Number(a + b);
                         }
+                    }
+                } else if *func == Self::Value("mul") {
+                    // https://message-from-space.readthedocs.io/en/latest/message9.html#product
+                    if operands.len() == 2 {
+                        if let [Self::Number(a), Self::Number(b)] = operands.as_slice() {
+                            return Self::Number(a * b);
+                        }
+                    }
+                } else if *func == Self::Value("s") {
+                    // https://message-from-space.readthedocs.io/en/latest/message18.html#s-combinator
+                    if operands.len() >= 3 {
+                        return Self::apply_combinator(operands, Self::s_combinator);
+                    }
+                } else if *func == Self::Value("c") {
+                    if operands.len() == 3 {
+                        // https://message-from-space.readthedocs.io/en/latest/message19.html#c-combinator
+                        return Self::apply_combinator(operands, Self::c_combinator);
+                    }
+                } else if *func == Self::Value("b") {
+                    // https://message-from-space.readthedocs.io/en/latest/message20.html#b-combinator
+                    if operands.len() == 3 {
+                        return Self::apply_combinator(operands, Self::b_combinator);
+                    }
+                } else if *func == Self::Value("i") {
+                    // https://message-from-space.readthedocs.io/en/latest/message24.html#i-combinator
+                    if operands.len() == 1 {
+                        return operands.pop().unwrap().reduce_calls();
                     }
                 }
 
@@ -201,7 +268,11 @@ impl<'a> Action<'a> {
     }
 
     fn multi_application<'b>(func: Action<'b>, operands: Vec<Action<'b>>) -> Action<'b> {
-        Action::MultipleArgApplication(Box::new(func), operands)
+        if operands.is_empty() {
+            func
+        } else {
+            Action::MultipleArgApplication(Box::new(func), operands)
+        }
     }
 }
 
