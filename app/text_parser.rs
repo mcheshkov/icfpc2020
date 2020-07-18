@@ -146,6 +146,29 @@ impl<'a> Action<'a> {
         }
     }
 
+    pub fn reduce_calls(self) -> Action<'a> {
+        match self {
+            Self::SingleArgApplication(func, operand) if *func == Self::Value("neg") => {
+                if let Self::Number(n) = *operand {
+                    return Self::Number(-n);
+                }
+                Self::application(func.reduce_calls(), operand.reduce_calls())
+            }
+            Self::MultipleArgApplication(func, operands)
+                if *func == Self::Value("neg") && operands.len() == 1 =>
+            {
+                if let Self::Number(n) = operands[0] {
+                    return Self::Number(-n);
+                }
+                Self::multi_application(
+                    func.reduce_calls(),
+                    operands.into_iter().map(|o| o.reduce_calls()).collect(),
+                )
+            }
+            _ => self.recursive_apply_no_leafs(Self::reduce_calls),
+        }
+    }
+
     pub fn substitute_value(self, ident: &str, with: &Action<'a>) -> Action<'a> {
         match self {
             Self::Value(i) if i == ident => with.clone(),
@@ -154,7 +177,7 @@ impl<'a> Action<'a> {
     }
 
     pub fn reduce_all(self) -> Action<'a> {
-        self.reduce_args().reduce_lists()
+        self.reduce_args().reduce_lists().reduce_calls()
     }
 
     pub fn parse_reduced(stream: &str) -> Vec<Action> {

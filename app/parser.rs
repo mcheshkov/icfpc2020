@@ -1,9 +1,9 @@
-use crate::text_parser::Action;
 use std::collections::HashMap;
 use std::fs::File;
 use std::io::Read;
 use std::io::Write;
 use std::path::Path;
+use text_parser::Action;
 
 mod text_parser;
 

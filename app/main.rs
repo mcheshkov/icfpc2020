@@ -1,5 +1,3 @@
-mod parser;
-
 use http_body::Body as _;
 use hyper::client::HttpConnector;
 use hyper::{Body, Client, Method, Request, StatusCode};
@@ -9,7 +7,6 @@ use std::thread;
 use std::time;
 
 mod modulation;
-mod text_parser;
 
 async fn send_to_aliens(
     client: &Client<HttpConnector>,
