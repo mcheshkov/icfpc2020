@@ -59,12 +59,14 @@ fn binding_as_ts(binding: (&str, Action)) -> String {
 }
 
 fn main() -> () {
-    let mut input_file = File::open(Path::new("galaxy.txt")).expect("Could not open galaxy.txt");
-    // let mut data = ":1029 = ap ap cons 7 ap ap cons 123229502148636 nil";
-    let mut data = String::new();
+    // let mut input_file = File::open(Path::new("galaxy.txt")).expect("Could not open galaxy.txt");
+    let mut data = ":1 = ap ap ap b inc dec x0";
+    // let mut data = String::new();
+    /*
     input_file
         .read_to_string(&mut data)
         .expect("Could not read galaxy.txt to string");
+    */
 
     // let mut known_file = File::create(Path::new("known.txt")).expect("Could not open known.txt");
     // let mut unknown_file =
@@ -81,7 +83,7 @@ fn main() -> () {
             println!("{}", binding_as_ts(binding));
         } else {
             for action in actions {
-                print!("{} ", print_as_ts(&action));
+                print!("{} ", action_as_ts(&action));
             }
         }
     }
