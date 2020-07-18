@@ -21,3 +21,4 @@ tokio = { version = "0.2.21", features = ["macros"] }
 hyper = "0.13.5"
 http-body = "0.3.1"
 hyper-tls = "0.4.3"
+lambda_calculus = "^3.0"

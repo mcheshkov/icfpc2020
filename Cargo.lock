@@ -7,6 +7,7 @@ dependencies = [
  "http-body",
  "hyper",
  "hyper-tls",
+ "lambda_calculus",
  "tokio",
 ]
 
@@ -259,6 +260,12 @@ dependencies = [
  "winapi 0.2.8",
  "winapi-build",
 ]
+
+[[package]]
+name = "lambda_calculus"
+version = "3.0.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "eb0ef92721be09addc1d147a8bf864bbfc8725046c6b8af1f31ea423f7f3cf6b"
 
 [[package]]
 name = "lazy_static"
