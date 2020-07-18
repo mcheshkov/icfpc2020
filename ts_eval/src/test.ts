@@ -16,7 +16,6 @@ function assertLit(l:Lam, ident: string) {
     assert.strictEqual(l.ident, ident);
 }
 
-
 function test_s() {
     // ap ap ap s add inc 1   =   3
     assertNum(s(add)(inc)(NumCons(1n)), 3n);

@@ -70,6 +70,7 @@ function NumBinOp(_name:string, fn:(x: bigint, y: bigint) => bigint) : Lam {
 
 export const inc = NumUnOp("inc", (x) => x+1n);
 export const dec = NumUnOp("dec", (x) => x-1n);
+export const neg = NumUnOp("neg", (x) => -x);
 export const add = NumBinOp("add", (x,y) => x+y);
 export const mul = NumBinOp("mul", (x,y) => x*y);
 
