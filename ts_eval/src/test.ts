@@ -1,13 +1,21 @@
 import assert from "assert";
 
-import {Lam, NumCons, add, c, inc, mul, s} from "./common";
+import {Lam, Lit, NumCons, add, b, c, dec, inc, mul, s} from "./common";
 
 function assertNum(l:Lam, n: bigint) {
     if (l.type !== "number") {
-        throw new Error("NUmber expected");
+        throw new Error("Number expected");
     }
     assert.strictEqual(l.value, n);
 }
+
+function assertLit(l:Lam, ident: string) {
+    if (l.type !== "literal") {
+        throw new Error("Literal expected");
+    }
+    assert.strictEqual(l.ident, ident);
+}
+
 
 function test_s() {
     // ap ap ap s add inc 1   =   3
@@ -21,9 +29,16 @@ function test_c() {
     assertNum(c(add)(NumCons(1n))(NumCons(2n)), 3n);
 }
 
+function test_b() {
+// TODO this test requires optimizng inc(dec) and appyling it to literal
+    // ap ap ap b inc dec x0   =   x0
+//    assertLit(b(inc)(dec)(Lit("x0")), "x0");
+}
+
 function test() {
     test_s();
     test_c();
+    test_b();
 }
 
 test();
