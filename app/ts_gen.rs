@@ -67,20 +67,19 @@ fn action_as_ts(action: &Action) -> String {
 
 fn binding_as_ts(binding: (&str, Action)) -> String {
     let (ident, body) = binding;
-    format!("const {} = {};", escape_ident_ts(ident), action_as_ts(&body))
+    format!("{}.result = {};", escape_ident_ts(ident), action_as_ts(&body))
 }
 
 fn main() -> () {
-    // let mut input_file = File::open(Path::new("galaxy.txt")).expect("Could not open galaxy.txt");
-    let mut data = "
-:1   =   ap ap cons x0 ap ap cons x1 ap ap cons x2 ap ap cons x5 nil
-    ";
-    // let mut data = String::new();
-    /*
+//     let mut data = "
+// :1   =   ap ap s ap ap c ap eq 0 1 ap ap b ap mul 2 ap ap b pwr2 ap add -1
+//     ";
+
+    let mut input_file = File::open(Path::new("galaxy.txt")).expect("Could not open galaxy.txt");
+    let mut data = String::new();
     input_file
         .read_to_string(&mut data)
         .expect("Could not read galaxy.txt to string");
-    */
 
     // let mut known_file = File::create(Path::new("known.txt")).expect("Could not open known.txt");
     // let mut unknown_file =
@@ -90,6 +89,8 @@ fn main() -> () {
 
     // let mut all_bindings = HashMap::new();
 
+    let mut bindings = vec![];
+
     for line in data.lines() {
         let actions = Action::parse(line)
             .into_iter()
@@ -97,11 +98,18 @@ fn main() -> () {
             .collect::<Vec<_>>();
 
         if let Some(binding) = parse_binding(&actions) {
-            println!("{}", binding_as_ts(binding));
+            bindings.push(binding);
         } else {
             for action in actions {
                 print!("{} ", action_as_ts(&action));
             }
         }
+    }
+
+    for (ident, _) in &bindings {
+        println!("const {} = empty_thunk();", escape_ident_ts(ident));
+    }
+    for binding in bindings {
+        println!("{}", binding_as_ts(binding));
     }
 }

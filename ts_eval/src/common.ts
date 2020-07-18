@@ -24,7 +24,7 @@ export type LamList = {
 }
 export type LamThunk = {
     type: "thunk",
-    eval: () => Lam,
+    eval: (() => Lam) | null,
     result: Lam | null,
 }
 export type LamPicture = {
@@ -34,7 +34,11 @@ export type LamPicture = {
 export type LamUnknown = {
     type: "unknown",
 }
-export type LamObj = LamNumber | LamLit | LamCons | LamList | LamUnknown | LamModulate | LamPicture | LamThunk;
+export type LamDefer = {
+    type: "defer",
+    init(v: Lam): void;
+}
+export type LamObj = LamNumber | LamLit | LamCons | LamList | LamUnknown | LamModulate | LamPicture | LamThunk | LamDefer;
 export type LamFn = (a: Lam) => Lam;
 export type Lam = LamFn & LamObj;
 
@@ -53,11 +57,27 @@ export function thunk(f: () => Lam): Lam & LamThunk {
     return res;
 }
 
+export function empty_thunk(): Lam & LamThunk {
+    let res: Lam & LamThunk = null as any;
+    res = function (x: Lam) {
+        return thunk(() => {
+            return unthunk(res)(x);
+        });
+    } as any;
+    res.type = "thunk";
+    res.eval = null;
+    res.result = null;
+    return res;
+}
+
 export function unthunk(input: Lam): Lam {
     let l = input;
 
     while (l.type === "thunk") {
         if (l.result === null) {
+            if (l.eval === null) {
+                throw new Error("Empty thunk");
+            }
             l.result = l.eval();
         }
         l = l.result;
@@ -116,10 +136,14 @@ export function unk(f: (a: Lam) => Lam): Lam {
 
 export function NumUnOp(_name:string, fn:(x: bigint) => bigint) : Lam {
     let res = function sum1(x: Lam): Lam {
-        if (x.type !== "number") {
-            throw new Error("Bad sum left arg");
-        }
-        return NumCons(fn(x.value));
+        return thunk(() => {
+            let xx = unthunk(x);
+            if (xx.type !== "number") {
+                throw new Error("Bad binop left arg");
+            }
+
+            return NumCons(fn(xx.value));
+        });
     };
     // (res as any).name = name;
     return unk(res);
@@ -234,4 +258,23 @@ export function assertLit(l:Lam, ident: string) {
         throw new Error("Literal expected");
     }
     strictEqual(l.ident, ident);
+}
+
+export function Defer(): Lam & LamDefer {
+    let value: Lam | null = null;
+    let res = function(x: Lam): Lam {
+        if (value === null) {
+            throw new Error("Defer not inited");
+        }
+        return value(x);
+    } as any;
+    res.type = "defer";
+    res.init = function(v: Lam): void {
+        if (value !== null) {
+            throw new Error("Defer already inited");
+        }
+        value = v;
+    }
+
+    return res;
 }

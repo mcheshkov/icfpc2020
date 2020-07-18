@@ -2,9 +2,9 @@ import "source-map-support/register";
 
 import {message} from "./messages";
 import {send} from "./send";
-import {Lam, NumCons, thunk, unk, unthunk} from "./common";
-import {ListCons} from "./list";
-import {b, c, i, s, t, car, cdr, cons, isnil, nil, add, div, eq, lt, mul, neg} from "./symbols";
+import {Lam, NumCons, unthunk} from "./common";
+import {cons, nil} from "./symbols";
+import {galaxy} from "./galaxy";
 
 export function main(ctx: CanvasRenderingContext2D) {
     console.log("Fn test");
@@ -43,6 +43,28 @@ export function main(ctx: CanvasRenderingContext2D) {
     console.log("Test ok");
 
     // real_send();
+
+    console.log("galaxy", galaxy);
+    const galaxy_u = unthunk(galaxy);
+    console.log("galaxy unthunk", galaxy_u);
+
+    const start_state = nil;
+    const start_point = cons(NumCons(0n))(NumCons(0n));
+    const first_iter = galaxy_u(start_state)(start_point);
+    console.log("first_iter", first_iter);
+    console.log("first_iter unthunk", unthunk(first_iter));
+
+    const walkList = (list: Lam): void => {
+        let l = unthunk(list);
+        while(l.type === "cons") {
+            console.log("LEFT", l.left);
+            console.log("LEFT unthunk", unthunk(l.left));
+            console.log("RIGHT", l.right);
+            l = unthunk(l.right);
+        }
+    };
+
+    walkList(first_iter);
 }
 
 // main(null);
