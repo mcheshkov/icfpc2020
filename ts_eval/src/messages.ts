@@ -369,4 +369,26 @@ message[18] = () => {
     }
 }
 
+message[19] = () => {
+    // used as fn definition
+    // ap ap ap c x0 x1 x2   =   ap ap x0 x2 x1
+
+    // ap ap ap c add 1 2   =   3
+    /*
+        a: ap
+            b: ap
+                c: ap
+                    c
+                    add
+                1
+            2
+    */
+    {
+        let c = _.c(_.add);
+        let b = c(NumCons(1n));
+        let a = b(NumCons(2n));
+        assertNum(a, 3n);
+    }
+}
+
 export {message};
