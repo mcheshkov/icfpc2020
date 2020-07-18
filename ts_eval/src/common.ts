@@ -22,6 +22,11 @@ export type LamList = {
     type: "list",
     items: Array<Lam>,
 }
+export type LamThunk = {
+    type: "thunk",
+    eval: () => Lam,
+    result: Lam | null,
+}
 export type LamPicture = {
     type: "picture",
     value: Pixels,
@@ -29,11 +34,36 @@ export type LamPicture = {
 export type LamUnknown = {
     type: "unknown",
 }
-export type LamObj = LamNumber | LamLit | LamCons | LamList | LamUnknown | LamModulate | LamPicture;
+export type LamObj = LamNumber | LamLit | LamCons | LamList | LamUnknown | LamModulate | LamPicture | LamThunk;
 export type LamFn = (a: Lam) => Lam;
 export type Lam = LamFn & LamObj;
 
 const bindings = new Map<string, Lam>();
+
+export function thunk(f: () => Lam): Lam & LamThunk {
+    let res: Lam & LamThunk = null as any;
+    res = function (x: Lam) {
+        return thunk(() => {
+            return unthunk(res)(x);
+        });
+    } as any;
+    res.type = "thunk";
+    res.eval = f;
+    res.result = null;
+    return res;
+}
+
+export function unthunk(input: Lam): Lam {
+    let l = input;
+
+    while (l.type === "thunk") {
+        if (l.result === null) {
+            l.result = l.eval();
+        }
+        l = l.result;
+    }
+    return l;
+}
 
 export function Lit(ident: string) : Lam {
     const res: Lam & LamLit = function literal(x: Lam): Lam {
@@ -98,13 +128,18 @@ export function NumUnOp(_name:string, fn:(x: bigint) => bigint) : Lam {
 export function NumBinOp(_name:string, fn:(x: bigint, y: bigint) => bigint) : Lam {
     let res = unk(function (x: Lam): Lam {
         let res1 = function sum1(y: Lam): Lam {
-            if (x.type !== "number") {
-                throw new Error("Bad sum left arg");
-            }
-            if (y.type !== "number") {
-                throw new Error("Bad sum left arg");
-            }
-            return NumCons(fn(x.value, y.value));
+            return thunk(() => {
+                let xx = unthunk(x);
+                if (xx.type !== "number") {
+                    throw new Error("Bad binop left arg");
+                }
+                let yy = unthunk(y);
+                if (yy.type !== "number") {
+                    throw new Error("Bad binop left arg");
+                }
+
+                return NumCons(fn(xx.value, yy.value));
+            });
         };
         // (res1 as any).name = name + "1";
         return unk(res1);
@@ -117,17 +152,20 @@ export function NumBinOp(_name:string, fn:(x: bigint, y: bigint) => bigint) : La
 import assert from "assert";
 
 export function assertNum(l:Lam, n: bigint) {
-    if (l.type !== "number") {
+    const ll = unthunk(l);
+    if (ll.type !== "number") {
         throw new Error("Number expected");
     }
-    assert.strictEqual(l.value, n);
+    assert.strictEqual(ll.value, n);
 }
 
 export function assertNumNum(l:Lam, n: Lam) {
-    if (l.type !== "number" || n.type !== "number") {
+    const ll = unthunk(l);
+    const nn = unthunk(n);
+    if (ll.type !== "number" || nn.type !== "number") {
         throw new Error("NUmber expected");
     }
-    assert.strictEqual(l.value, n.value);
+    assert.strictEqual(ll.value, nn.value);
 }
 
 export function assertModulate(l:Lam, n: Lam) {
