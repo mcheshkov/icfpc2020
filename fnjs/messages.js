@@ -275,12 +275,13 @@ exports.message[17] = () => {
     _.assert_eq(_.dec(_.inc(x0)), x0);
     // ap dec ap ap add x0 1   =   x0
     _.assert_eq(_.dec(_.add(x0)(1)), x0);
-    
-    /*
     // ap ap add ap ap add 2 3 4   =   9
-    _.assert_eq(_.inc(_.inc(0)), 2);
+    _.assert_eq(_.add(_.add(2)(3))(4), 9);
     // ap ap add 2 ap ap add 3 4   =   9
-    _.assert_eq(_.inc(_.inc(0)), 2);
+    let a = _.add(3)(4);
+    let b = _.add(2)(a);
+    _.assert_eq(b, 9);
+    /*
     // ap ap add ap ap mul 2 3 4   =   10
     _.assert_eq(_.inc(_.inc(0)), 2);
     // ap ap mul 2 ap ap add 3 4   =   14
