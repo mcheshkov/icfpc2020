@@ -1,4 +1,5 @@
 const messages = require("./messages");
+const send = require("./send").send;
 
 function main() {
     console.log("Fn test");
@@ -12,6 +13,9 @@ function main() {
     messages.message[12]();
     messages.message[13]();
     messages.message[14]();
+
+    console.log("send result:", send(42));
+    
     console.log("Test ok");
 }
 

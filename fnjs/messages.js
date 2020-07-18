@@ -240,6 +240,7 @@ exports.message[13] = () => {
 
 exports.message[14] = () => {
     let x0 = 100500;
+    // пришлось добавить особую переменую, потому что dem не работает с числами
     let x1 = JSON.stringify({signal:100500});
 
     // ap dem ap mod x0   =   x0
