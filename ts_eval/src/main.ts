@@ -2,9 +2,9 @@ import "source-map-support/register";
 
 import {message} from "./messages";
 import {send} from "./send";
-import {Lam, NumCons, thunk, unk, unthunk, empty_thunk} from "./common";
-import {ListCons} from "./list";
-import {b, c, i, s, t, car, cdr, cons, isnil, nil, add, div, eq, lt, mul, neg} from "./symbols";
+import {Lam, NumCons, unthunk} from "./common";
+import {cons, nil} from "./symbols";
+import {galaxy} from "./galaxy";
 
 function main() {
     console.log("Fn test");
@@ -44,31 +44,27 @@ function main() {
 
     // real_send();
 
-    const Z = unk(function z(f: Lam): Lam {
-        let inner = unk(function z1(x) {
-            return f(unk(function z2(v) {
-                return thunk(() => x(x)(v))
-            }));
-        });
+    console.log("galaxy", galaxy);
+    const galaxy_u = unthunk(galaxy);
+    console.log("galaxy unthunk", galaxy_u);
 
-        return inner(inner);
-    });
+    const start_state = nil;
+    const start_point = cons(NumCons(0n))(NumCons(0n));
+    const first_iter = galaxy_u(start_state)(start_point);
+    console.log("first_iter", first_iter);
+    console.log("first_iter unthunk", unthunk(first_iter));
 
-    console.log("Z", Z);
+    const walkList = (list: Lam): void => {
+        let l = unthunk(list);
+        while(l.type === "cons") {
+            console.log("LEFT", l.left);
+            console.log("LEFT unthunk", unthunk(l.left));
+            console.log("RIGHT", l.right);
+            l = unthunk(l.right);
+        }
+    };
 
-    // pwr2   =   ap ap s ap ap c ap eq 0 1 ap ap b ap mul 2 ap ap b pwr2 ap add -1
-    // const pwr2 = s(c(eq(NumCons(0n)))(NumCons(1n)))(b(mul(NumCons(2n)))(b(pwr2)(add(NumCons(-1n)))));
-    const pwr2_z = unk(
-        (f) => s(c(eq(NumCons(0n)))(NumCons(1n)))(b(mul(NumCons(2n)))(b(f)(add(NumCons(-1n)))))
-    );
-    console.log("pwr2_z", pwr2_z);
-    const pwr2 = Z(pwr2_z);
-
-
-
-    console.log("Z(pwr2_z)", pwr2);
-    console.log("thunk", pwr2(NumCons(0n)));
-    console.log("unthunk", unthunk(Z(pwr2_z)(NumCons(5n))));
+    walkList(first_iter);
 }
 
 main();
