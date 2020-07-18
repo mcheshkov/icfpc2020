@@ -26,7 +26,7 @@ export const f = unk(function t(x0: Lam): Lam {
     });
 });
 
-export function eq(x: Lam) : Lam {
+export const eq = unk(function eq(x: Lam) : Lam {
     return unk((y: Lam) => {
         if (x.type !== "number") {
             throw new Error("Bad eq left arg");
@@ -41,9 +41,9 @@ export function eq(x: Lam) : Lam {
             return f;
         }
     });
-}
+});
 
-export function lt(x: Lam) : Lam {
+export const lt = unk(function lt(x: Lam) : Lam {
     return unk((y: Lam) => {
         if (x.type !== "number") {
             throw new Error("Bad lt left arg");
@@ -58,7 +58,7 @@ export function lt(x: Lam) : Lam {
             return f;
         }
     });
-}
+});
 
 export const mod = unk((x: Lam): Lam => {
     if (x.type !== "number") {
