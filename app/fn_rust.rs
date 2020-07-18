@@ -1,11 +1,13 @@
-
-
 fn inc(x: i64) -> i64 {
     x + 1
 }
 
 fn dec(x: i64) -> i64 {
     x - 1
+}
+
+fn add(x: i64) -> impl Fn(i64) -> i64 {
+    return move |y| x + y;
 }
 
 fn message5() {
@@ -43,8 +45,23 @@ fn message6() {
     assert_eq!(dec(-2), -3);
 }
 
+
+fn message7() {
+    // ap ap add 1 2   =   3
+    assert_eq!(add(1)(2), 3);
+    // ap ap add 2 1   =   3
+    assert_eq!(add(2)(1), 3);
+    // ap ap add 0 1   =   1
+    assert_eq!(add(0)(1), 1);
+    // ap ap add 2 3   =   5
+    assert_eq!(add(2)(3), 5);
+    // ap ap add 3 5   =   8
+    assert_eq!(add(3)(5), 8);
+}
+
 pub fn main() {
     println!("Fn test");
     message5();
     message6();
+    message7();
 }
