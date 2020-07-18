@@ -14,9 +14,12 @@ async fn send_to_aliens(
     url: &str,
     body: String,
 ) -> Result<(), Box<dyn std::error::Error + Send + Sync>> {
+    let uri = url.to_owned() + "/aliens/send?apiKey=4b5b59dead9e42fbbf203df4e634a2da";
+    println!("Making request to ${}", uri);
+
     let req = Request::builder()
         .method(Method::POST)
-        .uri(url.to_owned() + "/aliens/send?apiKey=4b5b59dead9e42fbbf203df4e634a2da")
+        .uri(uri)
         .body(Body::from(body))?;
 
     match client.request(req).await {
