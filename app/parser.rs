@@ -9,11 +9,9 @@ mod text_parser;
 
 fn is_known(action: &Action) -> bool {
     match action {
-        Action::List(args) => args.iter().all(|a| match a {
-            Action::Number(_) => true,
-            Action::Value("nil") => true,
-            _ => false,
-        }),
+        Action::Number(_) => true,
+        Action::Value("nil") => true,
+        Action::List(args) => args.iter().all(is_known),
         _ => false,
     }
 }
@@ -29,7 +27,7 @@ fn parse_binding<'a, 'b>(actions: &'a [Action<'b>]) -> (&'b str, Action<'b>) {
 fn should_substitute(action: &Action) -> bool {
     match action {
         Action::Number(_) | Action::Value(_) => true,
-        _ => false,
+        _ => is_known(action),
     }
 }
 
