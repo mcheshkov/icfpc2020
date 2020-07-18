@@ -173,14 +173,14 @@ export function NumBinOp(_name:string, fn:(x: bigint, y: bigint) => bigint) : La
     return res;
 }
 
-import assert from "assert";
+import {strictEqual, deepStrictEqual} from "assert";
 
 export function assertNum(l:Lam, n: bigint) {
     const ll = unthunk(l);
     if (ll.type !== "number") {
         throw new Error("Number expected");
     }
-    assert.strictEqual(ll.value, n);
+    strictEqual(ll.value, n);
 }
 
 export function assertNumNum(l:Lam, n: Lam) {
@@ -189,14 +189,14 @@ export function assertNumNum(l:Lam, n: Lam) {
     if (ll.type !== "number" || nn.type !== "number") {
         throw new Error("NUmber expected");
     }
-    assert.strictEqual(ll.value, nn.value);
+    strictEqual(ll.value, nn.value);
 }
 
 export function assertModulate(l:Lam, n: Lam) {
     if (l.type !== "modulate" || n.type !== "modulate") {
         throw new Error("NUmber expected");
     }
-    assert.strictEqual(l.value, n.value);
+    strictEqual(l.value, n.value);
 }
 
 export function assertPicture(l:Lam, n: Lam) {
@@ -229,14 +229,14 @@ export function assertPicture(l:Lam, n: Lam) {
     let n_sorted = [...n.value];
     n_sorted.sort(comparator);
 
-    assert.deepStrictEqual(l_sorted, n_sorted);
+    deepStrictEqual(l_sorted, n_sorted);
 }
 
 export function assertLit(l:Lam, ident: string) {
     if (l.type !== "literal") {
         throw new Error("Literal expected");
     }
-    assert.strictEqual(l.ident, ident);
+    strictEqual(l.ident, ident);
 }
 
 export function Defer(): Lam & LamDefer {

@@ -6,7 +6,7 @@ import {Lam, NumCons, unthunk} from "./common";
 import {cons, nil} from "./symbols";
 import {galaxy} from "./galaxy";
 
-function main() {
+export function main() {
     console.log("Fn test");
     message[5]();
     message[6]();

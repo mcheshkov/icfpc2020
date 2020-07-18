@@ -1,5 +1,5 @@
 import {
-    inc, dec, add, mul, div, eq,
+    inc, dec, add, mul, div, eq, pwr2,
     lt, t, f, mod, dem, c, b, s,
     neg, i,
     cons, car, cdr, nil, isnil, vec,
@@ -455,7 +455,9 @@ message[22] = () => {
 
 message[23] = () => {
     // ap pwr2 2   =   4
-    // assertNum(pwr2(NumCons(2n)), 4n);
+    assertNum(pwr2(NumCons(2n)), 4n);
+    assertNum(pwr2(NumCons(3n)), 8n);
+    assertNum(pwr2(NumCons(4n)), 16n);
 }
 
 message[24] = () => {

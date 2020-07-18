@@ -123,13 +123,22 @@ export const b = unk(function b(x0: Lam): Lam {
     });
 });
 
+const Z = unk(function z(f: Lam): Lam {
+    let inner = unk(function z1(x) {
+        return f(unk(function z2(v) {
+            return thunk(() => x(x)(v))
+        }));
+    });
 
-// ap ap s ap ap c ap eq 0 1 ap ap b ap mul 2 ap ap b pwr2 ap add -1
-/*
-export function pwr2(x: Lam): Lam {
-    return s(c(eq(NumCons(0n)))(NumCons(1n)))(b(mul(NumCons(2n)))(b(pwr2)(add(NumCons(-1n)))));
-}
-*/
+    return inner(inner);
+});
+
+// pwr2   =   ap ap s ap ap c ap eq 0 1 ap ap b ap mul 2 ap ap b pwr2 ap add -1
+// const pwr2 = s(c(eq(NumCons(0n)))(NumCons(1n)))(b(mul(NumCons(2n)))(b(pwr2)(add(NumCons(-1n)))));
+const pwr2_z = unk(
+    (f) => s(c(eq(NumCons(0n)))(NumCons(1n)))(b(mul(NumCons(2n)))(b(f)(add(NumCons(-1n)))))
+);
+export const pwr2 = Z(pwr2_z);
 
 // ap ap ap cons x0 x1 x2   =   ap ap x2 x0 x1
 export const cons = unk(function cons(x0: Lam): Lam {
