@@ -6,7 +6,7 @@ import {Lam, NumCons, thunk, unk, unthunk} from "./common";
 import {ListCons} from "./list";
 import {b, c, i, s, t, car, cdr, cons, isnil, nil, add, div, eq, lt, mul, neg} from "./symbols";
 
-function main() {
+export function main() {
     console.log("Fn test");
     message[5]();
     message[6]();
