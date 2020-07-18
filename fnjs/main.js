@@ -10,6 +10,7 @@ function main() {
     messages.message[10]();
     messages.message[11]();
     messages.message[12]();
+    messages.message[13]();
     console.log("Test ok");
 }
 

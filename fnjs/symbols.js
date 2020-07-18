@@ -28,4 +28,14 @@ _.eq = (x) => ((y) => (x === y ? _.t : _.f));
 
 _.lt = (x) => ((y) => (x < y ? _.t : _.f));
 
+_.mod = (x) => {
+    if(typeof(x) === "number") {
+        return JSON.stringify({signal:x});
+    } else {
+        console.trace();
+        console.log("cannot modulate", x);
+        throw("");
+    }
+};
+
 exports.fn = _;

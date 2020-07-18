@@ -210,3 +210,30 @@ exports.message[12] = () => {
     // ap ap lt -21 -20   =   t
     _.assert_eq(_.lt(-21)(-20), _.t);
 }
+
+exports.message[13] = () => {
+    // ap mod 0   =   [0]
+    _.assert_eq(_.mod(0), JSON.stringify({signal:0}));
+    // ap mod 1   =   [1]
+    _.assert_eq(_.mod(1), JSON.stringify({signal:1}));
+    // ap mod -1   =   [-1]
+    _.assert_eq(_.mod(-1), JSON.stringify({signal:-1}));
+    // ap mod 2   =   [2]
+    _.assert_eq(_.mod(2), JSON.stringify({signal:2}));
+    // ap mod -2   =   [-2]
+    _.assert_eq(_.mod(-2), JSON.stringify({signal:-2}));
+    // ...
+    // ap mod 16   =   [16]
+    _.assert_eq(_.mod(16), JSON.stringify({signal:16}));
+    // ap mod -16   =   [-16]
+    _.assert_eq(_.mod(-16), JSON.stringify({signal:-16}));
+    // ...
+    // ap mod 255   =   [255]
+    _.assert_eq(_.mod(255), JSON.stringify({signal:255}));
+    // ap mod -255   =   [-255]
+    _.assert_eq(_.mod(-255), JSON.stringify({signal:-255}));
+    // ap mod 256   =   [256]
+    _.assert_eq(_.mod(256), JSON.stringify({signal:256}));
+    // ap mod -256   =   [-256]
+    _.assert_eq(_.mod(-256), JSON.stringify({signal:-256}));
+}
