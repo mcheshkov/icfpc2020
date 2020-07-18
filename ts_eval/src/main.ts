@@ -6,7 +6,7 @@ import {Lam, NumCons, thunk, unk, unthunk} from "./common";
 import {ListCons} from "./list";
 import {b, c, i, s, t, car, cdr, cons, isnil, nil, add, div, eq, lt, mul, neg} from "./symbols";
 
-export function main() {
+export function main(ctx: CanvasRenderingContext2D) {
     console.log("Fn test");
     message[5]();
     message[6]();
@@ -38,11 +38,11 @@ export function main() {
     message[28]();
     message[29]();
     message[30]();
-    message[32]();
+    message[32](ctx);
 
     console.log("Test ok");
 
     // real_send();
 }
 
-main();
+// main(null);

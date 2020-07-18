@@ -208,6 +208,27 @@ export function assertPicture(l:Lam, n: Lam) {
     deepStrictEqual(l_sorted, n_sorted);
 }
 
+export function drawPicture(picture: Lam, ctx: CanvasRenderingContext2D) {
+    if (picture.type !== "picture" ) {
+        throw new Error("Picture expected");
+    }
+
+    ctx.fillStyle = 'rgb(0, 0, 0)';
+    const WIDTH = 300;
+    const HEIGHT = 300;
+    const PIXEL_SIZE = 5;
+
+    ctx.clearRect(0, 0, WIDTH, HEIGHT);
+
+    picture.value.forEach(x => 
+        ctx.fillRect(
+            Number(x[0]) * PIXEL_SIZE,
+            Number(x[1]) * PIXEL_SIZE,
+            PIXEL_SIZE, PIXEL_SIZE
+        )
+    );
+}
+
 export function assertLit(l:Lam, ident: string) {
     if (l.type !== "literal") {
         throw new Error("Literal expected");

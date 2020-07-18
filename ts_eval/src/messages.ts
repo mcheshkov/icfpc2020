@@ -8,7 +8,7 @@ import {
 import {ListCons} from "./list";
 import {
     Lam, assertNum, assertNumNum, NumCons, NewModulate,
-    assertModulate, assertPicture, NewPicture,
+    assertModulate, assertPicture, NewPicture, drawPicture,
     unk, unthunk
 } from "./common";
 import {strictEqual} from "assert";
@@ -589,7 +589,7 @@ message[30] = () => {
     }
 }
 
-message[32] = () => {
+message[32] = (ctx: CanvasRenderingContext2D) => {
     // ap draw ( )   =   |picture1|
     assertPicture(draw(ListCons([])), NewPicture([]));
 
@@ -611,13 +611,16 @@ message[32] = () => {
     ])), NewPicture([[3n, 1n], [1n, 1n]]));
 
     // ap draw ( ap ap vec 5 3 , ap ap vec 6 3 , ap ap vec 4 4 , ap ap vec 6 4 , ap ap vec 4 5 )   =   |picture6|
-    assertPicture(draw(ListCons([
+    let picture6 = draw(ListCons([
         vec(NumCons(5n))(NumCons(3n)),
         vec(NumCons(6n))(NumCons(3n)),
         vec(NumCons(4n))(NumCons(4n)),
         vec(NumCons(6n))(NumCons(4n)),
         vec(NumCons(4n))(NumCons(5n)),
-    ])), NewPicture([[5n, 3n], [6n, 3n], [4n, 4n], [6n, 4n], [4n, 5n]]));
+    ]));
+
+    assertPicture(picture6, NewPicture([[5n, 3n], [6n, 3n], [4n, 4n], [6n, 4n], [4n, 5n]]));
+    drawPicture(picture6, ctx);
 }
 
 export {message};
