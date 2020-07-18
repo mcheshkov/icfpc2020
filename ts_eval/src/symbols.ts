@@ -197,6 +197,7 @@ function list_unpack(pixels: Pixels, l: Lam): Pixels {
         let right = unthunk(l.right);
 
         if(left.type === "number" && right.type === "number") {
+            // console.log([left.value, right.value]);
             return [...pixels, [left.value, right.value]];
         } else {
             // try to iterate over list
