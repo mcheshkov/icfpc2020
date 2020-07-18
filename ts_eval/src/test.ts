@@ -1,6 +1,6 @@
-import {Lam, Lit, NumCons, add, b, c, dec, inc, mul, s, assertNum, assertLit} from "./common";
-
-
+import {Lam, Lit, NumCons, assertNum, assertLit} from "./common";
+import {add, b, c, dec, inc, mul, s, t, i} from "./symbols";
+import assert from "assert";
 
 function test_s() {
     // ap ap ap s add inc 1   =   3
@@ -20,10 +20,35 @@ function test_b() {
 //    assertLit(b(inc)(dec)(Lit("x0")), "x0");
 }
 
+function test_t(){
+    // ap ap t 1 5   =   1
+    assertNum(t(NumCons(1n))(NumCons(5n)), 1n);
+    // ap ap t t i   =   t
+    assert.strictEqual(t(t)(i), t);
+    // ap ap t t ap inc 5   =   t
+    assert.strictEqual(t(t)(inc(NumCons(5n))), t);
+    // ap ap t ap inc 5 t   =   6
+    assertNum(t(inc(NumCons(5n)))(t), 6n);
+}
+
+function test_i(){
+//     ap i 1   =   1
+    assertNum(i(NumCons(1n)), 1n);
+//     ap i i   =   i
+    assert.strictEqual(i(i), i);
+//     ap i add   =   add
+    assert.strictEqual(i(add), add);
+    // TODO implement this
+//     ap i ap add 1   =   ap add 1
+//     assert.strictEqual(i(add(1)), add);
+}
+
 function test() {
     test_s();
     test_c();
     test_b();
+    test_t();
+    test_i();
 }
 
 test();
