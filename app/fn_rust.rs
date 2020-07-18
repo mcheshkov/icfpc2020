@@ -18,6 +18,18 @@ fn div(x: i64) -> impl Fn(i64) -> i64 {
     return move |y| x / y;
 }
 
+fn t(x: i64) -> impl Fn(i64) -> i64 {
+    return move |y| x;
+}
+
+fn f(x: i64) -> impl Fn(i64) -> i64 {
+    return move |y| y;
+}
+
+fn eq(x: i64) -> impl Fn(i64) -> dyn Fn(i64) {
+    return move |y| if x == y {t} else {f};
+}
+
 
 fn message5() {
     assert_eq!(inc(0), 1);
@@ -132,6 +144,34 @@ fn message10() {
     assert_eq!(div(-5)(-3), 1);
     // ap ap div x0 1   =   x0
     assert_eq!(div(x0)(1), x0);
+}
+
+fn message11() {
+    let x0: i64 = 42;
+
+    // ap ap eq x0 x0   =   t
+    assert_eq!(eq(x0)(x0), t);
+    // ap ap eq 0 -2   =   f
+    // ap ap eq 0 -1   =   f
+    // ap ap eq 0 0   =   t
+    // ap ap eq 0 1   =   f
+    // ap ap eq 0 2   =   f
+    // ap ap eq 1 -1   =   f
+    // ap ap eq 1 0   =   f
+    // ap ap eq 1 1   =   t
+    // ap ap eq 1 2   =   f
+    // ap ap eq 1 3   =   f
+    // ap ap eq 2 0   =   f
+    // ap ap eq 2 1   =   f
+    // ap ap eq 2 2   =   t
+    // ap ap eq 2 3   =   f
+    // ap ap eq 2 4   =   f
+    // ap ap eq 19 20   =   f
+    // ap ap eq 20 20   =   t
+    // ap ap eq 21 20   =   f
+    // ap ap eq -19 -20   =   f
+    // ap ap eq -20 -20   =   t
+    // ap ap eq -21 -20   =   f
 }
 
 pub fn main() {
