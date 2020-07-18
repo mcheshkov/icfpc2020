@@ -59,9 +59,33 @@ fn message7() {
     assert_eq!(add(3)(5), 8);
 }
 
+fn message8() {
+    let x0: i64 = 100;
+    let x1: i64 = 1337;
+    let x2: i64 = 1488;
+
+    // ap ap add 0 x0   =   x0
+    assert_eq!(add(0)(x0), x0);
+    // ap ap add 0 x1   =   x1
+    assert_eq!(add(0)(x1), x1);
+    // ap ap add 0 x2   =   x2
+    assert_eq!(add(0)(x2), x2);
+
+    // ap ap add x0 0   =   x0
+    assert_eq!(add(x0)(0), x0);
+    // ap ap add x1 0   =   x1
+    assert_eq!(add(x1)(0), x1);
+    // ap ap add x2 0   =   x2
+    assert_eq!(add(x2)(0), x2);
+
+    // ap ap add x0 x1   =   ap ap add x1 x0
+    assert_eq!(add(x0)(x1), add(x1)(x0));
+}
+
 pub fn main() {
     println!("Fn test");
     message5();
     message6();
     message7();
+    message8();
 }
