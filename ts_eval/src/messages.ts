@@ -1,4 +1,9 @@
-import {inc, dec, add, mul, div, eq, lt, t, f, mod, dem, c, b, s, neg, i} from "./symbols";
+import {
+    inc, dec, add, mul, div, eq,
+    lt, t, f, mod, dem, c, b, s,
+    neg, i,
+    
+} from "./symbols";
 import {assertNum, assertNumNum, NumCons, NewModulate, assertModulate} from "./common";
 import {strictEqual} from "assert";
 
@@ -436,6 +441,11 @@ message[22] = () => {
     assertNumNum(f(x0)(x1), x1);
     // f   =   ap s t
     assertNumNum(f(x0)(x1), s(t)(x0)(x1));
+}
+
+message[23] = () => {
+    // ap pwr2 2   =   4
+    // assertNum(pwr2(NumCons(2n)), 4n);
 }
 
 export {message};

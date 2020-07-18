@@ -111,3 +111,10 @@ export const b = unk(function b(x0: Lam): Lam {
         });
     });
 });
+
+// ap ap s ap ap c ap eq 0 1 ap ap b ap mul 2 ap ap b pwr2 ap add -1
+/*
+export function pwr2(x: Lam): Lam {
+    return s(c(eq(NumCons(0n)))(NumCons(1n)))(b(mul(NumCons(2n)))(b(pwr2)(add(NumCons(-1n)))));
+}
+*/
