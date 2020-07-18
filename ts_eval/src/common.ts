@@ -38,7 +38,7 @@ function unk(f: (a: Lam) => Lam): Lam {
     return f as any;
 }
 
-function NumUnOp(_name:string, fn:(x: bigint) => bigint) : Lam {
+export function NumUnOp(_name:string, fn:(x: bigint) => bigint) : Lam {
     let res = function sum1(x: Lam): Lam {
         if (x.type !== "number") {
             throw new Error("Bad sum left arg");
@@ -49,7 +49,7 @@ function NumUnOp(_name:string, fn:(x: bigint) => bigint) : Lam {
     return unk(res);
 }
 
-function NumBinOp(_name:string, fn:(x: bigint, y: bigint) => bigint) : Lam {
+export function NumBinOp(_name:string, fn:(x: bigint, y: bigint) => bigint) : Lam {
     let res = unk(function (x: Lam): Lam {
         let res1 = function sum1(y: Lam): Lam {
             if (x.type !== "number") {
@@ -102,4 +102,20 @@ export function b(x0: Lam): Lam {
             return x0(b);
         });
     });
+}
+
+import assert from "assert";
+
+export function assertNum(l:Lam, n: bigint) {
+    if (l.type !== "number") {
+        throw new Error("NUmber expected");
+    }
+    assert.strictEqual(l.value, n);
+}
+
+export function assertLit(l:Lam, ident: string) {
+    if (l.type !== "literal") {
+        throw new Error("Literal expected");
+    }
+    assert.strictEqual(l.ident, ident);
 }

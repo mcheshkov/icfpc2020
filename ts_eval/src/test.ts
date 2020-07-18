@@ -1,20 +1,5 @@
-import assert from "assert";
+import {Lam, Lit, NumCons, add, b, c, dec, inc, mul, s, assertNum, assertLit} from "./common";
 
-import {Lam, Lit, NumCons, add, b, c, dec, inc, mul, s} from "./common";
-
-function assertNum(l:Lam, n: bigint) {
-    if (l.type !== "number") {
-        throw new Error("Number expected");
-    }
-    assert.strictEqual(l.value, n);
-}
-
-function assertLit(l:Lam, ident: string) {
-    if (l.type !== "literal") {
-        throw new Error("Literal expected");
-    }
-    assert.strictEqual(l.ident, ident);
-}
 
 
 function test_s() {
