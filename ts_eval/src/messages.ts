@@ -2,7 +2,7 @@ import {
     inc, dec, add, mul, div, eq,
     lt, t, f, mod, dem, c, b, s,
     neg, i,
-    cons, car, cdr, nil, isnil
+    cons, car, cdr, nil, isnil, ListCons
 } from "./symbols";
 import {assertNum, assertNumNum, NumCons, NewModulate, assertModulate, unk} from "./common";
 import {strictEqual} from "assert";
@@ -506,11 +506,56 @@ message[28] = () => {
 message[29] = () => {
     let x0 = NumCons(100n);
     let x1 = NumCons(1337n);
-    
+
     // ap isnil nil   =   t
     strictEqual(isnil(nil), t);
     // ap isnil ap ap cons x0 x1   =   f
     strictEqual(isnil(cons(x0)(x1)), f);
+}
+
+message[30] = () => {
+    let x0 = NumCons(100n);
+    let x1 = NumCons(1337n);
+    let x2 = NumCons(-1488n);
+    let x5 = NumCons(-50n);
+
+    // ( )
+    {
+        // strictEqual(isnil(ListCons([])), t);
+    }
+
+    // ( x0 )   =   ap ap cons x0 nil
+    {
+        let list_a = cons(x0)(nil);
+        let list_b = ListCons([x0]);
+
+        strictEqual(isnil(list_a), f);
+        strictEqual(isnil(list_b), f);
+        assertNumNum(car(list_a), x0);
+        assertNumNum(car(list_b), x0);
+        let list_a1 = cdr(list_a);
+        let list_b1 = cdr(list_b);
+        strictEqual(isnil(list_a1), t);
+        strictEqual(isnil(list_b1), t);
+    }
+    // ( x0 , x1 )   =   ap ap cons x0 ap ap cons x1 nil
+    {
+        let list_a = cons(x0)(cons(x1)(nil));
+        let list_b = ListCons([x0, x1]);
+
+        strictEqual(isnil(list_a), f);
+        strictEqual(isnil(list_b), f);
+        assertNumNum(car(list_a), x0);
+        assertNumNum(car(list_b), x0);
+        let list_a1 = cdr(list_a);
+        let list_b1 = cdr(list_b);
+        strictEqual(isnil(list_a1), f);
+        strictEqual(isnil(list_b1), f);
+        assertNumNum(car(list_a1), x1);
+        assertNumNum(car(list_b1), x1);
+    }
+    // ( x0 , x1 , x2 )   =   ap ap cons x0 ap ap cons x1 ap ap cons x2 nil
+    // ( x0 , x1 , x2 , x5 )   =   ap ap cons x0 ap ap cons x1 ap ap cons x2 ap ap cons x5 nil
 }
 
 export {message};
