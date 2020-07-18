@@ -358,9 +358,10 @@ exports.message[18] = () => {
             6   =   42
     */
     {
-        let c = _.s(_.add);
-        let b = c(_.inc);
-        let a = b(1);
+        let d = _.add(1);
+        let c = _.s(_.mul);
+        let b = c(d);
+        let a = b(6);
         _.assert_eq(a, 42);
     }
 }
