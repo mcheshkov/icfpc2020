@@ -97,6 +97,18 @@ export function NumBinOp(_name:string, fn:(x: bigint, y: bigint) => bigint) : La
     return res;
 }
 
+export function ListCons(items: Array<Lam>): Lam & LamList {
+    const res: Lam & LamList = function list(x2: Lam): Lam {
+        let x0 = items[0];
+        let x1 = ListCons(items.slice(1));
+        return x2(x0)(x1);
+    } as any;
+    res.type = "list";
+    res.items = items;
+
+    return res;
+}
+
 import assert from "assert";
 
 export function assertNum(l:Lam, n: bigint) {

@@ -149,18 +149,6 @@ export const nil = unk(function nil(): Lam {
     return t;
 });
 
-export function ListCons(items: Array<Lam>): Lam & LamList {
-    const res: Lam & LamList = function list(x2: Lam): Lam {
-        let x0 = items[0];
-        let x1 = ListCons(items.slice(1));
-        return x2(x0)(x1);
-    } as any;
-    res.type = "list";
-    res.items = items;
-
-    return res;
-}
-
 // ap isnil nil   =   t
 // ap isnil ap ap cons x0 x1   =   f
 export const isnil = unk(function isnil(x0: Lam): Lam {

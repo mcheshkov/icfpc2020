@@ -1,6 +1,7 @@
 import {message} from "./messages";
 import {send} from "./send";
-import {NumCons} from "./common";
+import {ListCons, NumCons} from "./common";
+import {b, c, i, s, t, car, cdr, cons, isnil, nil, add, div, eq, lt, mul, neg} from "./symbols";
 
 function main() {
     console.log("Fn test");

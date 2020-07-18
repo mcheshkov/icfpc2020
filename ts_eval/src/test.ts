@@ -1,5 +1,5 @@
-import {Lam, Lit, NumCons, assertNum, assertLit} from "./common";
-import {add, b, c, car, cdr, cons, dec, inc, mul, s, t, i, ListCons} from "./symbols";
+import {Lam, Lit, ListCons, NumCons, assertNum, assertLit} from "./common";
+import {add, b, c, car, cdr, cons, dec, inc, mul, s, t, i} from "./symbols";
 import assert from "assert";
 
 function test_s() {
