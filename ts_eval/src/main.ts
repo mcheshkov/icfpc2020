@@ -10,8 +10,9 @@ function main() {
     message[9]();
     message[10]();
     message[11]();
-    /*
+
     message[12]();
+    /*
     message[13]();
     message[14]();
 

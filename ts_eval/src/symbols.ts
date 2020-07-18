@@ -29,13 +29,30 @@ export const f = unk(function t(x0: Lam): Lam {
 export function eq(x: Lam) : Lam {
     return unk((y: Lam) => {
         if (x.type !== "number") {
-            throw new Error("Bad sum left arg");
+            throw new Error("Bad eq left arg");
         }
         if (y.type !== "number") {
-            throw new Error("Bad sum left arg");
+            throw new Error("Bad eq left arg");
         }
 
         if(x.value === y.value) {
+            return t;
+        } else {
+            return f;
+        }
+    });
+}
+
+export function lt(x: Lam) : Lam {
+    return unk((y: Lam) => {
+        if (x.type !== "number") {
+            throw new Error("Bad lt left arg");
+        }
+        if (y.type !== "number") {
+            throw new Error("Bad lt left arg");
+        }
+
+        if(x.value < y.value) {
             return t;
         } else {
             return f;

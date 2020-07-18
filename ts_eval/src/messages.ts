@@ -172,51 +172,52 @@ exports.message[11] = () => {
     strictEqual(_.eq(NumCons(-21n))(NumCons(-20n)), _.f);
 }
 
-/*
+
 exports.message[12] = () => {
     // ap ap lt 0 -1   =   f
-    assertNum(_.lt(NumCons(0n))(NumCons(-1n)), _.f);
+    strictEqual(_.lt(NumCons(0n))(NumCons(-1n)), _.f);
 
     // ap ap lt 0 0   =   f
-    assertNum(_.lt(NumCons(0n))(NumCons(0n)), _.f);
+    strictEqual(_.lt(NumCons(0n))(NumCons(0n)), _.f);
     // ap ap lt 0 1   =   t
-    assertNum(_.lt(NumCons(0n))(NumCons(1n)), _.t);
+    strictEqual(_.lt(NumCons(0n))(NumCons(1n)), _.t);
     // ap ap lt 0 2   =   t
-    assertNum(_.lt(NumCons(0n))(NumCons(2n)), _.t);
+    strictEqual(_.lt(NumCons(0n))(NumCons(2n)), _.t);
     // ...
     // ap ap lt 1 0   =   f
-    assertNum(_.lt(NumCons(1n))(NumCons(0n)), _.f);
+    strictEqual(_.lt(NumCons(1n))(NumCons(0n)), _.f);
     // ap ap lt 1 1   =   f
-    assertNum(_.lt(NumCons(1n))(NumCons(1n)), _.f);
+    strictEqual(_.lt(NumCons(1n))(NumCons(1n)), _.f);
     // ap ap lt 1 2   =   t
-    assertNum(_.lt(NumCons(1n))(NumCons(2n)), _.t);
+    strictEqual(_.lt(NumCons(1n))(NumCons(2n)), _.t);
     // ap ap lt 1 3   =   t
-    assertNum(_.lt(NumCons(1n))(NumCons(3n)), _.t);
+    strictEqual(_.lt(NumCons(1n))(NumCons(3n)), _.t);
     // ...
     // ap ap lt 2 1   =   f
-    assertNum(_.lt(NumCons(2n))(NumCons(1n)), _.f);
+    strictEqual(_.lt(NumCons(2n))(NumCons(1n)), _.f);
     // ap ap lt 2 2   =   f
-    assertNum(_.lt(NumCons(2n))(NumCons(2n)), _.f);
+    strictEqual(_.lt(NumCons(2n))(NumCons(2n)), _.f);
     // ap ap lt 2 3   =   t
-    assertNum(_.lt(NumCons(2n))(NumCons(3n)), _.t);
+    strictEqual(_.lt(NumCons(2n))(NumCons(3n)), _.t);
     // ap ap lt 2 4   =   t
-    assertNum(_.lt(NumCons(2n))(NumCons(4n)), _.t);
+    strictEqual(_.lt(NumCons(2n))(NumCons(4n)), _.t);
     // ...
     // ap ap lt 19 20   =   t
-    assertNum(_.lt(NumCons(19n))(NumCons(20n)), _.t);
+    strictEqual(_.lt(NumCons(19n))(NumCons(20n)), _.t);
     // ap ap lt 20 20   =   f
-    assertNum(_.lt(NumCons(20n))(NumCons(20n)), _.f);
+    strictEqual(_.lt(NumCons(20n))(NumCons(20n)), _.f);
     // ap ap lt 21 20   =   f
-    assertNum(_.lt(NumCons(21n))(NumCons(20n)), _.f);
+    strictEqual(_.lt(NumCons(21n))(NumCons(20n)), _.f);
     // ...
     // ap ap lt -19 -20   =   f
-    assertNum(_.lt(NumCons(-19n))(NumCons(-20n)), _.f);
+    strictEqual(_.lt(NumCons(-19n))(NumCons(-20n)), _.f);
     // ap ap lt -20 -20   =   f
-    assertNum(_.lt(NumCons(-20n))(NumCons(-20n)), _.f);
+    strictEqual(_.lt(NumCons(-20n))(NumCons(-20n)), _.f);
     // ap ap lt -21 -20   =   t
-    assertNum(_.lt(NumCons(-21n))(NumCons(-20n)), _.t);
+    strictEqual(_.lt(NumCons(-21n))(NumCons(-20n)), _.t);
 }
 
+/*
 exports.message[13] = () => {
     // ap mod 0   =   [0]
     assertNum(_.mod(NumCons(0n)), JSON.stringify({signal:0}));
