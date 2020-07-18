@@ -90,6 +90,17 @@ impl<'a> Action<'a> {
         }
     }
 
+    fn recursive_apply_no_leafs<F: FnMut(Self) -> Self>(self, mut func: F) -> Self {
+        match self {
+            Self::Number(_) | Self::Value(_) => self,
+            Self::SingleArgApplication(f, args) => Self::application(func(*f), func(*args)),
+            Self::MultipleArgApplication(f, args) => {
+                Self::multi_application(func(*f), args.into_iter().map(func).collect())
+            }
+            Self::List(items) => Self::List(items.into_iter().map(func).collect()),
+        }
+    }
+
     pub fn reduce_args(self) -> Action<'a> {
         match self {
             Self::SingleArgApplication(func, operand) => {
@@ -107,12 +118,7 @@ impl<'a> Action<'a> {
                     }
                 }
             }
-            Self::Value(_) | Self::Number(_) => self,
-            Self::MultipleArgApplication(func, operands) => Self::multi_application(
-                func.reduce_args(),
-                operands.into_iter().map(|x| x.reduce_args()).collect(),
-            ),
-            Self::List(items) => Self::List(items.into_iter().map(|i| i.reduce_args()).collect()),
+            _ => self.recursive_apply_no_leafs(Self::reduce_args),
         }
     }
 
@@ -142,26 +148,8 @@ impl<'a> Action<'a> {
 
     pub fn substitute_value(self, ident: &str, with: &Action<'a>) -> Action<'a> {
         match self {
-            Self::Number(_) => self,
             Self::Value(i) if i == ident => with.clone(),
-            Self::Value(_) => self,
-            Self::SingleArgApplication(func, operand) => Self::application(
-                func.substitute_value(ident, with),
-                operand.substitute_value(ident, with),
-            ),
-            Self::MultipleArgApplication(func, operand) => Self::multi_application(
-                func.substitute_value(ident, with),
-                operand
-                    .into_iter()
-                    .map(|o| o.substitute_value(ident, with))
-                    .collect(),
-            ),
-            Self::List(items) => Self::List(
-                items
-                    .into_iter()
-                    .map(|i| i.substitute_value(ident, with))
-                    .collect(),
-            ),
+            _ => self.recursive_apply_no_leafs(|s| s.substitute_value(ident, with)),
         }
     }
 
