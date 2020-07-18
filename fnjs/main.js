@@ -18,6 +18,7 @@ function main() {
 
     messages.message[16]();
     messages.message[17]();
+    messages.message[18]();
 
     console.log("Test ok");
 }

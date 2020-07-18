@@ -319,7 +319,48 @@ exports.message[17] = () => {
 }
 
 exports.message[18] = () => {
+    let x0 = x => y => x + 2 * y;
+    let x1 = x => y => x * (y - 1);
+    let x2 = x => y => (1 + y * x);
+
     // ap ap ap s x0 x1 x2   =   ap ap x0 x2 ap x1 x2
+    let a = _.s(x0)(x1)(x2);
+    let b = x0(x2)(x1(x2));
+    // console.log(a, b);
+    _.assert_eq(a, b);
+
     // ap ap ap s add inc 1   =   3
+    /*
+    a: ap
+        b: ap
+            c: ap
+                s
+                add
+            inc
+        1
+    */
+    {
+        let c = _.s(_.add);
+        let b = c(_.inc);
+        let a = b(1);
+        _.assert_eq(a, 3);
+    }
     // ap ap ap s mul ap add 1 6   =   42
+    /*
+        a: ap
+            b: ap
+                c: ap
+                    s
+                    mul
+                d: ap
+                    add
+                    1
+            6   =   42
+    */
+    {
+        let c = _.s(_.add);
+        let b = c(_.inc);
+        let a = b(1);
+        _.assert_eq(a, 42);
+    }
 }

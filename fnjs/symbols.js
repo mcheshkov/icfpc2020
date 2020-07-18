@@ -46,4 +46,21 @@ _.inc = _.add(1);
 // dec   =   ap add ap neg 1
 _.dec = _.add(_.neg(1));
 
+// ap ap ap s x0 x1 x2   =   ap ap x0 x2 ap x1 x2
+/*
+a: ap
+    b: ap
+        x0
+        x2
+    c: ap
+        x1
+        x2
+*/
+
+_.s = (x0) => ((x1) => ((x2) => {
+    let b = x0(x2);
+    let c = x1(x2);
+    return b(c);
+}));
+
 exports.fn = _;
