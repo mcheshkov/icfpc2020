@@ -3,7 +3,7 @@ import {Lam, NumUnOp, NumBinOp, NumCons, unk} from "./common";
 export const add = NumBinOp("add", (x,y) => x+y);
 export const mul = NumBinOp("mul", (x,y) => x*y);
 export const neg = NumUnOp("neg", (x) => -x);
-
+export const div = NumBinOp("div", (x,y) => x / y);
 
 
 // inc   =   ap add 1
@@ -19,6 +19,29 @@ export const t = unk(function t(x0: Lam): Lam {
         return x0;
     });
 });
+
+export const f = unk(function t(x0: Lam): Lam {
+    return unk(function t1(x1) {
+        return x1;
+    });
+});
+
+export function eq(x: Lam) : Lam {
+    return unk((y: Lam) => {
+        if (x.type !== "number") {
+            throw new Error("Bad sum left arg");
+        }
+        if (y.type !== "number") {
+            throw new Error("Bad sum left arg");
+        }
+
+        if(x.value === y.value) {
+            return t;
+        } else {
+            return f;
+        }
+    });
+}
 
 // ap i x0   =   x0
 export const i = unk(function i(x0: Lam): Lam {

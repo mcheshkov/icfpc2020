@@ -1,5 +1,6 @@
 import * as _ from "./symbols";
 import {assertNum, assertNumNum, NumCons} from "./common";
+import {strictEqual} from "assert";
 
 let message: any[] = [];
 
@@ -75,10 +76,10 @@ exports.message[8] = () => {
     assertNumNum(_.add(x0)(x1), _.add(x1)(x0));
 }
 
-/*
+
 exports.message[9] = () => {
-    let x0 = -255;
-    let x1 = 100500;
+    let x0 = NumCons(-255n);
+    let x1 = NumCons(100500n);
 
     // ap ap _.mul 4 2   =   8
     assertNum(_.mul(NumCons(4n))(NumCons(2n)), 8n);
@@ -87,15 +88,16 @@ exports.message[9] = () => {
     // ap ap _.mul 3 -2   =   -6
     assertNum(_.mul(NumCons(3n))(NumCons(-2n)), -6n);
     // ap ap _.mul x0 x1   =   ap ap _.mul x1 x0
-    assertNum(_.mul(x0n)(x1n), _.mul(x1n)(x0n));
+    assertNumNum(_.mul(x0)(x1), _.mul(x1)(x0));
     // ap ap _.mul x0 0   =   0
-    assertNum(_.mul(x0n)(NumCons(0n)), 0n);
+    assertNum(_.mul(x0)(NumCons(0n)), 0n);
     // ap ap _.mul x0 1   =   x0
-    assertNum(_.mul(x0n)(NumCons(1n)), x0n);
+    assertNumNum(_.mul(x0)(NumCons(1n)), x0);
 }
 
+
 exports.message[10] = () => {
-    let x0 = 1008;
+    let x0 = NumCons(1008n);
 
     // ap ap _.div 4 2   =   2
     assertNum(_.div(NumCons(4n))(NumCons(2n)), 2n);
@@ -116,59 +118,61 @@ exports.message[10] = () => {
     // ap ap _.div -5 -3   =   1
     assertNum(_.div(NumCons(-5n))(NumCons(-3n)), 1n);
     // ap ap _.div x0 1   =   x0
-    assertNum(_.div(x0n)(NumCons(1n)), x0n);
+    assertNumNum(_.div(x0)(NumCons(1n)), x0);
 }
+
 
 exports.message[11] = () => {
-    let x0 = 42;
+    let x0 = NumCons(42n);
 
     // ap ap _.eq x0 x0   =   t
-    assertNum(_.eq(x0n)(x0n), _.t);
+    strictEqual(_.eq(x0)(x0), _.t);
 
     // ap ap _.eq 0 -2   =   f
-    assertNum(_.eq(NumCons(0n))(NumCons(-2n)), _.f);
+    strictEqual(_.eq(NumCons(0n))(NumCons(-2n)), _.f);
     // ap ap _.eq 0 -1   =   f
-    assertNum(_.eq(NumCons(0n))(NumCons(-1n)), _.f);
+    strictEqual(_.eq(NumCons(0n))(NumCons(-1n)), _.f);
     // ap ap _.eq 0 0   =   t
-    assertNum(_.eq(NumCons(0n))(NumCons(0n)), _.t);
+    strictEqual(_.eq(NumCons(0n))(NumCons(0n)), _.t);
     // ap ap _.eq 0 1   =   f
-    assertNum(_.eq(NumCons(0n))(NumCons(1n)), _.f);
+    strictEqual(_.eq(NumCons(0n))(NumCons(1n)), _.f);
     // ap ap _.eq 0 2   =   f
-    assertNum(_.eq(NumCons(0n))(NumCons(2n)), _.f);
+    strictEqual(_.eq(NumCons(0n))(NumCons(2n)), _.f);
     // ap ap _.eq 1 -1   =   f
-    assertNum(_.eq(NumCons(1n))(NumCons(-1n)), _.f);
+    strictEqual(_.eq(NumCons(1n))(NumCons(-1n)), _.f);
     // ap ap _.eq 1 0   =   f
-    assertNum(_.eq(NumCons(1n))(NumCons(0n)), _.f);
+    strictEqual(_.eq(NumCons(1n))(NumCons(0n)), _.f);
     // ap ap _.eq 1 1   =   t
-    assertNum(_.eq(NumCons(1n))(NumCons(1n)), _.t);
+    strictEqual(_.eq(NumCons(1n))(NumCons(1n)), _.t);
     // ap ap _.eq 1 2   =   f
-    assertNum(_.eq(NumCons(1n))(NumCons(2n)), _.f);
+    strictEqual(_.eq(NumCons(1n))(NumCons(2n)), _.f);
     // ap ap _.eq 1 3   =   f
-    assertNum(_.eq(NumCons(1n))(NumCons(3n)), _.f);
+    strictEqual(_.eq(NumCons(1n))(NumCons(3n)), _.f);
     // ap ap _.eq 2 0   =   f
-    assertNum(_.eq(NumCons(2n))(NumCons(0n)), _.f);
+    strictEqual(_.eq(NumCons(2n))(NumCons(0n)), _.f);
     // ap ap _.eq 2 1   =   f
-    assertNum(_.eq(NumCons(2n))(NumCons(1n)), _.f);
+    strictEqual(_.eq(NumCons(2n))(NumCons(1n)), _.f);
     // ap ap _.eq 2 2   =   t
-    assertNum(_.eq(NumCons(2n))(NumCons(2n)), _.t);
+    strictEqual(_.eq(NumCons(2n))(NumCons(2n)), _.t);
     // ap ap _.eq 2 3   =   f
-    assertNum(_.eq(NumCons(2n))(NumCons(3n)), _.f);
+    strictEqual(_.eq(NumCons(2n))(NumCons(3n)), _.f);
     // ap ap _.eq 2 4   =   f
-    assertNum(_.eq(NumCons(2n))(NumCons(4n)), _.f);
+    strictEqual(_.eq(NumCons(2n))(NumCons(4n)), _.f);
     // ap ap _.eq 19 20   =   f
-    assertNum(_.eq(NumCons(19n))(NumCons(20n)), _.f);
+    strictEqual(_.eq(NumCons(19n))(NumCons(20n)), _.f);
     // ap ap _.eq 20 20   =   t
-    assertNum(_.eq(NumCons(20n))(NumCons(20n)), _.t);
+    strictEqual(_.eq(NumCons(20n))(NumCons(20n)), _.t);
     // ap ap _.eq 21 20   =   f
-    assertNum(_.eq(NumCons(21n))(NumCons(20n)), _.f);
+    strictEqual(_.eq(NumCons(21n))(NumCons(20n)), _.f);
     // ap ap _.eq -19 -20   =   f
-    assertNum(_.eq(NumCons(-19n))(NumCons(-20n)), _.f);
+    strictEqual(_.eq(NumCons(-19n))(NumCons(-20n)), _.f);
     // ap ap _.eq -20 -20   =   t
-    assertNum(_.eq(NumCons(-20n))(NumCons(-20n)), _.t);
+    strictEqual(_.eq(NumCons(-20n))(NumCons(-20n)), _.t);
     // ap ap _.eq -21 -20   =   f
-    assertNum(_.eq(NumCons(-21n))(NumCons(-20n)), _.f);
+    strictEqual(_.eq(NumCons(-21n))(NumCons(-20n)), _.f);
 }
 
+/*
 exports.message[12] = () => {
     // ap ap lt 0 -1   =   f
     assertNum(_.lt(NumCons(0n))(NumCons(-1n)), _.f);
