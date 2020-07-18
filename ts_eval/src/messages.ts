@@ -5,7 +5,7 @@ import {
     cons, car, cdr, nil, isnil
 } from "./symbols";
 import {ListCons} from "./list";
-import {assertNum, assertNumNum, NumCons, NewModulate, assertModulate, unk} from "./common";
+import {Lam, assertNum, assertNumNum, NumCons, NewModulate, assertModulate, unk} from "./common";
 import {strictEqual} from "assert";
 
 let message: any[] = [];
@@ -520,6 +520,8 @@ message[30] = () => {
     let x2 = NumCons(-1488n);
     let x5 = NumCons(-50n);
 
+    let test_list = [x0, x1, x2, x5];
+
     // ( )
     {
         // strictEqual(isnil(ListCons([])), t);
@@ -527,33 +529,35 @@ message[30] = () => {
 
     // ( x0 )   =   ap ap cons x0 nil
     {
-        let list_a = cons(x0)(nil);
-        let list_b = ListCons([x0]);
+        let list_a: Lam = cons(x0)(nil);
+        let list_b: Lam = ListCons([x0]);
 
-        strictEqual(isnil(list_a), f);
-        strictEqual(isnil(list_b), f);
-        assertNumNum(car(list_a), x0);
-        assertNumNum(car(list_b), x0);
-        let list_a1 = cdr(list_a);
-        let list_b1 = cdr(list_b);
-        strictEqual(isnil(list_a1), t);
-        // strictEqual(isnil(list_b1), t);
+        for(let j = 0; j < 1; j++) {
+            strictEqual(isnil(list_a), f);
+            strictEqual(isnil(list_b), f);
+            assertNumNum(car(list_a), test_list[j]);
+            assertNumNum(car(list_b), test_list[j]);
+            list_a = cdr(list_a);
+            list_b = cdr(list_b);
+        }
+        strictEqual(isnil(list_a), t);
+        // strictEqual(isnil(list_b), t);
     }
     // ( x0 , x1 )   =   ap ap cons x0 ap ap cons x1 nil
     {
-        let list_a = cons(x0)(cons(x1)(nil));
-        let list_b = ListCons([x0, x1]);
+        let list_a: Lam = cons(x0)(cons(x1)(nil));
+        let list_b: Lam = ListCons([x0, x1]);
 
-        strictEqual(isnil(list_a), f);
-        strictEqual(isnil(list_b), f);
-        assertNumNum(car(list_a), x0);
-        assertNumNum(car(list_b), x0);
-        let list_a1 = cdr(list_a);
-        let list_b1 = cdr(list_b);
-        strictEqual(isnil(list_a1), f);
-        strictEqual(isnil(list_b1), f);
-        assertNumNum(car(list_a1), x1);
-        assertNumNum(car(list_b1), x1);
+        for(let j = 0; j < 2; j++) {
+            strictEqual(isnil(list_a), f);
+            strictEqual(isnil(list_b), f);
+            assertNumNum(car(list_a), test_list[j]);
+            assertNumNum(car(list_b), test_list[j]);
+            list_a = cdr(list_a);
+            list_b = cdr(list_b);
+        }
+        strictEqual(isnil(list_a), t);
+        // strictEqual(isnil(list_b), t);
     }
     // ( x0 , x1 , x2 )   =   ap ap cons x0 ap ap cons x1 ap ap cons x2 nil
     // ( x0 , x1 , x2 , x5 )   =   ap ap cons x0 ap ap cons x1 ap ap cons x2 ap ap cons x5 nil
