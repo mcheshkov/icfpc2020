@@ -94,7 +94,6 @@
 :1228 = s(b(b,b(i,c(:1141,1))),b(b(b(t)),b(c(b),c(b(b,b(b,b(b,s(b(s,b(c(c(c(s(b(s,b(b(s(i,i)),lt)),eq)),4)),c(c(:1339,1),:1141(:1445,1)))),b(s(b(c(:1190),:1229)),c(b(b,c(:1144,1)),c(cons,nil))))))),s(b(c,b(b(c),b(c(b(c,c(b(c,b(b(:1204),cons)),:1166(neg(3),neg(3),7,7)))),c(add,1)))),i)))))
 :1229 = c(b(s(b(cons,:1183(:1225(:1029)))),s(b(s,b(b(cons),b(:1183,c(b(:1183,:1214),cons(neg(5),0))))),c(b(c,b(b(cons),b(:1183,:1230))),nil))),cons(neg(3),neg(3)))
 :1230 = s(c(c(lt,4),nil),c(c(eq(4),:1131(:1200(neg(1),neg(1),9,9),:1200(neg(6),neg(1),5,5))),:1131(:1201(neg(1),neg(1),9,9),:1201(neg(6),neg(1),5,5))))
-:1231 = [0,0,nil,nil,nil,nil,nil,0]
 :1232 = [:1253,:1231]
 :1247 = [cons(0,cons(206919795632185305,cons(1,cons(10,cons(0,cons(neg(17782320571),cons(s(t),nil))))))),cons(1,cons(5505453539124369704,cons(2,cons(10,cons(1,cons(neg(41425561822),cons(t,nil))))))),cons(2,cons(1453706522611801003,cons(2,cons(6,cons(0,cons(neg(62144478180),cons(s(t),nil))))))),cons(3,cons(1002667954424443802,cons(4,cons(6,cons(0,cons(neg(63611317023),cons(t,nil))))))),cons(4,cons(6401706522611801001,cons(5,cons(6,cons(1,cons(neg(69073892261),cons(s(t),nil))))))),cons(5,cons(270608505102339400,cons(5,cons(8,cons(0,cons(neg(71253615015),cons(s(t),nil)))))))]
 :1248 = neg(14)
@@ -259,7 +258,6 @@
 :1468 = s(b(c,s(b(c,b(b(c),s(b(b,b(s,b(b(b),b(c(:1458),b(i,c(c(:1144,1),:1450)))))),b(c(b(b,b)),c(b(c,b(b(c),b(b(b(b)),b(b(b(b)),c(b(b,b(c,b(b(b),b(c(b(s,c(b(s,b(b(c),c(b(c,b(b(s),b(b(b(c)),b(b(b(c(i))),b(b(b(s(s(b(eq(12),b(:1128,c(:1141,2))),b(b(i,s(c(:1144,3),b(:1143,c(:1141,2)))),c(c(:1144,0),2))),i))),b(b(c(c(:1144,2))),b(b(:1155),c(b(cons,:1453))))))))),i))),:1461))),c(:1144,1))))),c(b(c,c(:1464)),1)))))),:1452))))),c(:1141,2))),c(:1141,1))
 :1469 = s(s(b(c,c(b(c,b(b(b),c(b(b,b(b,c(b(eq(2),c(:1141,0)),cons(:1131(:1183(:1225(:1029),cons(neg(3),neg(3))),:1107(cons(35,neg(2)))),cons(:1226(:1077),nil))))),s(b(c,b(c(b(c,b(c(b(b,cons)),b(c(cons),c(b(cons,c(b(:1183,:1214),cons(0,neg(6)))),nil))))),b(:1134,c(c(:1127,:1467),0)))),b(:1134,c(c(:1127,:1466),0)))))),c(b(add,b(neg,:1128)),12))),c(:1141,2)),c(:1141,1))
 :1471 = s(b(c,b(c,s(b(s,b(b(s),b(s(b(b,b(eq(2),c(:1141,0)))),s(b(s,b(b(c),b(b(c(c(:1204,:1166(neg(3),neg(3),7,7)))),b(b(c(c(:1339,2),:1141(:1420,1))),s(b(b,c(:1144,3)),b(c(b(cons,c(:1141,3))),c(:1141,3))))))),c(b(b,:1190),:1469))))),c(b(b,b(b,b(s(b(c(:1190),:1469)),c(:1144,1)))),:1468)))),b(i,c(:1141,1)))
-:1472 = [nil,nil]
 :1473 = b(b(:1476),c(b(b,cons),c(cons,nil)))
 :1474 = b(b(b(:1476)),c(b(b,b(b,cons)),c(b(b,cons),c(cons,nil))))
 :1475 = b(b(b(b(:1476))),c(b(b,b(b,b(b,cons))),c(b(b,b(b,cons)),c(b(b,cons),c(cons,nil)))))

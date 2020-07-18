@@ -11,6 +11,7 @@ fn is_known(action: &Action) -> bool {
     match action {
         Action::List(args) => args.iter().all(|a| match a {
             Action::Number(_) => true,
+            Action::Value("nil") => true,
             _ => false,
         }),
         _ => false,
