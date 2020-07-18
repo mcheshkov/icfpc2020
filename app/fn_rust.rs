@@ -10,6 +10,10 @@ fn add(x: i64) -> impl Fn(i64) -> i64 {
     return move |y| x + y;
 }
 
+fn mul(x: i64) -> impl Fn(i64) -> i64 {
+    return move |y| x * y;
+}
+
 fn message5() {
     assert_eq!(inc(0), 1);
     assert_eq!(inc(1), 2);
@@ -82,10 +86,29 @@ fn message8() {
     assert_eq!(add(x0)(x1), add(x1)(x0));
 }
 
+fn message9() {
+    let x0: i64 = -255;
+    let x1: i64 = 100500;
+
+    // ap ap mul 4 2   =   8
+    assert_eq!(mul(4)(2), 8);
+    // ap ap mul 3 4   =   12
+    assert_eq!(mul(3)(4), 12);
+    // ap ap mul 3 -2   =   -6
+    assert_eq!(mul(3)(-2), -6);
+    // ap ap mul x0 x1   =   ap ap mul x1 x0
+    assert_eq!(mul(x0)(x1), mul(x1)(x0));
+    // ap ap mul x0 0   =   0
+    assert_eq!(mul(x0)(0), 0);
+    // ap ap mul x0 1   =   x0
+    assert_eq!(mul(x0)(1), x0);
+}
+
 pub fn main() {
     println!("Fn test");
     message5();
     message6();
     message7();
     message8();
+    message9();
 }
