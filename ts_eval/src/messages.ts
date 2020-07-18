@@ -1,4 +1,4 @@
-import {inc, dec, add, mul, div, eq, lt, t, f, mod, dem, c, b, s, neg} from "./symbols";
+import {inc, dec, add, mul, div, eq, lt, t, f, mod, dem, c, b, s, neg, i} from "./symbols";
 import {assertNum, assertNumNum, NumCons, NewModulate, assertModulate} from "./common";
 import {strictEqual} from "assert";
 
@@ -402,6 +402,40 @@ message[20] = () => {
     // ap ap ap b inc dec x0   =   x0
     let a = b(inc)(dec)(x0);
     assertNumNum(a, x0);
+}
+
+message[21] = () => {
+    let x0 = NumCons(-42n);
+    let x1 = NumCons(100n);
+    /*
+    ap ap t x0 x1   =   x0
+    ap ap t 1 5   =   1
+    ap ap t t i   =   t
+    ap ap t t ap inc 5   =   t
+    ap ap t ap inc 5 t   =   6
+    */
+
+    const val_1 = t(x0)(x1);
+    const val_2 = t(NumCons(1n))(NumCons(5n));
+    const val_3 = t(t)(i);
+    const val_4 = t(t)(inc(NumCons(5n)));
+    const val_5 = t(inc(NumCons(5n)))(t);
+
+    assertNumNum(val_1, x0);
+    assertNum(val_2, 1n);
+    strictEqual(val_3, t);
+    strictEqual(val_4, t);
+    assertNum(val_5, 6n);
+}
+
+message[22] = () => {
+    let x0 = NumCons(-42n);
+    let x1 = NumCons(100n);
+
+    // ap ap f x0 x1   =   x1
+    assertNumNum(f(x0)(x1), x1);
+    // f   =   ap s t
+    assertNumNum(f(x0)(x1), s(t)(x0)(x1));
 }
 
 export {message};
