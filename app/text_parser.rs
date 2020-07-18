@@ -90,85 +90,121 @@ impl<'a> Action<'a> {
         }
     }
 
-    fn recursive_apply_no_leafs<F: FnMut(Self) -> Self>(self, mut func: F) -> Self {
-        match self {
-            Self::Number(_) | Self::Value(_) => self,
-            Self::SingleArgApplication(f, args) => Self::application(func(*f), func(*args)),
-            Self::MultipleArgApplication(f, args) => {
-                Self::multi_application(func(*f), args.into_iter().map(func).collect())
-            }
-            Self::List(items) => Self::List(items.into_iter().map(func).collect()),
-        }
-    }
-
-    pub fn reduce_args(self) -> Action<'a> {
-        match self {
-            Self::SingleArgApplication(func, operand) => {
-                let first_reduced = func.reduce_args();
-                match first_reduced {
-                    Action::Value(_) | Action::List(_) | Action::Number(_) => {
-                        Action::multi_application(first_reduced, vec![operand.reduce_args()])
-                    }
-                    Action::MultipleArgApplication(func, mut args) => {
-                        args.push(operand.reduce_args());
-                        Action::multi_application(func.reduce_args(), args)
-                    }
-                    Action::SingleArgApplication(_, _) => {
-                        unreachable!("cannot be SingleArgApplication")
-                    }
+    fn recursive_apply_no_leafs<F: FnMut(Self) -> (Self, bool)>(self, mut func: F) -> (Self, bool) {
+        let mut something_changed = false;
+        let res = {
+            let mut extract = Self::account_changed(&mut something_changed);
+            match self {
+                Self::Number(_) | Self::Value(_) => self,
+                Self::SingleArgApplication(f, args) => {
+                    Self::application(extract(func(*f)), extract(func(*args)))
+                }
+                Self::MultipleArgApplication(f, args) => Self::multi_application(
+                    extract(func(*f)),
+                    args.into_iter().map(|a| extract(func(a))).collect(),
+                ),
+                Self::List(items) => {
+                    Self::List(items.into_iter().map(|i| extract(func(i))).collect())
                 }
             }
-            Self::MultipleArgApplication(func, operands) => {
-                let first_reduced = func.reduce_args();
-                match first_reduced {
-                    Action::Value(_) | Action::List(_) | Action::Number(_) => {
-                        Action::multi_application(
-                            first_reduced,
-                            operands.into_iter().map(|o| o.reduce_args()).collect(),
-                        )
-                    }
-                    Action::MultipleArgApplication(func, mut other_operands) => {
-                        other_operands.extend(operands.into_iter().map(|o| o.reduce_args()));
-                        Action::multi_application(func.reduce_args(), other_operands)
-                    }
-                    Action::SingleArgApplication(_, _) => {
-                        unreachable!("cannot be SingleArgApplication")
-                    }
-                }
-            }
-            _ => self.recursive_apply_no_leafs(Self::reduce_args),
-        }
+        };
+        (res, something_changed.clone())
     }
 
-    pub fn reduce_lists(self) -> Action<'a> {
-        match self {
-            Self::MultipleArgApplication(val, mut args)
-                if *val == Self::Value("cons") && args.len() == 2 =>
-            {
-                let second = args.pop().unwrap();
-                let first = args.pop().unwrap();
-                let second_list_possibly = second.reduce_lists();
-                match second_list_possibly {
-                    Self::List(mut items) => {
-                        items.insert(0, first);
-                        Self::List(items)
-                    }
-                    Self::Value("nil") => Self::List(vec![first]),
-                    _ => Self::MultipleArgApplication(
-                        Box::new(Self::Value("cons")),
-                        vec![first, second_list_possibly],
-                    ),
-                }
-            }
-            _ => self,
-        }
+    pub fn account_changed<'b>(changed: &'b mut bool) -> impl FnMut((Action, bool)) -> Action + 'b {
+        return move |res| {
+            let (action, step_changed) = res;
+            *changed = *changed || step_changed;
+            action
+        };
     }
 
-    fn apply_combinator<F: FnMut(Self, Self, Self) -> Self>(
+    pub fn reduce_args(self) -> (Action<'a>, bool) {
+        let mut something_changed = false;
+        let res = {
+            let mut extract = Self::account_changed(&mut something_changed);
+            match self {
+                Self::SingleArgApplication(func, operand) => {
+                    let first_reduced = extract(func.reduce_args());
+                    match first_reduced {
+                        Action::Value(_) | Action::List(_) | Action::Number(_) => {
+                            Action::multi_application(
+                                first_reduced,
+                                vec![extract(operand.reduce_args())],
+                            )
+                        }
+                        Action::MultipleArgApplication(func, mut args) => {
+                            args.push(extract(operand.reduce_args()));
+                            Action::multi_application(extract(func.reduce_args()), args)
+                        }
+                        Action::SingleArgApplication(_, _) => {
+                            unreachable!("cannot be SingleArgApplication")
+                        }
+                    }
+                }
+                Self::MultipleArgApplication(func, operands) => {
+                    let first_reduced = extract(func.reduce_args());
+                    match first_reduced {
+                        Action::Value(_) | Action::List(_) | Action::Number(_) => {
+                            Action::multi_application(
+                                first_reduced,
+                                operands
+                                    .into_iter()
+                                    .map(|o| extract(o.reduce_args()))
+                                    .collect(),
+                            )
+                        }
+                        Action::MultipleArgApplication(func, mut other_operands) => {
+                            other_operands
+                                .extend(operands.into_iter().map(|o| extract(o.reduce_args())));
+                            Action::multi_application(extract(func.reduce_args()), other_operands)
+                        }
+                        Action::SingleArgApplication(_, _) => {
+                            unreachable!("cannot be SingleArgApplication")
+                        }
+                    }
+                }
+                _ => extract(self.recursive_apply_no_leafs(Self::reduce_args)),
+            }
+        };
+        (res, something_changed)
+    }
+
+    pub fn reduce_lists(self) -> (Action<'a>, bool) {
+        let mut something_changed = false;
+        let res = {
+            let mut extract = Self::account_changed(&mut something_changed);
+            match self {
+                Self::MultipleArgApplication(val, mut args)
+                    if *val == Self::Value("cons") && args.len() == 2 =>
+                {
+                    let second = args.pop().unwrap();
+                    let first = args.pop().unwrap();
+                    let second_list_possibly = extract(second.reduce_lists());
+                    match second_list_possibly {
+                        Self::List(mut items) => {
+                            items.insert(0, first);
+                            Self::List(items)
+                        }
+                        Self::Value("nil") => Self::List(vec![first]),
+                        _ => Self::multi_application(
+                            Self::Value("cons"),
+                            vec![first, second_list_possibly],
+                        ),
+                    }
+                }
+                _ => self,
+            }
+        };
+        (res, something_changed)
+    }
+
+    fn apply_combinator<F: FnMut(Self, Self, Self) -> Self, E: FnMut((Self, bool)) -> Self>(
         operands: Vec<Self>,
         mut combinator: F,
+        mut extract: E,
     ) -> Action<'a> {
-        let mut it = operands.into_iter().map(|i| i.reduce_calls());
+        let mut it = operands.into_iter().map(|i| extract(i.reduce_calls()));
         let first = it.next().unwrap();
         let second = it.next().unwrap();
         let third = it.next().unwrap();
@@ -188,96 +224,133 @@ impl<'a> Action<'a> {
         Self::application(a, Self::application(b, c))
     }
 
-    pub fn reduce_calls(self) -> Action<'a> {
-        match self {
-            Self::SingleArgApplication(func, operand) => {
-                if *func == Self::Value("inc") {
-                    // https://message-from-space.readthedocs.io/en/latest/message5.html#successor
-                    if let Self::Number(n) = *operand {
-                        return Self::Number(n + 1);
+    pub fn reduce_calls(self) -> (Action<'a>, bool) {
+        let mut something_changed = false;
+        let res = {
+            let mut extract = Self::account_changed(&mut something_changed);
+            match self {
+                Self::SingleArgApplication(func, operand) => {
+                    if *func == Self::Value("inc") {
+                        // https://message-from-space.readthedocs.io/en/latest/message5.html#successor
+                        if let Self::Number(n) = *operand {
+                            println!("inc number");
+                            return (Self::Number(n + 1), true);
+                        }
+                    } else if *func == Self::Value("neg") {
+                        if let Self::Number(n) = *operand {
+                            println!("neg number");
+                            return (Self::Number(-n), true);
+                        }
+                    } else if *func == Self::Value("i") {
+                        println!("identity");
+                        return (extract(operand.reduce_calls()), true);
                     }
-                } else if *func == Self::Value("neg") {
-                    if let Self::Number(n) = *operand {
-                        return Self::Number(-n);
-                    }
-                } else if *func == Self::Value("i") {
-                    return operand.reduce_calls();
+                    Self::application(
+                        extract(func.reduce_calls()),
+                        extract(operand.reduce_calls()),
+                    )
                 }
-                Self::application(func.reduce_calls(), operand.reduce_calls())
-            }
-            Self::MultipleArgApplication(func, mut operands) => {
-                if *func == Self::Value("inc") {
-                    // https://message-from-space.readthedocs.io/en/latest/message5.html#successor
-                    if operands.len() == 1 {
-                        if let Self::Number(n) = operands[0] {
-                            return Self::Number(n);
+                Self::MultipleArgApplication(func, mut operands) => {
+                    if *func == Self::Value("inc") {
+                        // https://message-from-space.readthedocs.io/en/latest/message5.html#successor
+                        if operands.len() == 1 {
+                            if let Self::Number(n) = operands[0] {
+                                println!("inc number");
+                                return (Self::Number(n), true);
+                            }
+                        }
+                    } else if *func == Self::Value("neg") {
+                        if operands.len() == 1 {
+                            if let Self::Number(n) = operands[0] {
+                                println!("neg number");
+                                return (Self::Number(-n), true);
+                            }
+                        }
+                    } else if *func == Self::Value("add") {
+                        if operands.len() == 2 {
+                            if let [Self::Number(a), Self::Number(b)] = operands.as_slice() {
+                                println!("add number");
+                                return (Self::Number(a + b), true);
+                            }
+                        }
+                    } else if *func == Self::Value("mul") {
+                        // https://message-from-space.readthedocs.io/en/latest/message9.html#product
+                        if operands.len() == 2 {
+                            if let [Self::Number(a), Self::Number(b)] = operands.as_slice() {
+                                println!("mul number");
+                                return (Self::Number(a * b), true);
+                            }
+                        }
+                    } else if *func == Self::Value("s") {
+                        // https://message-from-space.readthedocs.io/en/latest/message18.html#s-combinator
+                        if operands.len() >= 3 {
+                            println!("s combinator");
+                            return (
+                                Self::apply_combinator(operands, Self::s_combinator, extract),
+                                true,
+                            );
+                        }
+                    } else if *func == Self::Value("c") {
+                        if operands.len() >= 3 {
+                            // https://message-from-space.readthedocs.io/en/latest/message19.html#c-combinator
+                            println!("c combinator");
+                            return (
+                                Self::apply_combinator(operands, Self::c_combinator, extract),
+                                true,
+                            );
+                        }
+                    } else if *func == Self::Value("b") {
+                        // https://message-from-space.readthedocs.io/en/latest/message20.html#b-combinator
+                        if operands.len() >= 3 {
+                            println!("b combinator");
+                            return (
+                                Self::apply_combinator(operands, Self::b_combinator, extract),
+                                true,
+                            );
+                        }
+                    } else if *func == Self::Value("i") {
+                        // https://message-from-space.readthedocs.io/en/latest/message24.html#i-combinator
+                        if operands.len() == 1 {
+                            println!("identity");
+                            return (extract(operands.pop().unwrap().reduce_calls()), true);
                         }
                     }
-                } else if *func == Self::Value("neg") {
-                    if operands.len() == 1 {
-                        if let Self::Number(n) = operands[0] {
-                            return Self::Number(-n);
-                        }
-                    }
-                } else if *func == Self::Value("add") {
-                    if operands.len() == 2 {
-                        if let [Self::Number(a), Self::Number(b)] = operands.as_slice() {
-                            return Self::Number(a + b);
-                        }
-                    }
-                } else if *func == Self::Value("mul") {
-                    // https://message-from-space.readthedocs.io/en/latest/message9.html#product
-                    if operands.len() == 2 {
-                        if let [Self::Number(a), Self::Number(b)] = operands.as_slice() {
-                            return Self::Number(a * b);
-                        }
-                    }
-                } else if *func == Self::Value("s") {
-                    // https://message-from-space.readthedocs.io/en/latest/message18.html#s-combinator
-                    if operands.len() >= 3 {
-                        return Self::apply_combinator(operands, Self::s_combinator);
-                    }
-                } else if *func == Self::Value("c") {
-                    if operands.len() >= 3 {
-                        // https://message-from-space.readthedocs.io/en/latest/message19.html#c-combinator
-                        return Self::apply_combinator(operands, Self::c_combinator);
-                    }
-                } else if *func == Self::Value("b") {
-                    // https://message-from-space.readthedocs.io/en/latest/message20.html#b-combinator
-                    if operands.len() >= 3 {
-                        return Self::apply_combinator(operands, Self::b_combinator);
-                    }
-                } else if *func == Self::Value("i") {
-                    // https://message-from-space.readthedocs.io/en/latest/message24.html#i-combinator
-                    if operands.len() == 1 {
-                        return operands.pop().unwrap().reduce_calls();
-                    }
-                }
 
-                Self::multi_application(
-                    func.reduce_calls(),
-                    operands.into_iter().map(|o| o.reduce_calls()).collect(),
-                )
+                    Self::multi_application(
+                        extract(func.reduce_calls()),
+                        operands
+                            .into_iter()
+                            .map(|o| extract(o.reduce_calls()))
+                            .collect(),
+                    )
+                }
+                _ => extract(self.recursive_apply_no_leafs(Self::reduce_calls)),
             }
-            _ => self.recursive_apply_no_leafs(Self::reduce_calls),
-        }
+        };
+        (res, something_changed)
     }
 
-    pub fn substitute_value(self, ident: &str, with: &Action<'a>) -> Action<'a> {
+    pub fn substitute_value(self, ident: &str, with: &Action<'a>) -> (Action<'a>, bool) {
         match self {
-            Self::Value(i) if i == ident => with.clone(),
+            Self::Value(i) if i == ident => {
+                println!("substitution");
+                (with.clone(), true)
+            }
             _ => self.recursive_apply_no_leafs(|s| s.substitute_value(ident, with)),
         }
     }
 
-    pub fn reduce_all(self) -> Action<'a> {
-        self.reduce_args().reduce_lists().reduce_calls()
+    pub fn reduce_all(self) -> (Action<'a>, bool) {
+        let (args_res, args_changed) = self.reduce_args();
+        let (lists_res, lists_changed) = args_res.reduce_lists();
+        let (calls_res, calls_changed) = lists_res.reduce_calls();
+        (calls_res, args_changed || lists_changed || calls_changed)
     }
 
     pub fn parse_reduced(stream: &str) -> Vec<Action> {
         Self::parse(stream)
             .into_iter()
-            .map(|a| a.reduce_all())
+            .map(|a| a.reduce_all().0)
             .collect()
     }
 

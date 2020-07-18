@@ -62,24 +62,26 @@ fn main() -> () {
 
     let mut removed: HashMap<&str, Action> = HashMap::new();
 
-    loop {
+    let mut something_changed = true;
+
+    while something_changed {
         let (substitutki, new_all_bindings) = all_bindings
             .into_iter()
             .partition::<HashMap<_, _>, _>(|(_, value)| should_substitute(value));
-        if substitutki.is_empty() {
-            all_bindings = new_all_bindings;
-            break;
-        }
-        println!("Substitutki {:?}", substitutki);
+
+        something_changed = !substitutki.is_empty();
 
         all_bindings = new_all_bindings
             .into_iter()
             .map(|(k, mut value)| {
                 for (ident, body) in substitutki.iter() {
-                    value = value.substitute_value(ident, body);
+                    let (new_value, changed) = value.substitute_value(ident, body);
+                    value = new_value;
+                    something_changed = something_changed || changed;
                 }
-                value = value.reduce_all();
-                (k, value)
+                let (new_value, changed) = value.reduce_all();
+                something_changed = something_changed || changed;
+                (k, new_value)
             })
             .collect();
 
