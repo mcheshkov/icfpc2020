@@ -2,7 +2,7 @@ import "source-map-support/register";
 
 import {message} from "./messages";
 import {send} from "./send";
-import {Lam, NumCons, thunk, unk, unthunk, Defer} from "./common";
+import {Lam, NumCons, thunk, unk, unthunk, empty_thunk} from "./common";
 import {ListCons} from "./list";
 import {b, c, i, s, t, car, cdr, cons, isnil, nil, add, div, eq, lt, mul, neg} from "./symbols";
 

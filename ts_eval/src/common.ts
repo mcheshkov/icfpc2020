@@ -24,7 +24,7 @@ export type LamList = {
 }
 export type LamThunk = {
     type: "thunk",
-    eval: () => Lam,
+    eval: (() => Lam) | null,
     result: Lam | null,
 }
 export type LamPicture = {
@@ -57,11 +57,27 @@ export function thunk(f: () => Lam): Lam & LamThunk {
     return res;
 }
 
+export function empty_thunk(): Lam & LamThunk {
+    let res: Lam & LamThunk = null as any;
+    res = function (x: Lam) {
+        return thunk(() => {
+            return unthunk(res)(x);
+        });
+    } as any;
+    res.type = "thunk";
+    res.eval = null;
+    res.result = null;
+    return res;
+}
+
 export function unthunk(input: Lam): Lam {
     let l = input;
 
     while (l.type === "thunk") {
         if (l.result === null) {
+            if (l.eval === null) {
+                throw new Error("Empty thunk");
+            }
             l.result = l.eval();
         }
         l = l.result;

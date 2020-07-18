@@ -67,7 +67,7 @@ fn action_as_ts(action: &Action) -> String {
 
 fn binding_as_ts(binding: (&str, Action)) -> String {
     let (ident, body) = binding;
-    format!("{}.init({});", escape_ident_ts(ident), action_as_ts(&body))
+    format!("{}.result = {};", escape_ident_ts(ident), action_as_ts(&body))
 }
 
 fn main() -> () {
@@ -108,7 +108,7 @@ fn main() -> () {
     }
 
     for (ident, _) in &bindings {
-        println!("const {} = Defer();", escape_ident_ts(ident));
+        println!("const {} = empty_thunk();", escape_ident_ts(ident));
     }
     for binding in bindings {
         println!("{}", binding_as_ts(binding));
