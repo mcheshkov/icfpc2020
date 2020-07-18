@@ -43,32 +43,6 @@ function main() {
     console.log("Test ok");
 
     // real_send();
-
-    const Z = unk(function z(f: Lam): Lam {
-        let inner = unk(function z1(x) {
-            return f(unk(function z2(v) {
-                return thunk(() => x(x)(v))
-            }));
-        });
-
-        return inner(inner);
-    });
-
-    console.log("Z", Z);
-
-    // pwr2   =   ap ap s ap ap c ap eq 0 1 ap ap b ap mul 2 ap ap b pwr2 ap add -1
-    // const pwr2 = s(c(eq(NumCons(0n)))(NumCons(1n)))(b(mul(NumCons(2n)))(b(pwr2)(add(NumCons(-1n)))));
-    const pwr2_z = unk(
-        (f) => s(c(eq(NumCons(0n)))(NumCons(1n)))(b(mul(NumCons(2n)))(b(f)(add(NumCons(-1n)))))
-    );
-    console.log("pwr2_z", pwr2_z);
-    const pwr2 = Z(pwr2_z);
-
-
-
-    console.log("Z(pwr2_z)", pwr2);
-    console.log("thunk", pwr2(NumCons(0n)));
-    console.log("unthunk", unthunk(Z(pwr2_z)(NumCons(5n))));
 }
 
 main();
