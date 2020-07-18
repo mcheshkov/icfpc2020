@@ -91,7 +91,10 @@ fn main() -> () {
     // let mut all_bindings = HashMap::new();
 
     for line in data.lines() {
-        let actions = Action::parse(line);
+        let actions = Action::parse(line)
+            .into_iter()
+            .map(|a| a.reduce_args().reduce_lists())
+            .collect::<Vec<_>>();
 
         if let Some(binding) = parse_binding(&actions) {
             println!("{}", binding_as_ts(binding));

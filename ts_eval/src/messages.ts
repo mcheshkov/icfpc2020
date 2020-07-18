@@ -9,9 +9,13 @@ import {ListCons} from "./list";
 import {
     Lam, assertNum, assertNumNum, NumCons, NewModulate,
     assertModulate, assertPicture, NewPicture,
-    unk
+    unk, unthunk
 } from "./common";
 import {strictEqual} from "assert";
+
+function assertLamStrictEqual(l: Lam, r: Lam) {
+    strictEqual(unthunk(l), unthunk(r));
+}
 
 let message: any[] = [];
 
@@ -137,95 +141,95 @@ message[11] = () => {
     let x0 = NumCons(42n);
 
     // ap ap eq x0 x0   =   t
-    strictEqual(eq(x0)(x0), t);
+    assertLamStrictEqual(eq(x0)(x0), t);
 
     // ap ap eq 0 -2   =   f
-    strictEqual(eq(NumCons(0n))(NumCons(-2n)), f);
+    assertLamStrictEqual(eq(NumCons(0n))(NumCons(-2n)), f);
     // ap ap eq 0 -1   =   f
-    strictEqual(eq(NumCons(0n))(NumCons(-1n)), f);
+    assertLamStrictEqual(eq(NumCons(0n))(NumCons(-1n)), f);
     // ap ap eq 0 0   =   t
-    strictEqual(eq(NumCons(0n))(NumCons(0n)), t);
+    assertLamStrictEqual(eq(NumCons(0n))(NumCons(0n)), t);
     // ap ap eq 0 1   =   f
-    strictEqual(eq(NumCons(0n))(NumCons(1n)), f);
+    assertLamStrictEqual(eq(NumCons(0n))(NumCons(1n)), f);
     // ap ap eq 0 2   =   f
-    strictEqual(eq(NumCons(0n))(NumCons(2n)), f);
+    assertLamStrictEqual(eq(NumCons(0n))(NumCons(2n)), f);
     // ap ap eq 1 -1   =   f
-    strictEqual(eq(NumCons(1n))(NumCons(-1n)), f);
+    assertLamStrictEqual(eq(NumCons(1n))(NumCons(-1n)), f);
     // ap ap eq 1 0   =   f
-    strictEqual(eq(NumCons(1n))(NumCons(0n)), f);
+    assertLamStrictEqual(eq(NumCons(1n))(NumCons(0n)), f);
     // ap ap eq 1 1   =   t
-    strictEqual(eq(NumCons(1n))(NumCons(1n)), t);
+    assertLamStrictEqual(eq(NumCons(1n))(NumCons(1n)), t);
     // ap ap eq 1 2   =   f
-    strictEqual(eq(NumCons(1n))(NumCons(2n)), f);
+    assertLamStrictEqual(eq(NumCons(1n))(NumCons(2n)), f);
     // ap ap eq 1 3   =   f
-    strictEqual(eq(NumCons(1n))(NumCons(3n)), f);
+    assertLamStrictEqual(eq(NumCons(1n))(NumCons(3n)), f);
     // ap ap eq 2 0   =   f
-    strictEqual(eq(NumCons(2n))(NumCons(0n)), f);
+    assertLamStrictEqual(eq(NumCons(2n))(NumCons(0n)), f);
     // ap ap eq 2 1   =   f
-    strictEqual(eq(NumCons(2n))(NumCons(1n)), f);
+    assertLamStrictEqual(eq(NumCons(2n))(NumCons(1n)), f);
     // ap ap eq 2 2   =   t
-    strictEqual(eq(NumCons(2n))(NumCons(2n)), t);
+    assertLamStrictEqual(eq(NumCons(2n))(NumCons(2n)), t);
     // ap ap eq 2 3   =   f
-    strictEqual(eq(NumCons(2n))(NumCons(3n)), f);
+    assertLamStrictEqual(eq(NumCons(2n))(NumCons(3n)), f);
     // ap ap eq 2 4   =   f
-    strictEqual(eq(NumCons(2n))(NumCons(4n)), f);
+    assertLamStrictEqual(eq(NumCons(2n))(NumCons(4n)), f);
     // ap ap eq 19 20   =   f
-    strictEqual(eq(NumCons(19n))(NumCons(20n)), f);
+    assertLamStrictEqual(eq(NumCons(19n))(NumCons(20n)), f);
     // ap ap eq 20 20   =   t
-    strictEqual(eq(NumCons(20n))(NumCons(20n)), t);
+    assertLamStrictEqual(eq(NumCons(20n))(NumCons(20n)), t);
     // ap ap eq 21 20   =   f
-    strictEqual(eq(NumCons(21n))(NumCons(20n)), f);
+    assertLamStrictEqual(eq(NumCons(21n))(NumCons(20n)), f);
     // ap ap eq -19 -20   =   f
-    strictEqual(eq(NumCons(-19n))(NumCons(-20n)), f);
+    assertLamStrictEqual(eq(NumCons(-19n))(NumCons(-20n)), f);
     // ap ap eq -20 -20   =   t
-    strictEqual(eq(NumCons(-20n))(NumCons(-20n)), t);
+    assertLamStrictEqual(eq(NumCons(-20n))(NumCons(-20n)), t);
     // ap ap eq -21 -20   =   f
-    strictEqual(eq(NumCons(-21n))(NumCons(-20n)), f);
+    assertLamStrictEqual(eq(NumCons(-21n))(NumCons(-20n)), f);
 }
 
 
 message[12] = () => {
     // ap ap lt 0 -1   =   f
-    strictEqual(lt(NumCons(0n))(NumCons(-1n)), f);
+    assertLamStrictEqual(lt(NumCons(0n))(NumCons(-1n)), f);
 
     // ap ap lt 0 0   =   f
-    strictEqual(lt(NumCons(0n))(NumCons(0n)), f);
+    assertLamStrictEqual(lt(NumCons(0n))(NumCons(0n)), f);
     // ap ap lt 0 1   =   t
-    strictEqual(lt(NumCons(0n))(NumCons(1n)), t);
+    assertLamStrictEqual(lt(NumCons(0n))(NumCons(1n)), t);
     // ap ap lt 0 2   =   t
-    strictEqual(lt(NumCons(0n))(NumCons(2n)), t);
+    assertLamStrictEqual(lt(NumCons(0n))(NumCons(2n)), t);
     // ...
     // ap ap lt 1 0   =   f
-    strictEqual(lt(NumCons(1n))(NumCons(0n)), f);
+    assertLamStrictEqual(lt(NumCons(1n))(NumCons(0n)), f);
     // ap ap lt 1 1   =   f
-    strictEqual(lt(NumCons(1n))(NumCons(1n)), f);
+    assertLamStrictEqual(lt(NumCons(1n))(NumCons(1n)), f);
     // ap ap lt 1 2   =   t
-    strictEqual(lt(NumCons(1n))(NumCons(2n)), t);
+    assertLamStrictEqual(lt(NumCons(1n))(NumCons(2n)), t);
     // ap ap lt 1 3   =   t
-    strictEqual(lt(NumCons(1n))(NumCons(3n)), t);
+    assertLamStrictEqual(lt(NumCons(1n))(NumCons(3n)), t);
     // ...
     // ap ap lt 2 1   =   f
-    strictEqual(lt(NumCons(2n))(NumCons(1n)), f);
+    assertLamStrictEqual(lt(NumCons(2n))(NumCons(1n)), f);
     // ap ap lt 2 2   =   f
-    strictEqual(lt(NumCons(2n))(NumCons(2n)), f);
+    assertLamStrictEqual(lt(NumCons(2n))(NumCons(2n)), f);
     // ap ap lt 2 3   =   t
-    strictEqual(lt(NumCons(2n))(NumCons(3n)), t);
+    assertLamStrictEqual(lt(NumCons(2n))(NumCons(3n)), t);
     // ap ap lt 2 4   =   t
-    strictEqual(lt(NumCons(2n))(NumCons(4n)), t);
+    assertLamStrictEqual(lt(NumCons(2n))(NumCons(4n)), t);
     // ...
     // ap ap lt 19 20   =   t
-    strictEqual(lt(NumCons(19n))(NumCons(20n)), t);
+    assertLamStrictEqual(lt(NumCons(19n))(NumCons(20n)), t);
     // ap ap lt 20 20   =   f
-    strictEqual(lt(NumCons(20n))(NumCons(20n)), f);
+    assertLamStrictEqual(lt(NumCons(20n))(NumCons(20n)), f);
     // ap ap lt 21 20   =   f
-    strictEqual(lt(NumCons(21n))(NumCons(20n)), f);
+    assertLamStrictEqual(lt(NumCons(21n))(NumCons(20n)), f);
     // ...
     // ap ap lt -19 -20   =   f
-    strictEqual(lt(NumCons(-19n))(NumCons(-20n)), f);
+    assertLamStrictEqual(lt(NumCons(-19n))(NumCons(-20n)), f);
     // ap ap lt -20 -20   =   f
-    strictEqual(lt(NumCons(-20n))(NumCons(-20n)), f);
+    assertLamStrictEqual(lt(NumCons(-20n))(NumCons(-20n)), f);
     // ap ap lt -21 -20   =   t
-    strictEqual(lt(NumCons(-21n))(NumCons(-20n)), t);
+    assertLamStrictEqual(lt(NumCons(-21n))(NumCons(-20n)), t);
 }
 
 

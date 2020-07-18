@@ -1,6 +1,6 @@
 import {
     Lam, NumUnOp, NumBinOp, NewModulate, NumCons, unk, LamCons, LamList,
-    NewPicture, Pixels
+    NewPicture, Pixels, thunk, unthunk
 } from "./common";
 
 export const add = NumBinOp("add", (x,y) => x+y);
@@ -31,35 +31,43 @@ export const f = unk(function t(x0: Lam): Lam {
 
 export const eq = unk(function eq(x: Lam) : Lam {
     return unk((y: Lam) => {
-        if (x.type !== "number") {
-            throw new Error("Bad eq left arg");
-        }
-        if (y.type !== "number") {
-            throw new Error("Bad eq left arg");
-        }
+        return thunk(() => {
+            let xx = unthunk(x);
+            if (xx.type !== "number") {
+                throw new Error("Bad eq left arg");
+            }
+            let yy = unthunk(y);
+            if (yy.type !== "number") {
+                throw new Error("Bad eq left arg");
+            }
 
-        if(x.value === y.value) {
-            return t;
-        } else {
-            return f;
-        }
+            if (xx.value === yy.value) {
+                return t;
+            } else {
+                return f;
+            }
+        });
     });
 });
 
 export const lt = unk(function lt(x: Lam) : Lam {
     return unk((y: Lam) => {
-        if (x.type !== "number") {
-            throw new Error("Bad lt left arg");
-        }
-        if (y.type !== "number") {
-            throw new Error("Bad lt left arg");
-        }
+        return thunk(() => {
+            let xx = unthunk(x);
+            if (xx.type !== "number") {
+                throw new Error("Bad lt left arg");
+            }
+            let yy = unthunk(y);
+            if (yy.type !== "number") {
+                throw new Error("Bad lt left arg");
+            }
 
-        if(x.value < y.value) {
-            return t;
-        } else {
-            return f;
-        }
+            if(xx.value < yy.value) {
+                return t;
+            } else {
+                return f;
+            }
+        });
     });
 });
 
@@ -181,7 +189,7 @@ function list_unpack(pixels: Pixels, l: Lam): Pixels {
         }
 
     } else if(l.type === "list") {
-        
+
         return l.items.reduce((acc, x) => list_unpack(acc, x), pixels);
 
     } else if(l === nil) {
