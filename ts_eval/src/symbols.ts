@@ -1,4 +1,7 @@
-import {Lam, NumUnOp, NumBinOp, NewModulate, NumCons, unk, LamCons, LamList} from "./common";
+import {
+    Lam, NumUnOp, NumBinOp, NewModulate, NumCons, unk, LamCons, LamList,
+    NewPicture, Pixels
+} from "./common";
 
 export const add = NumBinOp("add", (x,y) => x+y);
 export const mul = NumBinOp("mul", (x,y) => x*y);
@@ -158,4 +161,38 @@ export const isnil = unk(function isnil(x0: Lam): Lam {
         // TODO proper implementation
         return f;
     }
+});
+
+export const vec = cons;
+
+function list_unpack(pixels: Pixels, l: Lam): Pixels {
+    if(l.type === "cons") {
+        if(l.left.type === "number" && l.right.type === "number") {
+            return [...pixels, [l.left.value, l.right.value]];
+        } else {
+            // try to iterate over list
+            let list: Lam = l;
+            while(isnil(list) === f) {
+                pixels = list_unpack(pixels, car(list));
+                list = cdr(list);
+            }
+
+            return pixels;
+        }
+
+    } else if(l.type === "list") {
+        
+        return l.items.reduce((acc, x) => list_unpack(acc, x), pixels);
+
+    } else if(l === nil) {
+        return pixels;
+    } else {
+
+        throw new Error("Bad list in picture");
+
+    }
+}
+
+export const draw = unk((x: Lam): Lam => {
+    return NewPicture(list_unpack([], x));
 });

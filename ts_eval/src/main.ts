@@ -36,6 +36,7 @@ function main() {
     message[28]();
     message[29]();
     message[30]();
+    message[32]();
 
     console.log("Test ok");
 

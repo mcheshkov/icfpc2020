@@ -2,10 +2,15 @@ import {
     inc, dec, add, mul, div, eq,
     lt, t, f, mod, dem, c, b, s,
     neg, i,
-    cons, car, cdr, nil, isnil
+    cons, car, cdr, nil, isnil, vec,
+    draw
 } from "./symbols";
 import {ListCons} from "./list";
-import {Lam, assertNum, assertNumNum, NumCons, NewModulate, assertModulate, unk} from "./common";
+import {
+    Lam, assertNum, assertNumNum, NumCons, NewModulate,
+    assertModulate, assertPicture, NewPicture,
+    unk
+} from "./common";
 import {strictEqual} from "assert";
 
 let message: any[] = [];
@@ -576,6 +581,37 @@ message[30] = () => {
         strictEqual(isnil(list_a), t);
         strictEqual(isnil(list_b), t);
     }
+}
+
+message[32] = () => {
+    // ap draw ( )   =   |picture1|
+    assertPicture(draw(ListCons([])), NewPicture([]));
+
+    // ap draw ( ap ap vec 1 1 )   =   |picture2|
+    assertPicture(draw(ListCons([vec(NumCons(1n))(NumCons(1n))])), NewPicture([[1n, 1n]]));
+    // ap draw ( ap ap vec 1 2 )   =   |picture3|
+    assertPicture(draw(ListCons([vec(NumCons(1n))(NumCons(2n))])), NewPicture([[1n, 2n]]));
+    // ap draw ( ap ap vec 2 5 )   =   |picture4|
+    assertPicture(draw(ListCons([vec(NumCons(2n))(NumCons(5n))])), NewPicture([[2n, 5n]]));
+    // ap draw ( ap ap vec 1 2 , ap ap vec 3 1 )   =   |picture5|
+    assertPicture(draw(ListCons([
+        vec(NumCons(1n))(NumCons(1n)),
+        vec(NumCons(3n))(NumCons(1n)),
+    ])), NewPicture([[1n, 1n], [3n, 1n]]));
+
+    assertPicture(draw(ListCons([
+        vec(NumCons(1n))(NumCons(1n)),
+        vec(NumCons(3n))(NumCons(1n)),
+    ])), NewPicture([[3n, 1n], [1n, 1n]]));
+
+    // ap draw ( ap ap vec 5 3 , ap ap vec 6 3 , ap ap vec 4 4 , ap ap vec 6 4 , ap ap vec 4 5 )   =   |picture6|
+    assertPicture(draw(ListCons([
+        vec(NumCons(5n))(NumCons(3n)),
+        vec(NumCons(6n))(NumCons(3n)),
+        vec(NumCons(4n))(NumCons(4n)),
+        vec(NumCons(6n))(NumCons(4n)),
+        vec(NumCons(4n))(NumCons(5n)),
+    ])), NewPicture([[5n, 3n], [6n, 3n], [4n, 4n], [6n, 4n], [4n, 5n]]));
 }
 
 export {message};
