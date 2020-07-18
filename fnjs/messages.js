@@ -237,3 +237,13 @@ exports.message[13] = () => {
     // ap mod -256   =   [-256]
     _.assert_eq(_.mod(-256), JSON.stringify({signal:-256}));
 }
+
+exports.message[14] = () => {
+    let x0 = 100500;
+    let x1 = JSON.stringify({signal:100500});
+
+    // ap dem ap mod x0   =   x0
+    _.assert_eq(_.dem(_.mod(x0)), x0);
+    // ap mod ap dem x0   =   x0
+    _.assert_eq(_.mod(_.dem(x1)), x1);
+}

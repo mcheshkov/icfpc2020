@@ -38,4 +38,6 @@ _.mod = (x) => {
     }
 };
 
+_.dem = (x) => JSON.parse(x).signal;
+
 exports.fn = _;
