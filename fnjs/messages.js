@@ -274,7 +274,7 @@ exports.message[17] = () => {
     // ap dec ap inc x0   =   x0
     _.assert_eq(_.dec(_.inc(x0)), x0);
     // ap dec ap ap add x0 1   =   x0
-    _.assert_eq(_.dec(_.add(0)(1)), x0);
+    _.assert_eq(_.dec(_.add(x0)(1)), x0);
     
     /*
     // ap ap add ap ap add 2 3 4   =   9
