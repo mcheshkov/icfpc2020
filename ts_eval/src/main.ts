@@ -1,5 +1,6 @@
 import {message} from "./messages";
-// import {send, real_send} from "./send";
+import {send} from "./send";
+import {NumCons} from "./common";
 
 function main() {
     console.log("Fn test");
@@ -14,15 +15,14 @@ function main() {
     message[12]();
     message[13]();
 
-    /*
     message[14]();
 
-    // console.log("send result:", send(42));
+    console.log("send result:", send(NumCons(42n)));
 
     message[16]();
     message[17]();
     message[18]();
-    */
+    message[19]();
 
     console.log("Test ok");
 

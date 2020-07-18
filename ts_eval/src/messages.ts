@@ -39,7 +39,7 @@ message[6] = () => {
 }
 
 
-exports.message[7] = () => {
+message[7] = () => {
     // ap ap _.add 1 2   =   3
     assertNum(_.add(NumCons(1n))(NumCons(2n)), 3n);
     // ap ap _.add 2 1   =   3
@@ -53,7 +53,7 @@ exports.message[7] = () => {
 }
 
 
-exports.message[8] = () => {
+message[8] = () => {
     let x0 = NumCons(100n);
     let x1 = NumCons(1337n);
     let x2 = NumCons(1488n);
@@ -77,7 +77,7 @@ exports.message[8] = () => {
 }
 
 
-exports.message[9] = () => {
+message[9] = () => {
     let x0 = NumCons(-255n);
     let x1 = NumCons(100500n);
 
@@ -96,7 +96,7 @@ exports.message[9] = () => {
 }
 
 
-exports.message[10] = () => {
+message[10] = () => {
     let x0 = NumCons(1008n);
 
     // ap ap _.div 4 2   =   2
@@ -122,7 +122,7 @@ exports.message[10] = () => {
 }
 
 
-exports.message[11] = () => {
+message[11] = () => {
     let x0 = NumCons(42n);
 
     // ap ap _.eq x0 x0   =   t
@@ -173,7 +173,7 @@ exports.message[11] = () => {
 }
 
 
-exports.message[12] = () => {
+message[12] = () => {
     // ap ap lt 0 -1   =   f
     strictEqual(_.lt(NumCons(0n))(NumCons(-1n)), _.f);
 
@@ -218,7 +218,7 @@ exports.message[12] = () => {
 }
 
 
-exports.message[13] = () => {
+message[13] = () => {
     // ap mod 0   =   [0]
     assertModulate(_.mod(NumCons(0n)), NewModulate(0n));
     // ap mod 1   =   [1]
@@ -245,19 +245,20 @@ exports.message[13] = () => {
     assertModulate(_.mod(NumCons(-256n)), NewModulate(-256n));
 }
 
-/*
-exports.message[14] = () => {
-    let x0 = 100500;
+
+message[14] = () => {
+    let x0 = NumCons(100500n);
     // пришлось добавить особую переменую, потому что dem не работает с числами
-    let x1 = NewModulate(100500});
+    let x1 = NewModulate(100500n);
 
     // ap dem ap mod x0   =   x0
-    assertNum(_.dem(_.mod(x0n)), x0n);
+    assertNumNum(_.dem(_.mod(x0)), x0);
     // ap mod ap dem x0   =   x0
-    assertNum(_.mod(_.dem(x1n)), x1n);
+    assertModulate(_.mod(_.dem(x1)), x1);
 }
 
-exports.message[16] = () => {
+
+message[16] = () => {
     // ap neg 0   =   0
     assertNum(_.neg(NumCons(0n)), 0n);
     // ap neg 1   =   -1
@@ -269,22 +270,21 @@ exports.message[16] = () => {
     // ap neg -2   =   2
     assertNum(_.neg(NumCons(-2n)), 2n);
 }
-*/
 
-/*
-exports.message[17] = () => {
-    let x0 = -42;
+
+message[17] = () => {
+    let x0 = NumCons(-42n);
 
     // ap inc ap inc 0   =   2
     assertNum(_.inc(_.inc(NumCons(0n))), 2n);
     // ap inc ap inc ap inc 0   =   3
     assertNum(_.inc(_.inc(_.inc(NumCons(0n)))), 3n);
     // ap inc ap dec x0   =   x0
-    assertNum(_.dec(_.inc(x0n)), x0n);
+    assertNumNum(_.dec(_.inc(x0)), x0);
     // ap dec ap inc x0   =   x0
-    assertNum(_.dec(_.inc(x0n)), x0n);
+    assertNumNum(_.dec(_.inc(x0)), x0);
     // ap dec ap ap add x0 1   =   x0
-    assertNum(_.dec(_.add(x0n)(NumCons(1n))), x0n);
+    assertNumNum(_.dec(_.add(x0)(NumCons(1n))), x0);
     // ap ap add ap ap add 2 3 4   =   9
     assertNum(_.add(_.add(NumCons(2n))(NumCons(3n)))(NumCons(4n)), 9n);
 
@@ -316,7 +316,7 @@ exports.message[17] = () => {
                 3
             4
     =   14
-    *
+    */
     {
         let d = _.add(NumCons(3n));
         let c = d(NumCons(4n));
@@ -327,19 +327,10 @@ exports.message[17] = () => {
 
     // inc and dec used as function-definition
 }
-*/
 
-/*
-exports.message[18] = () => {
-    let x0 = x => y => x + 2 * y;
-    let x1 = x => y => x * (y - 1n);
-    let x2 = x => y => (1 + y * x);
-
+message[18] = () => {
+    // used as fn definition
     // ap ap ap s x0 x1 x2   =   ap ap x0 x2 ap x1 x2
-    let a = _.s(x0n)(x1n)(x2n);
-    let b = x0(x2n)(x1(x2n));
-    // console.log(a, b);
-    assertNum(a, b);
 
     // ap ap ap s add inc 1   =   3
     /*
@@ -350,7 +341,7 @@ exports.message[18] = () => {
                 add
             inc
         1
-    *
+    */
     {
         let c = _.s(_.add);
         let b = c(_.inc);
@@ -368,7 +359,7 @@ exports.message[18] = () => {
                     add
                     1
             6   =   42
-    *
+    */
     {
         let d = _.add(NumCons(1n));
         let c = _.s(_.mul);
@@ -377,6 +368,27 @@ exports.message[18] = () => {
         assertNum(a, 42n);
     }
 }
-*/
+
+message[19] = () => {
+    // used as fn definition
+    // ap ap ap c x0 x1 x2   =   ap ap x0 x2 x1
+
+    // ap ap ap c add 1 2   =   3
+    /*
+        a: ap
+            b: ap
+                c: ap
+                    c
+                    add
+                1
+            2
+    */
+    {
+        let c = _.c(_.add);
+        let b = c(NumCons(1n));
+        let a = b(NumCons(2n));
+        assertNum(a, 3n);
+    }
+}
 
 export {message};

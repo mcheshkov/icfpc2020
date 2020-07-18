@@ -62,10 +62,18 @@ export function lt(x: Lam) : Lam {
 
 export const mod = unk((x: Lam): Lam => {
     if (x.type !== "number") {
-        throw new Error("Bad lt left arg");
+        throw new Error("Bad modulate left arg");
     }
 
     return NewModulate(x.value);
+});
+
+export const dem = unk((x: Lam): Lam => {
+    if (x.type !== "modulate") {
+        throw new Error("Bad demodulate left arg");
+    }
+
+    return NumCons(x.value);
 });
 
 // ap i x0   =   x0
