@@ -73,18 +73,13 @@ fn replace_all<'a, 'b>(mut bindings: Bindings<'a>, replacements: &'b Bindings<'a
         .collect()
 }
 
-fn replace_all_constants(bindings: Bindings) -> (Bindings, Bindings) {
+fn replace_matching<F: FnMut(&Action) -> bool>(
+    bindings: Bindings,
+    mut f: F,
+) -> (Bindings, Bindings) {
     let (replacements, new_bindings) = bindings
         .into_iter()
-        .partition::<HashMap<_, _>, _>(|(_, value)| is_constant(value));
-
-    (replace_all(new_bindings, &replacements), replacements)
-}
-
-fn replace_all_without_refs(bindings: Bindings) -> (Bindings, Bindings) {
-    let (replacements, new_bindings) = bindings
-        .into_iter()
-        .partition::<HashMap<_, _>, _>(|(_, value)| contains_no_references(value));
+        .partition::<HashMap<_, _>, _>(|(_, value)| f(value));
 
     (replace_all(new_bindings, &replacements), replacements)
 }
@@ -115,12 +110,13 @@ fn main() -> () {
     let mut something_changed = true;
 
     while something_changed {
-        let (new_all_bindings, substitutki) = replace_all_constants(all_bindings);
+        let (new_all_bindings, substitutki) = replace_matching(all_bindings, is_constant);
         something_changed = !substitutki.is_empty();
         removed.extend(substitutki);
         all_bindings = new_all_bindings;
 
-        let (new_all_bindings, substitutki) = replace_all_without_refs(all_bindings);
+        let (new_all_bindings, substitutki) =
+            replace_matching(all_bindings, contains_no_references);
         something_changed = !substitutki.is_empty();
         removed.extend(substitutki);
         all_bindings = new_all_bindings;
