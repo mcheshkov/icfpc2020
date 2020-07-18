@@ -101,7 +101,7 @@ import assert from "assert";
 
 export function assertNum(l:Lam, n: bigint) {
     if (l.type !== "number") {
-        throw new Error("NUmber expected");
+        throw new Error("Number expected");
     }
     assert.strictEqual(l.value, n);
 }

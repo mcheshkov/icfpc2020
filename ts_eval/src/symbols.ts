@@ -26,7 +26,7 @@ export const f = unk(function t(x0: Lam): Lam {
     });
 });
 
-export function eq(x: Lam) : Lam {
+export const eq = unk(function eq(x: Lam) : Lam {
     return unk((y: Lam) => {
         if (x.type !== "number") {
             throw new Error("Bad eq left arg");
@@ -41,9 +41,9 @@ export function eq(x: Lam) : Lam {
             return f;
         }
     });
-}
+});
 
-export function lt(x: Lam) : Lam {
+export const lt = unk(function lt(x: Lam) : Lam {
     return unk((y: Lam) => {
         if (x.type !== "number") {
             throw new Error("Bad lt left arg");
@@ -58,7 +58,7 @@ export function lt(x: Lam) : Lam {
             return f;
         }
     });
-}
+});
 
 export const mod = unk((x: Lam): Lam => {
     if (x.type !== "number") {
@@ -148,18 +148,6 @@ export const cdr = unk(function cdr(x0: Lam): Lam {
 export const nil = unk(function nil(): Lam {
     return t;
 });
-
-export function ListCons(items: Array<Lam>): Lam & LamList {
-    const res: Lam & LamList = function list(x2: Lam): Lam {
-        let x0 = items[0];
-        let x1 = ListCons(items.slice(1));
-        return x2(x0)(x1);
-    } as any;
-    res.type = "list";
-    res.items = items;
-
-    return res;
-}
 
 // ap isnil nil   =   t
 // ap isnil ap ap cons x0 x1   =   f
