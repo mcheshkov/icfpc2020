@@ -73,7 +73,7 @@ fn binding_as_ts(binding: (&str, Action)) -> String {
 fn main() -> () {
     // let mut input_file = File::open(Path::new("galaxy.txt")).expect("Could not open galaxy.txt");
     let mut data = "
-:1   =   ap ap cons x0 ap ap cons x1 nil
+:1   =   ap ap cons x0 ap ap cons x1 ap ap cons x2 ap ap cons x5 nil
     ";
     // let mut data = String::new();
     /*

@@ -541,7 +541,7 @@ message[30] = () => {
             list_b = cdr(list_b);
         }
         strictEqual(isnil(list_a), t);
-        // strictEqual(isnil(list_b), t);
+        strictEqual(isnil(list_b), t);
     }
     // ( x0 , x1 )   =   ap ap cons x0 ap ap cons x1 nil
     {
@@ -557,10 +557,25 @@ message[30] = () => {
             list_b = cdr(list_b);
         }
         strictEqual(isnil(list_a), t);
-        // strictEqual(isnil(list_b), t);
+        strictEqual(isnil(list_b), t);
     }
     // ( x0 , x1 , x2 )   =   ap ap cons x0 ap ap cons x1 ap ap cons x2 nil
     // ( x0 , x1 , x2 , x5 )   =   ap ap cons x0 ap ap cons x1 ap ap cons x2 ap ap cons x5 nil
+    {
+        let list_a: Lam = cons(x0)(cons(x1)(cons(x2)(cons(x5)(nil))));
+        let list_b: Lam = ListCons([x0, x1, x2, x5]);
+
+        for(let j = 0; j < 4; j++) {
+            strictEqual(isnil(list_a), f);
+            strictEqual(isnil(list_b), f);
+            assertNumNum(car(list_a), test_list[j]);
+            assertNumNum(car(list_b), test_list[j]);
+            list_a = cdr(list_a);
+            list_b = cdr(list_b);
+        }
+        strictEqual(isnil(list_a), t);
+        strictEqual(isnil(list_b), t);
+    }
 }
 
 export {message};
