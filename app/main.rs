@@ -1,6 +1,7 @@
 use http_body::Body as _;
 use hyper::client::HttpConnector;
 use hyper::{Body, Client, Method, Request, StatusCode};
+use hyper_tls::HttpsConnector;
 use std::env;
 use std::process;
 use std::thread;
@@ -9,7 +10,7 @@ use std::time;
 mod modulation;
 
 async fn send_to_aliens(
-    client: &Client<HttpConnector>,
+    client: &Client<HttpsConnector<HttpConnector>>,
     url: &str,
     body: String,
 ) -> Result<(), Box<dyn std::error::Error + Send + Sync>> {
@@ -61,7 +62,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error + Send + Sync>> {
 
     println!("ServerUrl: {}; PlayerKey: {}", server_url, player_key);
 
-    let client = Client::new();
+    let client = Client::builder().build::<_, hyper::Body>(HttpsConnector::new());
 
     send_to_aliens(&client, &server_url, "1101000\n".to_owned()).await?;
     thread::sleep(time::Duration::from_secs(12));
