@@ -166,9 +166,10 @@ export const cdr = unk(function cdr(x0: Lam): Lam {
 });
 
 // ap nil x0   =   t
-export const nil = unk(function nil(): Lam {
+export const nil: Lam & LamList = function nil(): Lam {
     return t;
-});
+} as any;
+nil.items = [];
 
 // ap isnil nil   =   t
 // ap isnil ap ap cons x0 x1   =   f
@@ -211,8 +212,6 @@ function list_unpack(pixels: Pixels, l: Lam): Pixels {
 
         return l.items.reduce((acc, x) => list_unpack(acc, x), pixels);
 
-    } else if(l === nil) {
-        return pixels;
     } else {
 
         throw new Error("Bad list in picture:" + l);

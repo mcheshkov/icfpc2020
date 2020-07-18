@@ -1,7 +1,7 @@
 import {Lam, LamList} from "./common";
 import {nil, t} from "./symbols";
 
-export function ListCons(items: Array<Lam>): Lam {
+export function ListCons(items: Array<Lam>): Lam & LamList {
     if (items.length === 0) return nil;
 
     const res: Lam & LamList = function list(x2: Lam): Lam {

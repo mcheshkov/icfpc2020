@@ -589,7 +589,7 @@ message[30] = () => {
     }
 }
 
-message[32] = (ctx: CanvasRenderingContext2D) => {
+message[32] = (ctx: CanvasRenderingContext2D | null) => {
     // ap draw ( )   =   |picture1|
     assertPicture(draw(ListCons([])), NewPicture([]));
 

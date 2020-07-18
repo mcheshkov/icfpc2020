@@ -232,7 +232,11 @@ export function assertPicture(l:Lam, n: Lam) {
     deepStrictEqual(l_sorted, n_sorted);
 }
 
-export function drawPicture(picture: Lam, ctx: CanvasRenderingContext2D) {
+export function drawPicture(picture: Lam, ctx: CanvasRenderingContext2D | null) {
+    if (ctx === null) {
+        return;
+    }
+
     if (picture.type !== "picture" ) {
         throw new Error("Picture expected");
     }
