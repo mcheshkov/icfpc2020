@@ -257,7 +257,7 @@ exports.message[14] = () => {
     assertModulate(_.mod(_.dem(x1)), x1);
 }
 
-/*
+
 exports.message[16] = () => {
     // ap neg 0   =   0
     assertNum(_.neg(NumCons(0n)), 0n);
@@ -270,22 +270,21 @@ exports.message[16] = () => {
     // ap neg -2   =   2
     assertNum(_.neg(NumCons(-2n)), 2n);
 }
-*/
 
-/*
+
 exports.message[17] = () => {
-    let x0 = -42;
+    let x0 = NumCons(-42n);
 
     // ap inc ap inc 0   =   2
     assertNum(_.inc(_.inc(NumCons(0n))), 2n);
     // ap inc ap inc ap inc 0   =   3
     assertNum(_.inc(_.inc(_.inc(NumCons(0n)))), 3n);
     // ap inc ap dec x0   =   x0
-    assertNum(_.dec(_.inc(x0n)), x0n);
+    assertNumNum(_.dec(_.inc(x0)), x0);
     // ap dec ap inc x0   =   x0
-    assertNum(_.dec(_.inc(x0n)), x0n);
+    assertNumNum(_.dec(_.inc(x0)), x0);
     // ap dec ap ap add x0 1   =   x0
-    assertNum(_.dec(_.add(x0n)(NumCons(1n))), x0n);
+    assertNumNum(_.dec(_.add(x0)(NumCons(1n))), x0);
     // ap ap add ap ap add 2 3 4   =   9
     assertNum(_.add(_.add(NumCons(2n))(NumCons(3n)))(NumCons(4n)), 9n);
 
@@ -317,7 +316,7 @@ exports.message[17] = () => {
                 3
             4
     =   14
-    *
+    */
     {
         let d = _.add(NumCons(3n));
         let c = d(NumCons(4n));
@@ -328,7 +327,6 @@ exports.message[17] = () => {
 
     // inc and dec used as function-definition
 }
-*/
 
 /*
 exports.message[18] = () => {

@@ -19,11 +19,9 @@ function main() {
 
     console.log("send result:", send(NumCons(42n)));
 
-    /*
     message[16]();
     message[17]();
-    message[18]();
-    */
+    // message[18]();
 
     console.log("Test ok");
 
