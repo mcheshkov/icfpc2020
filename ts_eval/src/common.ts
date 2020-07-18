@@ -116,10 +116,14 @@ export function unk(f: (a: Lam) => Lam): Lam {
 
 export function NumUnOp(_name:string, fn:(x: bigint) => bigint) : Lam {
     let res = function sum1(x: Lam): Lam {
-        if (x.type !== "number") {
-            throw new Error("Bad sum left arg");
-        }
-        return NumCons(fn(x.value));
+        return thunk(() => {
+            let xx = unthunk(x);
+            if (xx.type !== "number") {
+                throw new Error("Bad binop left arg");
+            }
+
+            return NumCons(fn(xx.value));
+        });
     };
     // (res as any).name = name;
     return unk(res);
