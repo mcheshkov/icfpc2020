@@ -66,18 +66,13 @@ async fn send_player_key(
 async fn send_to_aliens(
     client: &Client<HttpsConnector<HttpConnector>>,
     url: &str,
-    api_key: &str,
     body: String,
 ) -> Result<(), Box<dyn std::error::Error + Send + Sync>> {
-    let mut uri = url.to_owned() + "/aliens/send";
-    if !api_key.is_empty() {
-        uri += &format!("?apiKey={}", api_key);
-    }
-    println!("Making request to {}", uri);
+    println!("Making request to {}", url);
 
     let req = Request::builder()
         .method(Method::POST)
-        .uri(uri)
+        .uri(url)
         .body(Body::from(body))?;
 
     match client.request(req).await {
@@ -110,21 +105,24 @@ async fn main() -> Result<(), Box<dyn std::error::Error + Send + Sync>> {
     let args: Vec<String> = env::args().collect();
 
     let server_url = &args[1];
-    let player_key = &args[2];
-    let api_key = args.get(3).cloned().unwrap_or("".to_string());
+    let player_key = args.get(2).cloned();
 
-    println!("ServerUrl: {}; PlayerKey: {}", server_url, player_key);
+    println!(
+        "ServerUrl: {}; PlayerKey: {}",
+        server_url,
+        player_key.as_ref().map(|s| s.as_str()).unwrap_or("")
+    );
 
     let client = Client::builder().build::<_, hyper::Body>(HttpsConnector::new());
-    if !player_key.is_empty() {
-        send_player_key(&client, server_url, player_key.to_string()).await?;
+    if let Some(key) = player_key {
+        send_player_key(&client, server_url, key).await?;
     }
 
-    send_to_aliens(&client, &server_url, &api_key, "1101000\n".to_owned()).await?;
+    send_to_aliens(&client, &server_url, "1101000\n".to_owned()).await?;
     thread::sleep(time::Duration::from_secs(12));
-    send_to_aliens(&client, &server_url, &api_key, "1101000\n".to_owned()).await?;
+    send_to_aliens(&client, &server_url, "1101000\n".to_owned()).await?;
     thread::sleep(time::Duration::from_secs(6));
-    send_to_aliens(&client, &server_url, &api_key, "1101000\n".to_owned()).await?;
+    send_to_aliens(&client, &server_url, "1101000\n".to_owned()).await?;
 
     Ok(())
 }
