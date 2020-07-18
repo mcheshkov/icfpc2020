@@ -625,7 +625,7 @@ message[32] = (ctx: CanvasRenderingContext2D) => {
 
 message[33] = (ctx: CanvasRenderingContext2D) => {
     // ap ap checkerboard 7 0   =   |picture1|
-    let board = unthunk(checkerboard(NumCons(7n))(NumCons(0n)));
+    let board = unthunk(checkerboard(NumCons(11n))(NumCons(0n)));
     // console.log(board);
     let picture1 = draw(board);
     drawPicture(picture1, ctx);
