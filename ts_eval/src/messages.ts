@@ -39,7 +39,7 @@ message[6] = () => {
 }
 
 
-exports.message[7] = () => {
+message[7] = () => {
     // ap ap _.add 1 2   =   3
     assertNum(_.add(NumCons(1n))(NumCons(2n)), 3n);
     // ap ap _.add 2 1   =   3
@@ -53,7 +53,7 @@ exports.message[7] = () => {
 }
 
 
-exports.message[8] = () => {
+message[8] = () => {
     let x0 = NumCons(100n);
     let x1 = NumCons(1337n);
     let x2 = NumCons(1488n);
@@ -77,7 +77,7 @@ exports.message[8] = () => {
 }
 
 
-exports.message[9] = () => {
+message[9] = () => {
     let x0 = NumCons(-255n);
     let x1 = NumCons(100500n);
 
@@ -96,7 +96,7 @@ exports.message[9] = () => {
 }
 
 
-exports.message[10] = () => {
+message[10] = () => {
     let x0 = NumCons(1008n);
 
     // ap ap _.div 4 2   =   2
@@ -122,7 +122,7 @@ exports.message[10] = () => {
 }
 
 
-exports.message[11] = () => {
+message[11] = () => {
     let x0 = NumCons(42n);
 
     // ap ap _.eq x0 x0   =   t
@@ -173,7 +173,7 @@ exports.message[11] = () => {
 }
 
 
-exports.message[12] = () => {
+message[12] = () => {
     // ap ap lt 0 -1   =   f
     strictEqual(_.lt(NumCons(0n))(NumCons(-1n)), _.f);
 
@@ -218,7 +218,7 @@ exports.message[12] = () => {
 }
 
 
-exports.message[13] = () => {
+message[13] = () => {
     // ap mod 0   =   [0]
     assertModulate(_.mod(NumCons(0n)), NewModulate(0n));
     // ap mod 1   =   [1]
@@ -246,7 +246,7 @@ exports.message[13] = () => {
 }
 
 
-exports.message[14] = () => {
+message[14] = () => {
     let x0 = NumCons(100500n);
     // пришлось добавить особую переменую, потому что dem не работает с числами
     let x1 = NewModulate(100500n);
@@ -258,7 +258,7 @@ exports.message[14] = () => {
 }
 
 
-exports.message[16] = () => {
+message[16] = () => {
     // ap neg 0   =   0
     assertNum(_.neg(NumCons(0n)), 0n);
     // ap neg 1   =   -1
@@ -272,7 +272,7 @@ exports.message[16] = () => {
 }
 
 
-exports.message[17] = () => {
+message[17] = () => {
     let x0 = NumCons(-42n);
 
     // ap inc ap inc 0   =   2
@@ -328,7 +328,7 @@ exports.message[17] = () => {
     // inc and dec used as function-definition
 }
 
-exports.message[18] = () => {
+message[18] = () => {
     // used as fn definition
     // ap ap ap s x0 x1 x2   =   ap ap x0 x2 ap x1 x2
 
