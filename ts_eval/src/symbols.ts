@@ -1,6 +1,7 @@
 import {
     Lam, NumUnOp, NumBinOp, NewModulate, NumCons, unk, LamCons, LamList,
-    NewPicture, Pixels, thunk, unthunk
+    NewPicture, Pixels, thunk, unthunk,
+    empty_thunk
 } from "./common";
 
 export const add = NumBinOp("add", (x,y) => x+y);
@@ -183,15 +184,24 @@ export const isnil = unk(function isnil(x0: Lam): Lam {
 export const vec = cons;
 
 function list_unpack(pixels: Pixels, l: Lam): Pixels {
+    l = unthunk(l);
+
+    // console.log(l.type);
+
     if(l.type === "cons") {
-        if(l.left.type === "number" && l.right.type === "number") {
-            return [...pixels, [l.left.value, l.right.value]];
+        // console.log(l.left.type, l.right.type);
+
+        let left = unthunk(l.left);
+        let right = unthunk(l.right);
+
+        if(left.type === "number" && right.type === "number") {
+            return [...pixels, [left.value, right.value]];
         } else {
             // try to iterate over list
             let list: Lam = l;
             while(isnil(list) === f) {
                 pixels = list_unpack(pixels, car(list));
-                list = cdr(list);
+                list = unthunk(cdr(list));
             }
 
             return pixels;
@@ -205,7 +215,7 @@ function list_unpack(pixels: Pixels, l: Lam): Pixels {
         return pixels;
     } else {
 
-        throw new Error("Bad list in picture");
+        throw new Error("Bad list in picture:" + l);
 
     }
 }
@@ -213,3 +223,6 @@ function list_unpack(pixels: Pixels, l: Lam): Pixels {
 export const draw = unk((x: Lam): Lam => {
     return NewPicture(list_unpack([], x));
 });
+
+export const checkerboard = empty_thunk();
+checkerboard.result = s(b(s)(c(b(c)(b(c(c(s(b(s)(b(b(s(i)(i)))(lt)))(eq))))(s(mul)(i))))(nil)))(s(b(s)(b(b(cons))(s(b(s)(b(b(cons))(c(div))))(c(s(b(b)(c(b(b)(add))(neg)))(b(s(mul))(div)))))))(c(b(b)(checkerboard))(c(add)(NumCons(2n)))));

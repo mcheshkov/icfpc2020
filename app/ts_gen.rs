@@ -71,15 +71,15 @@ fn binding_as_ts(binding: (&str, Action)) -> String {
 }
 
 fn main() -> () {
-//     let mut data = "
-// :1   =   ap ap s ap ap c ap eq 0 1 ap ap b ap mul 2 ap ap b pwr2 ap add -1
-//     ";
+    let mut data = "
+checkerboard = ap ap s ap ap b s ap ap c ap ap b c ap ap b ap c ap c ap ap s ap ap b s ap ap b ap b ap ap s i i lt eq ap ap s mul i nil ap ap s ap ap b s ap ap b ap b cons ap ap s ap ap b s ap ap b ap b cons ap c div ap c ap ap s ap ap b b ap ap c ap ap b b add neg ap ap b ap s mul div ap ap c ap ap b b checkerboard ap ap c add 2
+    ";
 
     let mut input_file = File::open(Path::new("galaxy.txt")).expect("Could not open galaxy.txt");
-    let mut data = String::new();
+    /*let mut data = String::new();
     input_file
         .read_to_string(&mut data)
-        .expect("Could not read galaxy.txt to string");
+        .expect("Could not read galaxy.txt to string");*/
 
     // let mut known_file = File::create(Path::new("known.txt")).expect("Could not open known.txt");
     // let mut unknown_file =

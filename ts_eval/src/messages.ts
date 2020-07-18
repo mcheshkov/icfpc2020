@@ -3,7 +3,7 @@ import {
     lt, t, f, mod, dem, c, b, s,
     neg, i,
     cons, car, cdr, nil, isnil, vec,
-    draw
+    draw, checkerboard
 } from "./symbols";
 import {ListCons} from "./list";
 import {
@@ -621,6 +621,14 @@ message[32] = (ctx: CanvasRenderingContext2D) => {
 
     assertPicture(picture6, NewPicture([[5n, 3n], [6n, 3n], [4n, 4n], [6n, 4n], [4n, 5n]]));
     drawPicture(picture6, ctx);
+}
+
+message[33] = (ctx: CanvasRenderingContext2D) => {
+    // ap ap checkerboard 7 0   =   |picture1|
+    let board = unthunk(checkerboard(NumCons(7n))(NumCons(0n)));
+    // console.log(board);
+    let picture1 = draw(board);
+    drawPicture(picture1, ctx);
 }
 
 export {message};

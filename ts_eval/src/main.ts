@@ -38,7 +38,8 @@ export function main(ctx: CanvasRenderingContext2D) {
     message[28]();
     message[29]();
     message[30]();
-    message[32](ctx);
+    // message[32](ctx);
+    message[33](ctx);
 
     console.log("Test ok");
 
