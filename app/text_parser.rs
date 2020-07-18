@@ -154,23 +154,21 @@ impl<'a> Action<'a> {
                 }
                 Self::application(func.reduce_calls(), operand.reduce_calls())
             }
-            Self::MultipleArgApplication(func, operands)
-                if *func == Self::Value("neg") && operands.len() == 1 =>
-            {
-                if let Self::Number(n) = operands[0] {
-                    return Self::Number(-n);
+            Self::MultipleArgApplication(func, operands) => {
+                if *func == Self::Value("neg") {
+                    if operands.len() == 1 {
+                        if let Self::Number(n) = operands[0] {
+                            return Self::Number(-n);
+                        }
+                    }
+                } else if *func == Self::Value("add") {
+                    if operands.len() == 2 {
+                        if let [Self::Number(a), Self::Number(b)] = operands.as_slice() {
+                            return Self::Number(a + b);
+                        }
+                    }
                 }
-                Self::multi_application(
-                    func.reduce_calls(),
-                    operands.into_iter().map(|o| o.reduce_calls()).collect(),
-                )
-            }
-            Self::MultipleArgApplication(func, operands)
-                if *func == Self::Value("add") && operands.len() == 2 =>
-            {
-                if let [Self::Number(a), Self::Number(b)] = operands.as_slice() {
-                    return Self::Number(a + b);
-                }
+
                 Self::multi_application(
                     func.reduce_calls(),
                     operands.into_iter().map(|o| o.reduce_calls()).collect(),
