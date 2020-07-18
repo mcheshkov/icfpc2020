@@ -127,6 +127,7 @@
 :1335 = 10
 :1337 = b(t,c(b(b(cons(0)),c(b(b,cons),c(cons,nil))),cons(cons(cons(0,0),cons(cons(1,0),cons(cons(2,0),cons(cons(3,0),cons(cons(0,1),cons(cons(1,1),cons(cons(3,1),cons(cons(0,2),cons(cons(2,2),cons(cons(3,2),cons(cons(0,3),cons(cons(1,3),cons(cons(2,3),cons(cons(3,3),nil)))))))))))))),nil)))
 :1345 = 13
+:1352 = :1374
 :1378 = 0
 :1379 = 8
 :1380 = 13
@@ -156,3 +157,4 @@
 :1472 = [nil,nil]
 :1484 = cons(nil)
 :1489 = c(b(b,b),c(b(c,b(b(s),b(b(b(s)),c(b(c,b(b(c),b(b(b(c)),b(b(b(b(b))),b(b(b(b(cons))),c(b(c,b(b(c),b(b(b(c)),b(b(b(b(cons))),b(b(c(b(c,b(b(cons),c(b(c,b(b(cons),c(b(b,b(cons,add(-1))),add(-1)))),cons(3,3)))))),c(b(b,cons),c(cons,nil))))))),nil)))))),c(b(cons,c(cons,nil)),nil))))),s(b(s,b(b(cons),b(cons,add(-1)))),s(b(s,b(b(cons),cons)),s(b(s,b(b(cons),b(cons,c(add,1)))),s(b(s,b(b(cons),c(b(b,cons),add(-1)))),c(b(c,b(b(cons),c(b(b,cons),c(add,1)))),nil)))))))
+galaxy = :1338

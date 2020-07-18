@@ -110,14 +110,21 @@ fn main() -> () {
     let mut something_changed = true;
 
     while something_changed {
+        something_changed = false;
+
         let (new_all_bindings, substitutki) = replace_matching(all_bindings, is_constant);
-        something_changed = !substitutki.is_empty();
+        something_changed = something_changed || !substitutki.is_empty();
         removed.extend(substitutki);
         all_bindings = new_all_bindings;
 
         let (new_all_bindings, substitutki) =
             replace_matching(all_bindings, contains_no_references);
-        something_changed = !substitutki.is_empty();
+        something_changed = something_changed || !substitutki.is_empty();
+        removed.extend(substitutki);
+        all_bindings = new_all_bindings;
+
+        let (new_all_bindings, substitutki) = replace_matching(all_bindings, is_synonim);
+        something_changed = something_changed || !substitutki.is_empty();
         removed.extend(substitutki);
         all_bindings = new_all_bindings;
     }
