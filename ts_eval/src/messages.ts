@@ -328,17 +328,9 @@ exports.message[17] = () => {
     // inc and dec used as function-definition
 }
 
-/*
 exports.message[18] = () => {
-    let x0 = x => y => x + 2 * y;
-    let x1 = x => y => x * (y - 1n);
-    let x2 = x => y => (1 + y * x);
-
+    // used as fn definition
     // ap ap ap s x0 x1 x2   =   ap ap x0 x2 ap x1 x2
-    let a = _.s(x0n)(x1n)(x2n);
-    let b = x0(x2n)(x1(x2n));
-    // console.log(a, b);
-    assertNum(a, b);
 
     // ap ap ap s add inc 1   =   3
     /*
@@ -349,7 +341,7 @@ exports.message[18] = () => {
                 add
             inc
         1
-    *
+    */
     {
         let c = _.s(_.add);
         let b = c(_.inc);
@@ -367,7 +359,7 @@ exports.message[18] = () => {
                     add
                     1
             6   =   42
-    *
+    */
     {
         let d = _.add(NumCons(1n));
         let c = _.s(_.mul);
@@ -376,6 +368,5 @@ exports.message[18] = () => {
         assertNum(a, 42n);
     }
 }
-*/
 
 export {message};

@@ -21,7 +21,7 @@ function main() {
 
     message[16]();
     message[17]();
-    // message[18]();
+    message[18]();
 
     console.log("Test ok");
 
