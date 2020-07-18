@@ -16,6 +16,10 @@ path = "app/parser.rs"
 name = "fn_rust"
 path = "app/fn_rust.rs"
 
+[[bin]]
+name = "ts_gen"
+path = "app/ts_gen.rs"
+
 [dependencies]
 tokio = { version = "0.2.21", features = ["macros"] }
 hyper = "0.13.5"
