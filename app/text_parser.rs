@@ -347,10 +347,25 @@ impl<'a> Action<'a> {
         (calls_res, args_changed || lists_changed || calls_changed)
     }
 
+    pub fn reduce_all_max(self) -> (Self, bool) {
+        let mut res_changed = false;
+        let mut something_changed = true;
+        let mut res = self;
+
+        while something_changed {
+            let (new_res, changed) = res.reduce_all();
+            res_changed = res_changed || changed;
+            something_changed = changed;
+            res = new_res;
+        }
+
+        (res, res_changed)
+    }
+
     pub fn parse_reduced(stream: &str) -> Vec<Action> {
         Self::parse(stream)
             .into_iter()
-            .map(|a| a.reduce_all().0)
+            .map(|a| a.reduce_all_max().0)
             .collect()
     }
 
