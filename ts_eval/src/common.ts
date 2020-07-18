@@ -2,6 +2,10 @@ export type LamNumber = {
     type: "number",
     value: bigint,
 }
+export type LamModulate = {
+    type: "modulate",
+    value: bigint,
+}
 export type LamLit = {
     type: "literal",
     ident: string,
@@ -9,7 +13,7 @@ export type LamLit = {
 export type LamUnknown = {
     type: "unknown",
 }
-export type LamObj = LamNumber | LamLit | LamUnknown;
+export type LamObj = LamNumber | LamLit | LamUnknown | LamModulate;
 export type LamFn = (a: Lam) => Lam;
 export type Lam = LamFn & LamObj;
 
@@ -34,6 +38,16 @@ export function NumCons(v: bigint): Lam {
         return res;
     } as any;
     res.type = "number";
+    res.value = v;
+
+    return res;
+}
+
+export function NewModulate(v: bigint): Lam {
+    const res: Lam & LamModulate = function modulate(): Lam {
+        return res;
+    } as any;
+    res.type = "modulate";
     res.value = v;
 
     return res;
@@ -85,6 +99,13 @@ export function assertNum(l:Lam, n: bigint) {
 
 export function assertNumNum(l:Lam, n: Lam) {
     if (l.type !== "number" || n.type !== "number") {
+        throw new Error("NUmber expected");
+    }
+    assert.strictEqual(l.value, n.value);
+}
+
+export function assertModulate(l:Lam, n: Lam) {
+    if (l.type !== "modulate" || n.type !== "modulate") {
         throw new Error("NUmber expected");
     }
     assert.strictEqual(l.value, n.value);

@@ -1,4 +1,4 @@
-import {Lam, NumUnOp, NumBinOp, NumCons, unk} from "./common";
+import {Lam, NumUnOp, NumBinOp, NewModulate, NumCons, unk} from "./common";
 
 export const add = NumBinOp("add", (x,y) => x+y);
 export const mul = NumBinOp("mul", (x,y) => x*y);
@@ -59,6 +59,14 @@ export function lt(x: Lam) : Lam {
         }
     });
 }
+
+export const mod = unk((x: Lam): Lam => {
+    if (x.type !== "number") {
+        throw new Error("Bad lt left arg");
+    }
+
+    return NewModulate(x.value);
+});
 
 // ap i x0   =   x0
 export const i = unk(function i(x0: Lam): Lam {

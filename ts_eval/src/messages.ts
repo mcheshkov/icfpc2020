@@ -1,5 +1,5 @@
 import * as _ from "./symbols";
-import {assertNum, assertNumNum, NumCons} from "./common";
+import {assertNum, assertNumNum, NumCons, NewModulate, assertModulate} from "./common";
 import {strictEqual} from "assert";
 
 let message: any[] = [];
@@ -217,38 +217,39 @@ exports.message[12] = () => {
     strictEqual(_.lt(NumCons(-21n))(NumCons(-20n)), _.t);
 }
 
-/*
+
 exports.message[13] = () => {
     // ap mod 0   =   [0]
-    assertNum(_.mod(NumCons(0n)), JSON.stringify({signal:0}));
+    assertModulate(_.mod(NumCons(0n)), NewModulate(0n));
     // ap mod 1   =   [1]
-    assertNum(_.mod(NumCons(1n)), JSON.stringify({signal:1}));
+    assertModulate(_.mod(NumCons(1n)), NewModulate(1n));
     // ap mod -1   =   [-1]
-    assertNum(_.mod(NumCons(-1n)), JSON.stringify({signal:-1}));
+    assertModulate(_.mod(NumCons(-1n)), NewModulate(-1n));
     // ap mod 2   =   [2]
-    assertNum(_.mod(NumCons(2n)), JSON.stringify({signal:2}));
+    assertModulate(_.mod(NumCons(2n)), NewModulate(2n));
     // ap mod -2   =   [-2]
-    assertNum(_.mod(NumCons(-2n)), JSON.stringify({signal:-2}));
+    assertModulate(_.mod(NumCons(-2n)), NewModulate(-2n));
     // ...
     // ap mod 16   =   [16]
-    assertNum(_.mod(NumCons(16n)), JSON.stringify({signal:16}));
+    assertModulate(_.mod(NumCons(16n)), NewModulate(16n));
     // ap mod -16   =   [-16]
-    assertNum(_.mod(NumCons(-16n)), JSON.stringify({signal:-16}));
+    assertModulate(_.mod(NumCons(-16n)), NewModulate(-16n));
     // ...
     // ap mod 255   =   [255]
-    assertNum(_.mod(NumCons(255n)), JSON.stringify({signal:255}));
+    assertModulate(_.mod(NumCons(255n)), NewModulate(255n));
     // ap mod -255   =   [-255]
-    assertNum(_.mod(NumCons(-255n)), JSON.stringify({signal:-255}));
+    assertModulate(_.mod(NumCons(-255n)), NewModulate(-255n));
     // ap mod 256   =   [256]
-    assertNum(_.mod(NumCons(256n)), JSON.stringify({signal:256}));
+    assertModulate(_.mod(NumCons(256n)), NewModulate(256n));
     // ap mod -256   =   [-256]
-    assertNum(_.mod(NumCons(-256n)), JSON.stringify({signal:-256}));
+    assertModulate(_.mod(NumCons(-256n)), NewModulate(-256n));
 }
 
+/*
 exports.message[14] = () => {
     let x0 = 100500;
     // пришлось добавить особую переменую, потому что dem не работает с числами
-    let x1 = JSON.stringify({signal:100500});
+    let x1 = NewModulate(100500});
 
     // ap dem ap mod x0   =   x0
     assertNum(_.dem(_.mod(x0n)), x0n);
