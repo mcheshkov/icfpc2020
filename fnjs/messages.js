@@ -166,3 +166,47 @@ exports.message[11] = () => {
     // ap ap _.eq -21 -20   =   f
     _.assert_eq(_.eq(-21)(-20), _.f);
 }
+
+exports.message[12] = () => {
+    // ap ap lt 0 -1   =   f
+    _.assert_eq(_.lt(0)(-1), _.f);
+
+    // ap ap lt 0 0   =   f
+    _.assert_eq(_.lt(0)(0), _.f);
+    // ap ap lt 0 1   =   t
+    _.assert_eq(_.lt(0)(1), _.t);
+    // ap ap lt 0 2   =   t
+    _.assert_eq(_.lt(0)(2), _.t);
+    // ...
+    // ap ap lt 1 0   =   f
+    _.assert_eq(_.lt(1)(0), _.f);
+    // ap ap lt 1 1   =   f
+    _.assert_eq(_.lt(1)(1), _.f);
+    // ap ap lt 1 2   =   t
+    _.assert_eq(_.lt(1)(2), _.t);
+    // ap ap lt 1 3   =   t
+    _.assert_eq(_.lt(1)(3), _.t);
+    // ...
+    // ap ap lt 2 1   =   f
+    _.assert_eq(_.lt(2)(1), _.f);
+    // ap ap lt 2 2   =   f
+    _.assert_eq(_.lt(2)(2), _.f);
+    // ap ap lt 2 3   =   t
+    _.assert_eq(_.lt(2)(3), _.t);
+    // ap ap lt 2 4   =   t
+    _.assert_eq(_.lt(2)(4), _.t);
+    // ...
+    // ap ap lt 19 20   =   t
+    _.assert_eq(_.lt(19)(20), _.t);
+    // ap ap lt 20 20   =   f
+    _.assert_eq(_.lt(20)(20), _.f);
+    // ap ap lt 21 20   =   f
+    _.assert_eq(_.lt(21)(20), _.f);
+    // ...
+    // ap ap lt -19 -20   =   f
+    _.assert_eq(_.lt(-19)(-20), _.f);
+    // ap ap lt -20 -20   =   f
+    _.assert_eq(_.lt(-20)(-20), _.f);
+    // ap ap lt -21 -20   =   t
+    _.assert_eq(_.lt(-21)(-20), _.t);
+}

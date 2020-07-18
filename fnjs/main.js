@@ -9,6 +9,7 @@ function main() {
     messages.message[9]();
     messages.message[10]();
     messages.message[11]();
+    messages.message[12]();
     console.log("Test ok");
 }
 
