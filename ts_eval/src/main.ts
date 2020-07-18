@@ -28,6 +28,9 @@ function main() {
     message[22]();
     message[23]();
     message[24]();
+    message[25]();
+    message[26]();
+    message[27]();
 
     console.log("Test ok");
 

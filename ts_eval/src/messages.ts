@@ -2,9 +2,9 @@ import {
     inc, dec, add, mul, div, eq,
     lt, t, f, mod, dem, c, b, s,
     neg, i,
-    
+    cons, car, cdr
 } from "./symbols";
-import {assertNum, assertNumNum, NumCons, NewModulate, assertModulate} from "./common";
+import {assertNum, assertNumNum, NumCons, NewModulate, assertModulate, unk} from "./common";
 import {strictEqual} from "assert";
 
 let message: any[] = [];
@@ -462,5 +462,34 @@ message[24] = () => {
     // ap i ap add 1   =   ap add 1
     assertNumNum(i(add(NumCons(1n)))(x0), add(NumCons(1n))(x0));
 };
+
+message[25] = () => {
+    let x0 = NumCons(100n);
+    let x1 = NumCons(1337n);
+    let x2 = NumCons(1488n);
+
+    // ap ap ap cons x0 x1 x2   =   ap ap x2 x0 x1
+    // no check
+}
+
+message[26] = () => {
+    let x0 = NumCons(100n);
+    let x1 = NumCons(1337n);
+
+    let x2 = i;
+
+    // ap car ap ap cons x0 x1   =   x0
+    assertNumNum(car(cons(x0)(x1)), x0);
+    // ap car x2   =   ap x2 t
+    // assertNumNum(car(x2)(x0), x2(t)(x0)); // not work
+}
+
+message[27] = () => {
+    let x0 = NumCons(100n);
+    let x1 = NumCons(1337n);
+
+    // ap cdr ap ap cons x0 x1   =   x1
+    assertNumNum(cdr(cons(x0)(x1)), x1);
+}
 
 export {message};
