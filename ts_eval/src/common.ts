@@ -34,7 +34,11 @@ export type LamPicture = {
 export type LamUnknown = {
     type: "unknown",
 }
-export type LamObj = LamNumber | LamLit | LamCons | LamList | LamUnknown | LamModulate | LamPicture | LamThunk;
+export type LamDefer = {
+    type: "defer",
+    init(v: Lam): void;
+}
+export type LamObj = LamNumber | LamLit | LamCons | LamList | LamUnknown | LamModulate | LamPicture | LamThunk | LamDefer;
 export type LamFn = (a: Lam) => Lam;
 export type Lam = LamFn & LamObj;
 
@@ -217,4 +221,23 @@ export function assertLit(l:Lam, ident: string) {
         throw new Error("Literal expected");
     }
     assert.strictEqual(l.ident, ident);
+}
+
+export function Defer(): Lam & LamDefer {
+    let value: Lam | null = null;
+    let res = function(x: Lam): Lam {
+        if (value === null) {
+            throw new Error("Defer not inited");
+        }
+        return value(x);
+    } as any;
+    res.type = "defer";
+    res.init = function(v: Lam): void {
+        if (value !== null) {
+            throw new Error("Defer already inited");
+        }
+        value = v;
+    }
+
+    return res;
 }

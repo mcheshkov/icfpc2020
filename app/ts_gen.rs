@@ -67,7 +67,7 @@ fn action_as_ts(action: &Action) -> String {
 
 fn binding_as_ts(binding: (&str, Action)) -> String {
     let (ident, body) = binding;
-    format!("const {} = {};", escape_ident_ts(ident), action_as_ts(&body))
+    format!("{}.init({});", escape_ident_ts(ident), action_as_ts(&body))
 }
 
 fn main() -> () {
@@ -90,6 +90,8 @@ fn main() -> () {
 
     // let mut all_bindings = HashMap::new();
 
+    let mut bindings = vec![];
+
     for line in data.lines() {
         let actions = Action::parse(line)
             .into_iter()
@@ -97,11 +99,18 @@ fn main() -> () {
             .collect::<Vec<_>>();
 
         if let Some(binding) = parse_binding(&actions) {
-            println!("{}", binding_as_ts(binding));
+            bindings.push(binding);
         } else {
             for action in actions {
                 print!("{} ", action_as_ts(&action));
             }
         }
+    }
+
+    for (ident, _) in &bindings {
+        println!("const {} = Defer();", escape_ident_ts(ident));
+    }
+    for binding in bindings {
+        println!("{}", binding_as_ts(binding));
     }
 }
