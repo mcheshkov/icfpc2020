@@ -58,6 +58,7 @@ export const inc = NumUnOp("inc", (x) => x+1n);
 export const add = NumBinOp("add", (x,y) => x+y);
 export const mul = NumBinOp("mul", (x,y) => x*y);
 
+// ap ap ap s x0 x1 x2   =   ap ap x0 x2 ap x1 x2
 export function s(x0: Lam): Lam {
     return unk(function s1(x1) {
         return unk(function s2(x2) {
@@ -67,3 +68,14 @@ export function s(x0: Lam): Lam {
         });
     });
 }
+
+// ap ap ap c x0 x1 x2   =   ap ap x0 x2 x1
+export function c(x0: Lam): Lam {
+    return unk(function s1(x1) {
+        return unk(function s2(x2) {
+            let b = x0(x2);
+            return b(x1);
+        });
+    });
+}
+
