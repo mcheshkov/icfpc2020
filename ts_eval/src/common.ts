@@ -15,10 +15,14 @@ export type LamCons = {
     left: Lam,
     right: Lam,
 }
+export type LamList = {
+    type: "list",
+    items: Array<Lam>,
+}
 export type LamUnknown = {
     type: "unknown",
 }
-export type LamObj = LamNumber | LamLit | LamCons | LamUnknown | LamModulate;
+export type LamObj = LamNumber | LamLit | LamCons | LamList | LamUnknown | LamModulate;
 export type LamFn = (a: Lam) => Lam;
 export type Lam = LamFn & LamObj;
 

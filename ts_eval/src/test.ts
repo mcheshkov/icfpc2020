@@ -1,5 +1,5 @@
 import {Lam, Lit, NumCons, assertNum, assertLit} from "./common";
-import {add, b, c, car, cdr, cons, dec, inc, mul, s, t, i} from "./symbols";
+import {add, b, c, car, cdr, cons, dec, inc, mul, s, t, i, ListCons} from "./symbols";
 import assert from "assert";
 
 function test_s() {
@@ -46,6 +46,7 @@ function test_i(){
 function test_car(){
     // ap car ap ap cons x0 x1   =   x0
     assertLit(car(cons(Lit("x0"))(Lit("x1"))), "x0");
+    assertLit(car(ListCons([Lit("x0"), (Lit("x1"))])), "x0");
 }
 
 

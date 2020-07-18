@@ -40,13 +40,25 @@ fn action_as_ts(action: &Action) -> String {
             res += &format!("NumCons({}n)", n)
         },
         Action::SingleArgApplication(func, operand) => {
-            res += &format!("{}({})", action_as_ts(func), action_as_ts(operand))
+            res += &format!("{}({})", action_as_ts(&func), action_as_ts(&operand))
         },
-        Action::MultipleArgApplication(_, _) => {
-            panic!("Should not happen");
+        Action::MultipleArgApplication(func, args) => {
+            let apps = args
+                .iter()
+                .map(action_as_ts)
+                .map(|a| format!("({})", a))
+                .collect::<Vec<_>>()
+                .join("");
+            res += &format!(
+                "{}{}", action_as_ts(&func), apps)
         },
-        Action::List(_) => {
-            panic!("Should not happen");
+        Action::List(items) => {
+            let items = items
+                .iter()
+                .map(action_as_ts)
+                .collect::<Vec<_>>()
+                .join(",");
+            res += &format!("ListCons([{}])", items)
         },
     }
 
