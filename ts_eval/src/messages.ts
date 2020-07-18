@@ -448,4 +448,19 @@ message[23] = () => {
     // assertNum(pwr2(NumCons(2n)), 4n);
 }
 
+message[24] = () => {
+    let x0 = NumCons(-42n);
+
+    // ap i x0   =   x0
+    assertNumNum(i(x0), x0);
+    // ap i 1   =   1
+    assertNum(i(NumCons(1n)), 1n);
+    // ap i i   =   i
+    strictEqual(i(i), i);
+    // ap i add   =   add
+    strictEqual(i(add), add);
+    // ap i ap add 1   =   ap add 1
+    assertNumNum(i(add(NumCons(1n)))(x0), add(NumCons(1n))(x0));
+};
+
 export {message};
