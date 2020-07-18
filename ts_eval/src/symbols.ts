@@ -169,6 +169,7 @@ export const cdr = unk(function cdr(x0: Lam): Lam {
 export const nil: Lam & LamList = function nil(): Lam {
     return t;
 } as any;
+nil.type = "list";
 nil.items = [];
 
 // ap isnil nil   =   t
