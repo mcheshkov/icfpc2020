@@ -2,12 +2,26 @@ export type LamNumber = {
     type: "number",
     value: bigint,
 }
+export type LamLit = {
+    type: "literal",
+    ident: string,
+}
 export type LamUnknown = {
     type: "unknown",
 }
-export type LamObj = LamNumber | LamUnknown;
+export type LamObj = LamNumber | LamLit | LamUnknown;
 export type LamFn = (a: Lam) => Lam;
 export type Lam = LamFn & LamObj;
+
+export function Lit(ident: string) : Lam {
+    const res: Lam & LamLit = function literal(): Lam {
+        throw new Error("Literal evaluation unimplemented");
+    } as any;
+    res.type = "literal";
+    res.ident = ident;
+
+    return res;
+}
 
 export function NumCons(v: bigint): Lam {
     const res: Lam & LamNumber = function number(): Lam {
@@ -55,6 +69,7 @@ function NumBinOp(_name:string, fn:(x: bigint, y: bigint) => bigint) : Lam {
 }
 
 export const inc = NumUnOp("inc", (x) => x+1n);
+export const dec = NumUnOp("dec", (x) => x-1n);
 export const add = NumBinOp("add", (x,y) => x+y);
 export const mul = NumBinOp("mul", (x,y) => x*y);
 
@@ -79,3 +94,12 @@ export function c(x0: Lam): Lam {
     });
 }
 
+// ap ap ap b x0 x1 x2   =   ap x0 ap x1 x2
+export function b(x0: Lam): Lam {
+    return unk(function b1(x1) {
+        return unk(function b2(x2) {
+            let b = x1(x2);
+            return x0(b);
+        });
+    });
+}
