@@ -165,6 +165,17 @@ impl<'a> Action<'a> {
                     operands.into_iter().map(|o| o.reduce_calls()).collect(),
                 )
             }
+            Self::MultipleArgApplication(func, operands)
+                if *func == Self::Value("add") && operands.len() == 2 =>
+            {
+                if let [Self::Number(a), Self::Number(b)] = operands.as_slice() {
+                    return Self::Number(a + b);
+                }
+                Self::multi_application(
+                    func.reduce_calls(),
+                    operands.into_iter().map(|o| o.reduce_calls()).collect(),
+                )
+            }
             _ => self.recursive_apply_no_leafs(Self::reduce_calls),
         }
     }
