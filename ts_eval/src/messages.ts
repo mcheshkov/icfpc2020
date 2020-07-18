@@ -2,7 +2,7 @@ import {
     inc, dec, add, mul, div, eq,
     lt, t, f, mod, dem, c, b, s,
     neg, i,
-    cons, car, cdr
+    cons, car, cdr, nil, isnil
 } from "./symbols";
 import {assertNum, assertNumNum, NumCons, NewModulate, assertModulate, unk} from "./common";
 import {strictEqual} from "assert";
@@ -481,15 +481,36 @@ message[26] = () => {
     // ap car ap ap cons x0 x1   =   x0
     assertNumNum(car(cons(x0)(x1)), x0);
     // ap car x2   =   ap x2 t
-    // assertNumNum(car(x2)(x0), x2(t)(x0)); // not work
+    strictEqual(car(x2), x2(t)); // works only for i
 }
 
 message[27] = () => {
     let x0 = NumCons(100n);
     let x1 = NumCons(1337n);
 
+    let x2 = i;
+
     // ap cdr ap ap cons x0 x1   =   x1
     assertNumNum(cdr(cons(x0)(x1)), x1);
+    // ap cdr x2   =   ap x2 f
+    strictEqual(cdr(x2), x2(f)); // works only for i
+}
+
+message[28] = () => {
+    let x0 = NumCons(100n);
+
+    // ap nil x0   =   t
+    strictEqual(nil(x0), t);
+}
+
+message[29] = () => {
+    let x0 = NumCons(100n);
+    let x1 = NumCons(1337n);
+    
+    // ap isnil nil   =   t
+    strictEqual(isnil(nil), t);
+    // ap isnil ap ap cons x0 x1   =   f
+    strictEqual(isnil(cons(x0)(x1)), f);
 }
 
 export {message};
