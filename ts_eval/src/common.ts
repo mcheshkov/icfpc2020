@@ -73,12 +73,12 @@ export function empty_thunk(): Lam & LamThunk {
 export function unthunk(input: Lam): Lam {
     let l = input;
 
-    while (l.type === "thunk") {
+    if (l.type === "thunk") {
         if (l.result === null) {
             if (l.eval === null) {
                 throw new Error("Empty thunk");
             }
-            l.result = l.eval();
+            l.result = unthunk(l.eval());
         }
         l = l.result;
     }
