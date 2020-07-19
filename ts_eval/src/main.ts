@@ -89,9 +89,9 @@ const parseProtocolResponse = (response: Lam): [Lam & LamNumber, Lam & LamData, 
 };
 
 export function interact(x: number, y: number, state?: LamData): [bigint, LamData, Array<Lam>] {
-    const start_point = cons(NumCons(BigInt(x)))(NumCons(BigInt(y)));
+    const point = cons(NumCons(BigInt(x)))(NumCons(BigInt(y)));
     state = state === undefined ? nil : state;
-    const res = galaxy_u(state)(start_point);
+    const res = galaxy_u(state)(point);
 
     let [flag, newState, data] = parseProtocolResponse(res);
     let pictures = (data as LamList).items.map(convertToPicture);
