@@ -10,9 +10,9 @@ import {cons, nil, convertToPicture, vec} from "./symbols";
 import {galaxy} from "./galaxy";
 import {ListCons} from "./list";
 
-console.log("galaxy", galaxy);
+// console.log("galaxy", galaxy);
 const galaxy_u = unthunk(galaxy);
-console.log("galaxy unthunk", galaxy_u);
+// console.log("galaxy unthunk", galaxy_u);
 
 const consMap = (list: LamCons, fn: (l:Lam) => Lam): Lam & LamCons => {
     return cons(fn(list.left))(fn(list.right)) as any;
@@ -86,15 +86,23 @@ const parseProtocolResponse = (response: Lam): [Lam & LamNumber, Lam & LamData, 
     return [flag, state, data];
 };
 
-export function interact(x: number, y: number, state?: LamData): [bigint, LamData, Array<Lam>] {
+function interact(protocol: Lam, state: LamData, vector: LamData): [LamData, LamData] {
+    while (true) {
+        const protocol_response = protocol(state)(vector);
+        const [flag, newState, data] = parseProtocolResponse(protocol_response);
+        if (flag.value === 0n) {
+            return [newState, data];
+        } else {
+            state = newState;
+            vector = collectData(send(data));
+        }
+    }
+}
+
+export function interact_galaxy(x: number, y: number, state: LamData): [LamData, LamData] {
     const point = cons(NumCons(BigInt(x)))(NumCons(BigInt(y)));
-    state = state === undefined ? nil : state;
-    const res = galaxy_u(state)(point);
 
-    let [flag, newState, data] = parseProtocolResponse(res);
-    let pictures = (data as LamList).items.map(convertToPicture);
-
-    return [flag.value, newState, pictures];
+    return interact(galaxy_u, state, point as LamData);
 }
 
 export const initState: LamData = vec(
@@ -141,51 +149,6 @@ export function main() {
     message[30]();
 
     console.log("Test ok");
-
-    // real_send();
-
-    const start_state = nil;
-    const start_point = cons(NumCons(0n))(NumCons(0n));
-    const first_iter = galaxy_u(start_state)(start_point);
-    console.log("first_iter", first_iter);
-    console.log("first_iter unthunk", unthunk(first_iter));
-
-    const interact = (protocol: Lam, state: LamData, vector: LamData): [LamData, LamData] => {
-        while (true) {
-            const protocol_response = protocol(state)(vector);
-            const [flag, newState, data] = parseProtocolResponse(protocol_response);
-            if (flag.value === 0n) {
-                return [newState, data];
-            } else {
-                state = newState;
-                vector = collectData(send(data));
-            }
-        }
-    }
-
-    class Runner {
-        state: LamData;
-
-        constructor(protected protocol: Lam, protected draw:(images: LamData) => void) {
-            const start_state = nil;
-            const start_point = cons(NumCons(0n))(NumCons(0n)) as any;
-            const [newState, images] = interact(this.protocol, start_state, start_point);
-            this.state = newState;
-            this.draw(images);
-        }
-
-        click(vector: LamData) {
-            const [newState, images] = interact(this.protocol, this.state, vector);
-            this.state = newState;
-            this.draw(images);
-        }
-    }
-
-    const parsed = parseProtocolResponse(first_iter);
-
-    console.log("parsed", parsed);
-    console.log("newState", dataToString(parsed[1]));
-    console.log("data", dataToString(parsed[2]));
 }
 
 if (process && process.env && process.env.SHELL) {

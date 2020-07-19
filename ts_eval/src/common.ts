@@ -100,7 +100,7 @@ export function Lit(ident: string) : Lam {
 }
 
 export function NumCons(v: bigint): Lam {
-    const res: Lam & LamNumber = function number(): Lam {
+    const res: Lam & LamNumber = function number(x: any): Lam {
         throw new Error("Application on number!");
     } as any;
     res.type = "number";

@@ -7,6 +7,8 @@ const response_example = 1337n;
 const url = "https://icfpc2020-api.testkontur.ru/aliens/send?apiKey=4b5b59dead9e42fbbf203df4e634a2da";
 
 export const send = unk((x: Lam): Lam => {
+	console.log("send request");
+
     let request = _.mod(x);
 
     return _.dem(_.mod(NumCons(response_example)));

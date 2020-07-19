@@ -3,23 +3,23 @@ import {useRef} from 'react';
 
 import './App.css';
 
-import {interact} from 'fn_js/build/main';
+import {interact_galaxy} from 'fn_js/build/main';
 import {
     drawMultiplePicture, WIDTH, HEIGHT, PIXEL_SIZE, dataToString, LamData,
-    NumCons
+    NumCons, LamList
 } from 'fn_js/build/common';
-import {nil, vec} from 'fn_js/build/symbols';
+import {nil, vec, convertToPicture} from 'fn_js/build/symbols';
 import {ListCons} from 'fn_js/build/list';
 
 function processClick(canvas: CanvasRenderingContext2D, x: number, y: number, state?: any): LamData {
     console.log(`Sending click, x: ${x}, y: ${y}`);
-    let [flag, newState, image] = interact(x, y, state);
-    console.log("Interact results", flag, newState, image);
+    let [newState, imageData] = interact_galaxy(x, y, state);
     console.log("State", dataToString(newState));
+    // console.log("Image", image);
 
-    console.log("Drawing new image");
-    drawMultiplePicture(image, canvas);
-    console.log("Finished drawing image");
+    // console.log("Drawing new image");
+    drawMultiplePicture((imageData as LamList).items.map(convertToPicture), canvas);
+    // console.log("Finished drawing image");
 
     return newState;
 }
@@ -35,14 +35,14 @@ export const initState: LamData = vec(
 ) as LamData;
 
 function App() {
-    console.log("App is called");
+    // console.log("App is called");
     const canvasContainer = useRef<HTMLCanvasElement>(null);
     let canvas: HTMLCanvasElement;
     let canvasContext: CanvasRenderingContext2D;
 
     let state: LamData = initState;
 
-    console.log("init state:", dataToString(initState));
+    // console.log("init state:", dataToString(initState));
 
     function init() {
         if (!canvasContainer.current) {
