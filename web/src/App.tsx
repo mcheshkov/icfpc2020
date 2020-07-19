@@ -3,11 +3,13 @@ import {useRef} from 'react';
 
 import './App.css';
 
-import {interact} from 'fn_js/build/main';
+import {interact, initState} from 'fn_js/build/main';
 import {
-    drawMultiplePicture, WIDTH, HEIGHT, PIXEL_SIZE, dataToString, LamData
+    drawMultiplePicture, WIDTH, HEIGHT, PIXEL_SIZE, dataToString, LamData,
+    NumCons
 } from 'fn_js/build/common';
 import {nil} from 'fn_js/build/symbols';
+import {ListCons} from 'fn_js/build/list';
 
 function processClick(canvas: CanvasRenderingContext2D, x: number, y: number, state?: any): LamData {
     console.log(`Sending click, x: ${x}, y: ${y}`);
@@ -28,7 +30,9 @@ function App() {
     let canvas: HTMLCanvasElement;
     let canvasContext: CanvasRenderingContext2D;
 
-    let state: LamData = nil;
+    let state: LamData = initState;
+
+    console.log("init state:", dataToString(initState));
 
     function init() {
         if (!canvasContainer.current) {
@@ -41,7 +45,7 @@ function App() {
             throw new Error("Cannot draw in your browser");
         }
         canvasContext = context;
-        state = processClick(canvasContext, 0, 0);
+        state = processClick(canvasContext, 0, 0, state);
     }
 
     setTimeout(init, 10);

@@ -6,7 +6,7 @@ import {
     Lam, LamCons, LamList, LamNumber, LamData,
     NumCons, unthunk, dataToString
 } from "./common";
-import {cons, nil, convertToPicture} from "./symbols";
+import {cons, nil, convertToPicture, vec} from "./symbols";
 import {galaxy} from "./galaxy";
 import {ListCons} from "./list";
 
@@ -96,6 +96,16 @@ export function interact(x: number, y: number, state?: LamData): [bigint, LamDat
 
     return [flag.value, newState, pictures];
 }
+
+export const initState: LamData = vec(
+    NumCons(1n)
+)(
+    vec(
+        ListCons([NumCons(8n)])
+    )(
+        ListCons([NumCons(0n), ListCons([])])
+    )
+) as LamData;
 
 export function main() {
     console.log("Fn test");
