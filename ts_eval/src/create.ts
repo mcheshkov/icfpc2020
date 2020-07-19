@@ -1,6 +1,7 @@
 import {Client, deepConsToList} from "./client";
 import {Data} from "./modulation";
-import {fork} from "child_process";
+import {spawn} from "child_process";
+import fs from "fs";
 
 function consToList(data: Data): Array<Data> {
     if (data === null) {
@@ -31,8 +32,11 @@ async function main() {
     console.log("atKey", atKey);
     console.log("defKey", defKey);
 
-    const atClient = fork(__dirname + "/bot.js", [serverUrl, String(atKey)]);
-    const defClient = fork(__dirname + "/bot.js", [serverUrl, String(defKey)]);
+    const attackerLog = fs.openSync("attacker.log", "w");
+    const defenderLog = fs.openSync("defender.log", "w");
+
+    const atClient = spawn("node", [__dirname + "/bot.js", serverUrl, String(atKey)], {stdio: ["ignore", attackerLog, attackerLog]});
+    const defClient = spawn("node", [__dirname + "/bot.js", serverUrl, String(defKey)], {stdio: ["ignore", defenderLog, defenderLog]});
 }
 
 main()
