@@ -1,7 +1,11 @@
+// Запускать из папки ts_eval; Логи создаются в корневой папке репо
+// ./build.sh && ICFPC_API_KEY=4b5b59dead9e42fbbf203df4e634a2da node build/create.js 'https://icfpc2020-api.testkontur.ru'
+
 import {Client, deepConsToList} from "./client";
 import {Data} from "./modulation";
 import {spawn} from "child_process";
 import fs from "fs";
+import path from "path";
 
 function consToList(data: Data): Array<Data> {
     if (data === null) {
@@ -20,6 +24,10 @@ type StartResponse = [1n, [[0n, bigint], [1n, bigint]]] | BadResponse;
 
 
 async function main() {
+    const runDir = path.resolve(process.cwd(), "..");
+    console.log("runDir", runDir);
+    process.chdir(runDir);
+
     const serverUrl = process.argv[2];
 
     console.log(`ServerUrl: ${serverUrl};`);
@@ -35,8 +43,14 @@ async function main() {
     const attackerLog = fs.openSync("attacker.log", "w");
     const defenderLog = fs.openSync("defender.log", "w");
 
-    const atClient = spawn("node", [__dirname + "/bot.js", serverUrl, String(atKey)], {stdio: ["ignore", attackerLog, attackerLog]});
-    const defClient = spawn("node", [__dirname + "/bot.js", serverUrl, String(defKey)], {stdio: ["ignore", defenderLog, defenderLog]});
+    const atClient = spawn("./run.sh", [serverUrl, String(atKey)], {
+        stdio: ["ignore", attackerLog, attackerLog],
+        shell: true,
+    });
+    const defClient = spawn("./run.sh", [serverUrl, String(defKey)], {
+        stdio: ["ignore", defenderLog, defenderLog],
+        shell: true,
+    });
 }
 
 main()
