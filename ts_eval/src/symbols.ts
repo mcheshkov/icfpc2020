@@ -97,20 +97,25 @@ export const i = unk(function i(x0: Lam): Lam {
 export const s = unk(function s(x0: Lam): Lam {
     return unk(function s1(x1) {
         return unk(function s2(x2) {
-            let b = x0(x2);
-            let c = x1(x2);
-            return b(c);
+            let b = thunk(() => x0(x2));
+            let c = thunk(() => x1(x2));
+            return thunk(() => b(c));
         });
     });
 });
 
 // ap ap ap c x0 x1 x2   =   ap ap x0 x2 x1
 export const c = unk(function c(x0: Lam): Lam {
-    return unk(function s1(x1) {
-        return unk(function s2(x2) {
-            let b = x0(x2);
-            return b(x1);
-        });
+    return unk(function c1(x1) {
+        function c2(x2: Lam): Lam {
+            let b = thunk(() => x0(x2));
+            return thunk(() => b(x1));
+        }
+        c2.toString = function() {
+            return `c(${x0}, ${x1})`;
+        };
+
+        return unk(c2);
     });
 });
 
@@ -118,8 +123,8 @@ export const c = unk(function c(x0: Lam): Lam {
 export const b = unk(function b(x0: Lam): Lam {
     return unk(function b1(x1) {
         return unk(function b2(x2) {
-            let b = x1(x2);
-            return x0(b);
+            let b = thunk(() => x1(x2));
+            return thunk(() => x0(b));
         });
     });
 });
