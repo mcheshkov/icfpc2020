@@ -88,7 +88,7 @@ export function main(ctx: CanvasRenderingContext2D | null) {
         return cons(fn(list.left))(fn(list.right)) as any;
     }
 
-    type LamData = LamCons|LamList|LamNumber;
+    type LamData = Lam & (LamCons|LamList|LamNumber);
 
     const collectData = (data: Lam): Lam & (LamData) => {
         const l = unthunk(data);
@@ -165,6 +165,37 @@ export function main(ctx: CanvasRenderingContext2D | null) {
 
         return [flag, state, data];
     };
+
+    const interact = (protocol: Lam, state: LamData, vector: LamData): [LamData, LamData] => {
+        while (true) {
+            const protocol_response = protocol(state)(vector);
+            const [flag, newState, data] = parseProtocolResponse(protocol_response);
+            if (flag.value === 0n) {
+                return [newState, data];
+            } else {
+                state = newState;
+                vector = collectData(send(data));
+            }
+        }
+    }
+
+    class Runner {
+        state: LamData;
+
+        constructor(protected protocol: Lam, protected draw:(images: LamData) => void) {
+            const start_state = nil;
+            const start_point = cons(NumCons(0n))(NumCons(0n)) as any;
+            const [newState, images] = interact(this.protocol, start_state, start_point);
+            this.state = newState;
+            this.draw(images);
+        }
+
+        click(vector: LamData) {
+            const [newState, images] = interact(this.protocol, this.state, vector);
+            this.state = newState;
+            this.draw(images);
+        }
+    }
 
     const parsed = parseProtocolResponse(first_iter);
 
