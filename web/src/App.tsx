@@ -8,7 +8,7 @@ import {drawMultiplePicture, WIDTH, HEIGHT, PIXEL_SIZE} from 'fn_js/build/common
 import {nil} from 'fn_js/build/symbols';
 
 function processClick(canvas: CanvasRenderingContext2D, x: number, y: number, state?: any): LamData {
-    console.log("Sending click", x, y);
+    console.log(`Sending click, x: ${x}, y: ${y}`);
     let [flag, newState, image] = interact(0, 0, state);
     console.log("Interact results", flag, newState, image);
 

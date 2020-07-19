@@ -243,15 +243,22 @@ export function drawPicture(picture: Lam, ctx: CanvasRenderingContext2D, color: 
     }
 
     ctx.fillStyle = color;
-    
 
-    picture.value.forEach(x => 
+    const minX = -WIDTH/PIXEL_SIZE;
+    const maxX = WIDTH/PIXEL_SIZE - 1;
+    const minY = -WIDTH/PIXEL_SIZE;
+    const maxY = WIDTH/PIXEL_SIZE - 1;
+    picture.value.forEach(([x, y]) => {
+        if (x < minX || x > maxX || y < minY || y > maxY) {
+            throw new Error(`Trying to draw point at x: ${x}, y: ${y} which out of bounds`);
+        }
+
         ctx.fillRect(
-            WIDTH/2 + Number(x[0]) * PIXEL_SIZE,
-            HEIGHT/2 + Number(x[1]) * PIXEL_SIZE,
+            WIDTH/2 + Number(x) * PIXEL_SIZE,
+            HEIGHT/2 + Number(y) * PIXEL_SIZE,
             PIXEL_SIZE, PIXEL_SIZE
         )
-    );
+    });
 }
 
 export function drawSinglePicture(picture: Lam, ctx: CanvasRenderingContext2D) {
