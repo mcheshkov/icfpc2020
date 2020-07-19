@@ -1,6 +1,6 @@
 import assert from "assert";
 
-type Data = bigint | [Data, Data] | null;
+export type Data = bigint | [Data, Data] | null;
 
 const BITS_PER_ONE: number = 4;
 
