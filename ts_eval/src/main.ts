@@ -206,4 +206,4 @@ export function main(ctx: CanvasRenderingContext2D | null) {
     drawPicture(draw(parseProtocolResponse(first_iter)[2]), ctx);
 }
 
-main(null);
+// main(null);

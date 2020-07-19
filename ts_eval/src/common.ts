@@ -251,8 +251,8 @@ export function drawPicture(picture: Lam, ctx: CanvasRenderingContext2D | null) 
 
     picture.value.forEach(x => 
         ctx.fillRect(
-            Number(x[0]) * PIXEL_SIZE,
-            Number(x[1]) * PIXEL_SIZE,
+            WIDTH/2 + Number(x[0]) * PIXEL_SIZE,
+            HEIGHT/2 + Number(x[1]) * PIXEL_SIZE,
             PIXEL_SIZE, PIXEL_SIZE
         )
     );
