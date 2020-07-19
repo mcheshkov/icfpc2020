@@ -52,7 +52,38 @@ const GameStage = t.union([
     bigliteral(2n),
 ]);
 
+enum GameStageS {
+    NotStarted,
+    InProgress,
+    Finished,
+}
+
+function mkGameStageS(a: t.TypeOf<typeof GameStage>): GameStageS {
+    switch (a) {
+        case 0n:
+            return GameStageS.NotStarted;
+        case 1n:
+            return GameStageS.InProgress;
+        case 2n:
+            return GameStageS.Finished;
+    }
+}
+
 const Role = t.union([bigliteral(0n), bigliteral(1n)]);
+
+enum RoleS {
+    Attacker,
+    Defender,
+}
+
+function mkRoleS(a: t.TypeOf<typeof Role>): RoleS {
+    switch (a) {
+        case 0n:
+            return RoleS.Attacker;
+        case 1n:
+            return RoleS.Defender;
+    }
+}
 
 const StaticGameInfo = t.tuple([
     t.unknown,
@@ -63,27 +94,58 @@ const StaticGameInfo = t.tuple([
     t.unknown,
 ]);
 
+type StaticGameInfoS = {
+    role: RoleS,
+}
+
+function StaticGameInfoS(a: t.TypeOf<typeof StaticGameInfo>): StaticGameInfoS {
+    return {
+        role: mkRoleS(a[1]),
+    };
+}
+
 const Vec = t.tuple([
     bigint,
     bigint,
 ]);
 
+type VecS = [bigint, bigint];
+
 const ShipId = bigint;
+
+type ShipIdS = bigint;
 
 const Ship = t.tuple([
     // role
     Role,
     // shipId
     ShipId,
-    // // position
+    // position
     Vec,
     // velocity
     Vec,
-    t.unknown,
-    t.unknown,
-    t.unknown,
-    t.unknown,
+
+    // t.unknown,
+    // t.unknown,
+    // t.unknown,
+    // t.unknown,
 ]);
+
+type ShipS = {
+    role: RoleS,
+    id: ShipIdS,
+    position: VecS,
+    velocity: VecS,
+}
+
+function ShipS(a: t.TypeOf<typeof Ship>): ShipS {
+    return {
+        role: mkRoleS(a[0]),
+        id: a[1],
+        position: a[2],
+        velocity: a[3],
+    };
+}
 
 const AccelCommand = t.tuple([
     bigliteral(0n),
@@ -91,10 +153,21 @@ const AccelCommand = t.tuple([
     Vec,
 ]);
 
+type AccelCommandS = {
+    id: 0n,
+    shipId: ShipIdS,
+    vec: VecS,
+}
+
 const DetonateCommand = t.tuple([
     bigliteral(1n),
     ShipId,
 ]);
+
+type DetonateCommandS = {
+    id: 1n,
+    shipId: ShipIdS,
+}
 
 const ShootCommand = t.tuple([
     bigliteral(2n),
@@ -103,11 +176,41 @@ const ShootCommand = t.tuple([
     t.unknown,
 ]);
 
+type ShootCommandS = {
+    id: 2n,
+    shipId: ShipIdS,
+    target: VecS,
+}
+
 const Command = t.union([
     AccelCommand,
     DetonateCommand,
     ShootCommand,
 ]);
+
+type CommandS = AccelCommandS | DetonateCommandS | ShootCommandS;
+
+function CommandS(a: t.TypeOf<typeof Command>): CommandS {
+    switch (a[0]) {
+        case 0n:
+            return {
+                id: 0n,
+                shipId: a[1],
+                vec: a[2],
+            };
+        case 1n:
+            return {
+                id: 1n,
+                shipId: a[1],
+            };
+        case 2n:
+            return {
+                id: 2n,
+                shipId: a[1],
+                target: a[2],
+            };
+    }
+}
 
 const AppliedCommands = t.array(
     Command
@@ -122,9 +225,19 @@ const ShipsAndCommands = t.array(
     ])
 );
 
-const EmptyGameState = t.tuple([]);
+type ShipsAndCommandsS = Array<{
+    ship: ShipS,
+    commands: Array<CommandS>,
+}>;
 
-const FilledGameState = t.tuple([
+function ShipsAndCommandsS(a: t.TypeOf<typeof ShipsAndCommands>): ShipsAndCommandsS {
+    return a.map(i => ({
+        ship: ShipS(i[0]),
+        commands: i[1].map(CommandS),
+    }));
+}
+
+const GameState = t.tuple([
     // gameTick
     bigint,
     t.unknown,
@@ -132,9 +245,23 @@ const FilledGameState = t.tuple([
     ShipsAndCommands,
 ]);
 
-const GameState = t.union([
-    EmptyGameState,
-    FilledGameState,
+type GameStateS = {
+    tick: bigint,
+    shipsAndCommands: ShipsAndCommandsS,
+}
+
+function GameStateS(a: t.TypeOf<typeof GameState>): GameStateS {
+    return {
+        tick: a[0],
+        shipsAndCommands: ShipsAndCommandsS(a[2]),
+    }
+}
+
+const JoinGameResponse = t.tuple([
+    bigliteral(1n),
+    GameStage,
+    StaticGameInfo,
+    // GameState, // it's empty
 ]);
 
 const GoodGameResponse = t.tuple([
@@ -145,6 +272,20 @@ const GoodGameResponse = t.tuple([
 ]);
 
 export type GoodGameResponse = t.TypeOf<typeof GoodGameResponse>;
+
+type GoodGameResponseS = {
+    stage: GameStageS,
+    info: StaticGameInfoS,
+    state: GameStateS | null,
+}
+
+function GoodGameResponseS(gr: GoodGameResponse): GoodGameResponseS {
+    return {
+        stage: mkGameStageS(gr[1]),
+        info: StaticGameInfoS(gr[2]),
+        state: GameStateS(gr[3]),
+    }
+}
 
 const GameResponse = t.union([ GoodGameResponse, BadResponse ]);
 
@@ -255,29 +396,37 @@ export class Client {
         return createResponse;
     }
 
-    protected async gameRequest(data: Data, method: string): Promise<GoodGameResponse> {
+    protected async gameRequest(data: Data, method: string): Promise<GoodGameResponseS> {
         const result = await this.sendAliens(data);
 
         const listResult = deepConsToList(result);
-        console.log("listResult", method, listResult);
         const gameResponse = decode(GameResponse, listResult);
-        console.log(`${method} response: ${dataAsJson(gameResponse)}`);
         if (gameResponse[0] !== 1n) {
             throw new Error(`Bad response: ${result}`);
         }
 
-        return gameResponse;
+        const r = GoodGameResponseS(gameResponse);
+        console.log(`${method} response: ${dataAsJson(r)}`);
+        return r;
     }
 
-    async join(): Promise<GoodGameResponse> {
-        return this.gameRequest(JOIN(this.playerKey), "JOIN");
+    async join(): Promise<void> {
+        const result = await this.sendAliens(JOIN(this.playerKey));
+
+        const listResult = deepConsToList(result);
+        const gameResponse = decode(JoinGameResponse, listResult);
+        if (gameResponse[0] !== 1n) {
+            throw new Error(`Bad response: ${result}`);
+        }
+
+        // TODO JoinGameResponse
     }
 
-    async start(): Promise<GoodGameResponse> {
+    async start(): Promise<GoodGameResponseS> {
         return await this.gameRequest(START(this.playerKey), "START");
     }
 
-    async commands(): Promise<GoodGameResponse> {
+    async commands(): Promise<GoodGameResponseS> {
         return await this.gameRequest(COMMANDS(this.playerKey), "COMMANDS");
     }
 }
@@ -333,16 +482,18 @@ const gs = [123456789n, -1n, scs];
 
 function test_parse_gamestate() {
     decode(GameState, gs);
-    decode(GameState, []);
+    // TODO it's join response with empty state
+    // decode(GameState, []);
 }
 
 function test_parse_game_response() {
-    decode(GoodGameResponse, [
-        1n, // flag
-        0n, // stage
-        [ 256n, 1n, [ 448n, 1n, 64n ], [ 16n, 128n ], [] ], // static info
-        [], // state
-    ]);
+    // TODO it's join response with empty state
+    // decode(GoodGameResponse, [
+    //     1n, // flag
+    //     0n, // stage
+    //     [ 256n, 1n, [ 448n, 1n, 64n ], [ 16n, 128n ], [] ], // static info
+    //     [], // state
+    // ]);
 }
 
 function test() {
