@@ -35,12 +35,14 @@ class Client {
     }
 
     async sendAliens(data: Data): Promise<Data> {
+        console.log(`Sending :`, JSON.stringify(data, null, '\t'));
         const body = modulate(data);
 
         try {
             const response = await got.post(`${this.serverUrl}/aliens/send`, {body});
-            console.log(`Server response:`, response.body);
-            return demodulate(response.body)[0];
+            const result = demodulate(response.body)[0];
+            console.log(`Receiving :`, JSON.stringify(result, null, '\t'));
+            return result;
         } catch (e) {
             console.log(`Unexpected server response:\n`, e);
             if (typeof e.response !== 'undefined') {
