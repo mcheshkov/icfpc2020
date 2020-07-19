@@ -61,8 +61,8 @@ export class Client {
             const response = await got.post(url, {
                 body,
                 agent: {
-                    http: new HttpAgent(),
-                    https: new HttpsAgent(),
+                    http: this.httpAgent,
+                    https: this.httpsAgent,
                 },
             });
             const result = demodulate(response.body)[0];
@@ -82,7 +82,7 @@ export class Client {
     }
 
     async join(): Promise<Data> {
-        return await this.sendAliens(JOIN(this.playerKey));
+        return this.sendAliens(JOIN(this.playerKey));
     }
 
     async start(): Promise<Data> {
