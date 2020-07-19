@@ -3,12 +3,12 @@ import {
     lt, t, f, mod, dem, c, b, s,
     neg, i,
     cons, car, cdr, nil, isnil, vec,
-    draw, checkerboard
+    draw, checkerboard, multipledraw
 } from "./symbols";
 import {ListCons} from "./list";
 import {
     Lam, assertNum, assertNumNum, NumCons, NewModulate,
-    assertModulate, assertPicture, NewPicture, drawPicture,
+    assertModulate, assertPicture, NewPicture, drawSinglePicture, drawPictures
     unk, unthunk
 } from "./common";
 import {strictEqual} from "assert";
@@ -620,7 +620,7 @@ message[32] = (ctx: CanvasRenderingContext2D | null) => {
     ]));
 
     assertPicture(picture6, NewPicture([[5n, 3n], [6n, 3n], [4n, 4n], [6n, 4n], [4n, 5n]]));
-    drawPicture(picture6, ctx);
+    drawSinglePicture(picture6, ctx);
 }
 
 message[33] = (ctx: CanvasRenderingContext2D) => {
@@ -628,7 +628,26 @@ message[33] = (ctx: CanvasRenderingContext2D) => {
     let board = unthunk(checkerboard(NumCons(11n))(NumCons(0n)));
     // console.log(board);
     let picture1 = draw(board);
-    drawPicture(picture1, ctx);
+    drawSinglePicture(picture1, ctx);
+}
+
+message[34] = (ctx: CanvasRenderingContext2D) => {
+    {
+        let list = ListCons([
+            ListCons([
+                vec(NumCons(5n))(NumCons(3n)),
+                vec(NumCons(6n))(NumCons(3n)),
+                vec(NumCons(4n))(NumCons(4n)),
+                vec(NumCons(6n))(NumCons(4n)),
+                vec(NumCons(4n))(NumCons(5n)),
+            ]),
+            ListCons([
+                vec(NumCons(1n))(NumCons(1n)),
+                vec(NumCons(3n))(NumCons(1n)),
+            ]),
+        ]);
+        drawPictures(list, ctx);
+    }
 }
 
 export {message};

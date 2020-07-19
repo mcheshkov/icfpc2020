@@ -233,11 +233,7 @@ export function assertPicture(l:Lam, n: Lam) {
     deepStrictEqual(l_sorted, n_sorted);
 }
 
-export function drawPicture(picture: Lam, ctx: CanvasRenderingContext2D | null) {
-    if (ctx === null) {
-        return;
-    }
-
+export function drawPicture(picture: Lam, ctx: CanvasRenderingContext2D) {
     if (picture.type !== "picture" ) {
         throw new Error("Picture expected");
     }
@@ -256,6 +252,61 @@ export function drawPicture(picture: Lam, ctx: CanvasRenderingContext2D | null) 
             PIXEL_SIZE, PIXEL_SIZE
         )
     );
+}
+
+export function drawSinglePicture(picture: Lam, ctx: CanvasRenderingContext2D | null) {
+    if (ctx === null) {
+        return;
+    }
+
+    ctx.fillStyle = 'rgb(0, 0, 0)';
+    const WIDTH = 300;
+    const HEIGHT = 300;
+    const PIXEL_SIZE = 5;
+
+    ctx.clearRect(0, 0, WIDTH, HEIGHT);
+
+    drawPicture(picture, ctx);
+}
+
+import {car, cdr, isnil, t, f} from "./symbols";
+
+export function drawPictures(l: Lam, ctx: CanvasRenderingContext2D | null) {
+    if (ctx === null) {
+        return;
+    }
+
+    l = unthunk(l);
+
+    // console.log(l.type);
+
+    ctx.fillStyle = 'rgb(0, 0, 0)';
+    const WIDTH = 300;
+    const HEIGHT = 300;
+    const PIXEL_SIZE = 5;
+
+    ctx.clearRect(0, 0, WIDTH, HEIGHT);
+
+    if(l.type === "cons") {
+        // console.log(l.left.type, l.right.type);
+        let list: Lam = l;
+        while(isnil(list) === f) {
+            drawPicture(unthunk(car(list)), ctx);
+
+            list = unthunk(cdr(list));
+        }
+    } else if(l.type === "list") {
+
+        return l.items.forEach(uitem => {
+            let item = unthunk(uitem);
+            drawPicture(item, ctx);
+        });
+
+    } else {
+
+        throw new Error("Bad list for pictures:" + l);
+
+    }
 }
 
 export function assertLit(l:Lam, ident: string) {

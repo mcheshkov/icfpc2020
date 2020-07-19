@@ -41,6 +41,7 @@ export function main(ctx: CanvasRenderingContext2D | null) {
     message[30]();
     // message[32](ctx); // sample draw
     // message[33](ctx); // draw checkerboard
+    message[34](ctx); // multiple draw
 
     console.log("Test ok");
 
@@ -203,7 +204,7 @@ export function main(ctx: CanvasRenderingContext2D | null) {
     console.log("newState", dataToString(parsed[1]));
     console.log("data", dataToString(parsed[2]));
 
-    drawPicture(draw(parseProtocolResponse(first_iter)[2]), ctx);
+    // drawPicture(draw(parseProtocolResponse(first_iter)[2]), ctx);
 }
 
 // main(null);

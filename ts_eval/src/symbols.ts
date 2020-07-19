@@ -3,6 +3,7 @@ import {
     NewPicture, Pixels, thunk, unthunk,
     empty_thunk
 } from "./common";
+import {ListCons} from "./list";
 
 export const add = NumBinOp("add", (x,y) => x+y);
 export const mul = NumBinOp("mul", (x,y) => x*y);
@@ -236,3 +237,32 @@ export const draw = unk((x: Lam): Lam => {
 
 export const checkerboard = empty_thunk();
 checkerboard.result = s(b(s)(c(b(c)(b(c(c(s(b(s)(b(b(s(i)(i)))(lt)))(eq))))(s(mul)(i))))(nil)))(s(b(s)(b(b(cons))(s(b(s)(b(b(cons))(c(div))))(c(s(b(b)(c(b(b)(add))(neg)))(b(s(mul))(div)))))))(c(b(b)(checkerboard))(c(add)(NumCons(2n)))));
+
+export const multipledraw = unk((l: Lam) => {
+    l = unthunk(l);
+
+    if(l === nil) {
+        return nil;
+    } else {
+        if(l.type === "cons") {
+            // ap ap cons ap draw x0 ap multipledraw x1
+            /*
+            ap
+                ap
+                    cons
+                    ap
+                        draw
+                        x0
+                ap
+                    multipledraw
+                    x1
+            */
+            return cons(draw(unthunk(l.left)))(multipledraw(unthunk(l.right)));
+        } else if(l.type === "list") {
+            return ListCons(l.items.map(item => draw(unthunk(item))));
+        } else {
+            throw new Error("Bad list in multipledraw:" + l);
+            return nil;
+        }
+    }
+});
