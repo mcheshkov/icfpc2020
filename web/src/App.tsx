@@ -3,14 +3,17 @@ import {useRef} from 'react';
 
 import './App.css';
 
-import {interact, LamData} from 'fn_js/build/main';
-import {drawMultiplePicture, WIDTH, HEIGHT, PIXEL_SIZE} from 'fn_js/build/common'
+import {interact} from 'fn_js/build/main';
+import {
+    drawMultiplePicture, WIDTH, HEIGHT, PIXEL_SIZE, dataToString, LamData
+} from 'fn_js/build/common';
 import {nil} from 'fn_js/build/symbols';
 
 function processClick(canvas: CanvasRenderingContext2D, x: number, y: number, state?: any): LamData {
     console.log(`Sending click, x: ${x}, y: ${y}`);
     let [flag, newState, image] = interact(x, y, state);
     console.log("Interact results", flag, newState, image);
+    console.log("State", dataToString(newState));
 
     console.log("Drawing new image");
     drawMultiplePicture(image, canvas);

@@ -320,3 +320,41 @@ export function Defer(): Lam & LamDefer {
 
     return res;
 }
+
+export type LamData = Lam & (LamCons|LamList|LamNumber);
+
+export function dataToString(data: LamData): string {
+    function isData(l: Lam): l is Lam & LamData {
+        return l.type === "number" || l.type === "list" || l.type === "cons";
+    }
+
+    switch (data.type) {
+        case "list":
+            return "[" + data.items
+                    .map(i => {
+                        if (!isData(i)) {
+                            throw new Error(`Bad type in data: ${i}`);
+                        }
+                        return i;
+                    })
+                    .filter(i => isData(i))
+                    .map(i => dataToString(i))
+                    .join(", ")
+                + "]";
+        case "number":
+            return data.value.toString(10);
+        case "cons": {
+            const left = data.left;
+            if (! isData(left)) {
+                throw new Error(`Left in cons is not data: ${left}`);
+            }
+
+            const right = data.right;
+            if (! isData(right)) {
+                throw new Error(`Right in cons is not data: ${right}`);
+            }
+
+            return `(${dataToString(left)},${dataToString(right)})`;
+        }
+    }
+}

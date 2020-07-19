@@ -3,14 +3,12 @@ import "source-map-support/register";
 import {message} from "./messages";
 import {send} from "./send";
 import {
-    Lam, LamCons, LamList, LamNumber,
-    NumCons, unthunk
+    Lam, LamCons, LamList, LamNumber, LamData,
+    NumCons, unthunk, dataToString
 } from "./common";
 import {cons, nil, convertToPicture} from "./symbols";
 import {galaxy} from "./galaxy";
 import {ListCons} from "./list";
-
-export type LamData = Lam & (LamCons|LamList|LamNumber);
 
 console.log("galaxy", galaxy);
 const galaxy_u = unthunk(galaxy);
@@ -141,42 +139,6 @@ export function main() {
     const first_iter = galaxy_u(start_state)(start_point);
     console.log("first_iter", first_iter);
     console.log("first_iter unthunk", unthunk(first_iter));
-
-    function dataToString(data: LamData): string {
-        function isData(l: Lam): l is Lam & LamData {
-            return l.type === "number" || l.type === "list" || l.type === "cons";
-        }
-
-        switch (data.type) {
-            case "list":
-                return "[" + data.items
-                        .map(i => {
-                            if (!isData(i)) {
-                                throw new Error(`Bad type in data: ${i}`);
-                            }
-                            return i;
-                        })
-                        .filter(i => isData(i))
-                        .map(i => dataToString(i))
-                        .join(", ")
-                    + "]";
-            case "number":
-                return data.value.toString(10);
-            case "cons": {
-                const left = data.left;
-                if (! isData(left)) {
-                    throw new Error(`Left in cons is not data: ${left}`);
-                }
-
-                const right = data.right;
-                if (! isData(right)) {
-                    throw new Error(`Right in cons is not data: ${right}`);
-                }
-
-                return `(${dataToString(left)},${dataToString(right)})`;
-            }
-        }
-    }
 
     const interact = (protocol: Lam, state: LamData, vector: LamData): [LamData, LamData] => {
         while (true) {
