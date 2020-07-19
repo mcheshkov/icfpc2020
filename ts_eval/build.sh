@@ -1,2 +1,2 @@
 #!/bin/bash
-npm run build
+node node_modules/.bin/tsc
