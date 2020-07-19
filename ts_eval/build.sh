@@ -1,2 +1,2 @@
 #!/bin/bash
-npx tsc
+npm run build
