@@ -7,6 +7,7 @@ import { isRight } from "fp-ts/lib/Either";
 import * as t from 'io-ts'
 
 import {Data, demodulate, modulate} from "./modulation";
+import {read} from "fs";
 
 function decode<T, D extends t.Any>(decoder: D, t: unknown): t.TypeOf<typeof decoder> {
     const res = decoder.decode(t);
@@ -109,7 +110,7 @@ const Vec = t.tuple([
     bigint,
 ]);
 
-type VecS = [bigint, bigint];
+export type VecS = readonly [bigint, bigint];
 
 const ShipId = bigint;
 
@@ -205,12 +206,12 @@ type CommandS = AccelCommandS | DetonateCommandS | ShootCommandS;
 function serCommandS(cs: CommandS): Command {
     switch (cs.id) {
         case 0n:
-            return [cs.id, cs.shipId, cs.vec];
+            return [cs.id, cs.shipId, [cs.vec[0],cs.vec[1]]];
         case 1n:
             return [cs.id, cs.shipId];
         case 2n:
             // TODO last param
-            return [cs.id, cs.shipId, cs.target, 0n];
+            return [cs.id, cs.shipId, [cs.target[0],cs.target[1]], 0n];
     }
 }
 
@@ -452,6 +453,7 @@ export class Client {
     }
 
     async commands(cs: Array<CommandS>): Promise<GoodGameResponseS> {
+        console.log(`commands request: ${dataAsJson(cs)}`);
         return await this.gameRequest(COMMANDS(this.playerKey, cs), "COMMANDS");
     }
 }
