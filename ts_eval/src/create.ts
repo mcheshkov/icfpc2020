@@ -8,16 +8,12 @@ async function main() {
 
     const client = new Client(serverUrl, playerKey);
 
-    await client.join();
-    await client.start();
-    for (let i=0; i<256; i++) {
-        await client.commands();
-    }
+    await client.create();
 }
 
 main()
-.catch((e) => {
-    console.log(e);
-    console.log(e.stack);
-    process.exit(1);
-});
+    .catch((e) => {
+        console.log(e);
+        console.log(e.stack);
+        process.exit(1);
+    });
