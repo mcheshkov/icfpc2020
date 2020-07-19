@@ -24,6 +24,9 @@ function div(a:VecS, b:bigint) : VecS {
 function neg(a:VecS) : VecS {
     return [-a[0], -a[1]];
 }
+function clamp(a:bigint, l:bigint, r:bigint): bigint {
+    return a < l ? l : a > r ? r : a;
+}
 
 export class Bot {
     protected client: Client;
@@ -44,19 +47,28 @@ export class Bot {
                 .filter(scs => scs.ship.role === role)
                 .map(scs => scs.ship.id);
 
+            // Хочу выйти на орбиту и крутится
+            // похоже гравитация действует только вдоль одной оси - той, вдоль которой расстояние БОЛЬШЕ, типа бесконечная (кубическая) норма
+            // в ускорение можно передатьва ТОЛЬКО +-1
+
             const accels = myShips.map(id => {
                 const ship = state.shipsAndCommands.find(sc => sc.ship.id === id)!.ship;
                 const pos = ship.position;
                 const tangent: VecS = [pos[1], -pos[0]];
                 const dist = norm(pos);
+                const vel = norm(ship.velocity);
 
                 let thrust = tangent;
-                if (dist < 40n) {
-                    const amp = (40n - dist);
-                    const dir = neg(pos);
-                    thrust = add(thrust, mul(dir, amp))
+
+                if (vel > 7) {
+                    thrust = [0n, 1n];
                 }
 
+                thrust = ship.velocity;
+                thrust = [
+                    clamp(ship.velocity[0], -1n, 1n),
+                    clamp(ship.velocity[1], -1n, 1n),
+                ]
                 return Accel(id, thrust);
             });
 

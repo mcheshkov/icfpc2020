@@ -7,7 +7,7 @@ async function main() {
     console.log(`ServerUrl: ${serverUrl}; playerKey: ${playerKey}`);
 
     const bot = new Bot(serverUrl, playerKey);
-    bot.run()
+    await bot.run()
 }
 
 main()
