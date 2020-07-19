@@ -2,7 +2,10 @@ import "source-map-support/register";
 
 import {message} from "./messages";
 import {send} from "./send";
-import {Lam, LamCons, LamList, LamNumber, NumCons, unthunk, drawPicture, drawSinglePicture} from "./common";
+import {
+    Lam, LamCons, LamList, LamNumber,
+    NumCons, unthunk, drawSinglePicture, drawPicture, drawMultiplePicture
+} from "./common";
 import {cons, nil, draw} from "./symbols";
 import {galaxy} from "./galaxy";
 import {ListCons} from "./list";
@@ -204,7 +207,11 @@ export function main(ctx: CanvasRenderingContext2D | null) {
     console.log("newState", dataToString(parsed[1]));
     console.log("data", dataToString(parsed[2]));
 
-    drawSinglePicture(draw(parseProtocolResponse(first_iter)[2]), ctx);
+    
+
+    let pictures = (parsed[2] as LamList).items.map((x, i) => draw(x));
+
+    drawMultiplePicture(pictures, ctx);
 }
 
 // main(null);

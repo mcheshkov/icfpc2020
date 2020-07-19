@@ -8,7 +8,7 @@ import {
 import {ListCons} from "./list";
 import {
     Lam, assertNum, assertNumNum, NumCons, NewModulate,
-    assertModulate, assertPicture, NewPicture, drawSinglePicture, drawPictures,
+    assertModulate, assertPicture, NewPicture, drawSinglePicture,
     unk, unthunk
 } from "./common";
 import {strictEqual} from "assert";
@@ -646,7 +646,7 @@ message[34] = (ctx: CanvasRenderingContext2D) => {
                 vec(NumCons(3n))(NumCons(1n)),
             ]),
         ]);
-        drawPictures(list, ctx);
+        // drawPictures(list, ctx);
     }
 }
 

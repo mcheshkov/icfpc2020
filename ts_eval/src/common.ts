@@ -233,17 +233,17 @@ export function assertPicture(l:Lam, n: Lam) {
     deepStrictEqual(l_sorted, n_sorted);
 }
 
-export function drawPicture(picture: Lam, ctx: CanvasRenderingContext2D) {
+const WIDTH = 300;
+const HEIGHT = 300;
+const PIXEL_SIZE = 5;
+
+export function drawPicture(picture: Lam, ctx: CanvasRenderingContext2D, color: string) {
     if (picture.type !== "picture" ) {
         throw new Error("Picture expected");
     }
 
-    ctx.fillStyle = 'rgb(0, 0, 0)';
-    const WIDTH = 300;
-    const HEIGHT = 300;
-    const PIXEL_SIZE = 5;
-
-    ctx.clearRect(0, 0, WIDTH, HEIGHT);
+    ctx.fillStyle = color;
+    
 
     picture.value.forEach(x => 
         ctx.fillRect(
@@ -259,55 +259,42 @@ export function drawSinglePicture(picture: Lam, ctx: CanvasRenderingContext2D | 
         return;
     }
 
-    ctx.fillStyle = 'rgb(0, 0, 0)';
-    const WIDTH = 300;
-    const HEIGHT = 300;
-    const PIXEL_SIZE = 5;
-
     ctx.clearRect(0, 0, WIDTH, HEIGHT);
 
-    drawPicture(picture, ctx);
+    drawPicture(picture, ctx, 'rgb(0, 0, 0)');
 }
 
-import {car, cdr, isnil, t, f} from "./symbols";
-
-export function drawPictures(l: Lam, ctx: CanvasRenderingContext2D | null) {
+export function drawMultiplePicture(pictures: Array<Lam>, ctx: CanvasRenderingContext2D | null) {
     if (ctx === null) {
         return;
     }
 
-    l = unthunk(l);
+    const COLORS = [
+        "#001f3f",
+        "#0074D9",
+        "#7FDBFF",
+        "#39CCCC",
+        "#3D9970",
+        "#2ECC40",
+        "#01FF70",
+        "#FFDC00",
+        "#FF851B",
+        "#85144b",
+        "#F012BE",
+        "#B10DC9",
+        "#111111",
+        "#AAAAAA",
+        "#DDDDDD",
+    ];
 
-    // console.log(l.type);
-
-    ctx.fillStyle = 'rgb(0, 0, 0)';
-    const WIDTH = 300;
-    const HEIGHT = 300;
-    const PIXEL_SIZE = 5;
+    const DEFAULT_COLOR = "#FF0000";
 
     ctx.clearRect(0, 0, WIDTH, HEIGHT);
 
-    if(l.type === "cons") {
-        // console.log(l.left.type, l.right.type);
-        let list: Lam = l;
-        while(isnil(list) === f) {
-            drawPicture(unthunk(car(list)), ctx);
-
-            list = unthunk(cdr(list));
-        }
-    } else if(l.type === "list") {
-
-        return l.items.forEach(uitem => {
-            let item = unthunk(uitem);
-            drawPicture(item, ctx);
-        });
-
-    } else {
-
-        throw new Error("Bad list for pictures:" + l);
-
-    }
+    pictures.forEach((item, idx) => drawPicture(item, ctx, COLORS[idx] || DEFAULT_COLOR));
 }
+
+import {car, cdr, isnil, t, f} from "./symbols";
 
 export function assertLit(l:Lam, ident: string) {
     if (l.type !== "literal") {
