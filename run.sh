@@ -1,3 +1,3 @@
 #!/bin/sh
 
-/solution/target/release/app "$@" || echo "run error code: $?"
+node ts_eval/build/bot.js "$@" || echo "run error code: $?"

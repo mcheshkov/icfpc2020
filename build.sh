@@ -1,4 +1,3 @@
 #!/bin/sh
 
-cd app
-CI=true cargo build --release --offline --color=never
+cd ts_eval && ./build.sh
