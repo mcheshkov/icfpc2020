@@ -181,11 +181,13 @@ nil.items = [];
 // ap isnil ap ap cons x0 x1   =   f
 export const isnil = unk(function isnil(x0: Lam): Lam {
     return thunk(() => {
-        if (unthunk(x0) == nil) {
+        const xx0 = unthunk(x0);
+        if (xx0 === nil) {
             return t;
-        } else {
-            // TODO proper implementation
+        } else if (xx0.type === "cons" || xx0.type === "list") {
             return f;
+        } else {
+            throw new Error(`INvalid isnil arg: ${xx0}`);
         }
     });
 });
