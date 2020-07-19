@@ -1,6 +1,48 @@
 import { Agent as HttpAgent } from "http";
 import { Agent as HttpsAgent } from "https";
+
 import got from "got";
+
+import { isRight } from "fp-ts/lib/Either";
+import * as t from 'io-ts'
+
+function decode<T, D extends t.Any>(decoder: D, t: unknown): t.TypeOf<typeof decoder> {
+    const res = decoder.decode(t);
+    if (isRight(res)) {
+        return res.right;
+    }
+    // TODO proper message
+    throw new Error("Parsing failed");
+}
+
+const bigliteral = <T extends bigint>(x: T) => t.literal(x, x.toString());
+
+const bigint = new t.Type<bigint, bigint, unknown>(
+    'bigint',
+    (u): u is bigint => typeof u === "bigint",
+    (u, c) => (typeof u === "bigint" ? t.success(u) : t.failure(u, c)),
+    (a) => a,
+)
+
+const BadResponse = t.tuple([ bigliteral(0n) ]);
+
+const GoodCreateResponse = t.tuple([
+    bigliteral(1n),
+    t.tuple([
+        t.tuple([
+            bigliteral(0n),
+            bigint,
+        ]),
+        t.tuple([
+            bigliteral(1n),
+            bigint,
+        ]),
+    ]),
+]);
+
+export type GoodCreateResponse = t.TypeOf<typeof GoodCreateResponse>;
+
+const CreateResponse = t.union([ GoodCreateResponse, BadResponse ])
 
 import {Data, demodulate, modulate} from "./modulation";
 
@@ -40,6 +82,23 @@ function dataAsJson(data: Data) {
     return JSON.stringify(data, (k, v) => typeof v === "bigint" ? v.toString() : v, '\t');
 }
 
+type ListData = Array<ListData> | bigint;
+
+export function deepConsToList(data: Data): ListData {
+    if (data === null) {
+        return [];
+    }
+    if (typeof data === "bigint") {
+        return data;
+    }
+    const [head, tail] = data;
+    const tailList = deepConsToList(tail);
+    if (typeof tailList === "bigint") {
+        throw new Error("Unexpected number in tail");
+    }
+    return [deepConsToList(head), ...tailList];
+}
+
 export class Client {
     protected httpAgent: HttpAgent;
     protected httpsAgent: HttpsAgent;
@@ -77,8 +136,17 @@ export class Client {
         }
     }
 
-    async create(): Promise<Data> {
-        return await this.sendAliens(CREATE());
+    async create(): Promise<GoodCreateResponse> {
+        const result = await this.sendAliens(CREATE());
+
+        const listResult = deepConsToList(result);
+        const createResponse = decode(CreateResponse, listResult);
+        console.log(`Create response: ${createResponse}`);
+        if (createResponse[0] !== 1n) {
+            throw new Error(`Bad response: ${result}`);
+        }
+
+        return createResponse;
     }
 
     async join(): Promise<Data> {

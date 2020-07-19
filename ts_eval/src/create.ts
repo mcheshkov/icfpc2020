@@ -1,4 +1,4 @@
-import { Client } from "./client";
+import {Client, deepConsToList} from "./client";
 import {Data} from "./modulation";
 import {fork} from "child_process";
 
@@ -13,26 +13,10 @@ function consToList(data: Data): Array<Data> {
     return [head, ...consToList(tail)];
 }
 
-type ListData = Array<ListData> | bigint;
-
 type BadResponse = [0n];
 
 type StartResponse = [1n, [[0n, bigint], [1n, bigint]]] | BadResponse;
 
-function deepConsToList(data: Data): ListData {
-    if (data === null) {
-        return [];
-    }
-    if (typeof data === "bigint") {
-        return data;
-    }
-    const [head, tail] = data;
-    const tailList = deepConsToList(tail);
-    if (typeof tailList === "bigint") {
-        throw new Error("Unexpected number in tail");
-    }
-    return [deepConsToList(head), ...tailList];
-}
 
 async function main() {
     const serverUrl = process.argv[2];
@@ -41,13 +25,9 @@ async function main() {
 
     const createClient = new Client(serverUrl, 0n);
 
-    const result = await createClient.create();
-    const listResult = deepConsToList(result) as StartResponse;
-    if (listResult[0] !== 1n) {
-        throw new Error(`Bad response: ${result}`);
-    }
+    const createResponse = await createClient.create();
 
-    const [[_0, atKey], [_1, defKey]] = listResult[1];
+    const [[_0, atKey], [_1, defKey]] = createResponse[1];
     console.log("atKey", atKey);
     console.log("defKey", defKey);
 
