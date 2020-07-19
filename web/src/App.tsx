@@ -11,9 +11,9 @@ import {
 import {nil, vec, convertToPicture} from 'fn_js/build/symbols';
 import {ListCons} from 'fn_js/build/list';
 
-function processClick(canvas: CanvasRenderingContext2D, x: number, y: number, state?: any): LamData {
+async function processClick(canvas: CanvasRenderingContext2D, x: number, y: number, state?: any): Promise<LamData> {
     console.log(`Sending click, x: ${x}, y: ${y}`);
-    let [newState, imageData] = interact_galaxy(x, y, state);
+    let [newState, imageData] = await interact_galaxy(x, y, state);
     console.log("State", dataToString(newState));
     // console.log("Image", image);
 
@@ -44,7 +44,7 @@ function App() {
 
     // console.log("init state:", dataToString(initState));
 
-    function init() {
+    async function init() {
         if (!canvasContainer.current) {
             // Почему-то эта функция вызывается дважды, первый раз ещё canvas.current не готов
             return;
@@ -55,16 +55,16 @@ function App() {
             throw new Error("Cannot draw in your browser");
         }
         canvasContext = context;
-        state = processClick(canvasContext, 0, 0, state);
+        state = await processClick(canvasContext, 0, 0, state);
     }
 
     setTimeout(init, 10);
 
-    const handleClickEvent = (e: any) => {
+    const handleClickEvent = async (e: any) => {
         let x = (e.pageX - canvas.offsetLeft - WIDTH/2) / PIXEL_SIZE | 0;
         let y = -(e.pageY - canvas.offsetTop - HEIGHT/2)  / PIXEL_SIZE | 0;
 
-        state = processClick(canvasContext, x, y, state);
+        state = await processClick(canvasContext, x, y, state);
     }
 
     return (

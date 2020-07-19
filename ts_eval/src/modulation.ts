@@ -1,4 +1,6 @@
 import assert from "assert";
+import {Lam, unthunk} from "./common";
+import {isnil, car, cdr, f, nil} from "./symbols";
 
 export type Data = bigint | [Data, Data] | null;
 
@@ -26,6 +28,41 @@ export function modulate(data: Data): string {
     } else {
         return `11${modulate(data[0])}${modulate(data[1])}`;
     }
+}
+
+function list_unpack(signal: string, l: Lam): string {
+    l = unthunk(l);
+
+    if(l === nil) {
+        return "00";
+    }
+
+    // console.log(l.type);
+    switch (l.type) {
+        case "cons":
+            // console.log(l.left.type, l.right.type);
+
+            // try to iterate over list
+            let list: Lam = l;
+            while(isnil(list) === f) {
+                signal = "11" + list_unpack(signal, car(list)) + "00";
+                list = unthunk(cdr(list));
+            }
+
+            return signal;
+
+        case "list":
+            return l.items.reduce((acc, x) => "11" + list_unpack(acc, x) + "00", signal);
+
+        case "number":
+            return signal + modulateNumber(l.value);
+        default:
+            throw new Error("Bad symbol:" + l);
+    }
+}
+
+export function modulateLam(l: Lam): string {
+    return list_unpack("", l);
 }
 
 function demodulateNumber(s: string): [bigint, string] {

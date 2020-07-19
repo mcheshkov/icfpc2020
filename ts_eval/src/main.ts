@@ -86,7 +86,7 @@ const parseProtocolResponse = (response: Lam): [Lam & LamNumber, Lam & LamData, 
     return [flag, state, data];
 };
 
-function interact(protocol: Lam, state: LamData, vector: LamData): [LamData, LamData] {
+async function interact(protocol: Lam, state: LamData, vector: LamData): Promise<[LamData, LamData]> {
     while (true) {
         const protocol_response = protocol(state)(vector);
         const [flag, newState, data] = parseProtocolResponse(protocol_response);
@@ -94,26 +94,18 @@ function interact(protocol: Lam, state: LamData, vector: LamData): [LamData, Lam
             return [newState, data];
         } else {
             state = newState;
-            vector = collectData(send(data));
+            console.log("data to send:", dataToString(data));
+            let serverResponse = await send(data);
+            vector = collectData(serverResponse);
         }
     }
 }
 
-export function interact_galaxy(x: number, y: number, state: LamData): [LamData, LamData] {
+export function interact_galaxy(x: number, y: number, state: LamData): Promise<[LamData, LamData]> {
     const point = cons(NumCons(BigInt(x)))(NumCons(BigInt(y)));
 
     return interact(galaxy_u, state, point as LamData);
 }
-
-export const initState: LamData = vec(
-    NumCons(1n)
-)(
-    vec(
-        ListCons([NumCons(8n)])
-    )(
-        ListCons([NumCons(0n), ListCons([])])
-    )
-) as LamData;
 
 export function main() {
     console.log("Fn test");

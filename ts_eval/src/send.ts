@@ -1,26 +1,26 @@
 import * as _ from "./symbols";
 import {Lam, NumUnOp, NumBinOp, NewModulate, NumCons, unk} from "./common";
-// const got = require('got');
-
-const response_example = 1337n;
+import {modulateLam, demodulate} from "./modulation";
 
 const url = "https://icfpc2020-api.testkontur.ru/aliens/send?apiKey=4b5b59dead9e42fbbf203df4e634a2da";
 
-export const send = unk((x: Lam): Lam => {
-	console.log("send request");
+export async function send(x: Lam): Promise<Lam> {
 
-    let request = _.mod(x);
+    let request = modulateLam(x);
 
-    return _.dem(_.mod(NumCons(response_example)));
-});
+    console.log("send request", request);
 
+    let response = await fetch(url, {
+    	method: 'POST', 
+    	body: request
+    });
 
-/*
-exports.real_send = async () => {
-    const {body} = await got.post(url, "1101000");
+    let response_text = await response.text();
 
-    console.log("response", body);
+    let demodulated = demodulate(response_text);
 
-    return body;
-}
-*/
+    console.log("get response", response_text);
+    console.log("demod", demodulated);
+
+    return NumCons(0n);
+};
