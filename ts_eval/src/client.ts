@@ -14,7 +14,7 @@ function decode<T, D extends t.Any>(decoder: D, t: unknown): t.TypeOf<typeof dec
         return res.right;
     }
     // TODO proper message
-    throw new Error("Parsing failed");
+    throw new Error(`Parsing failed: ${dataAsJson(t)}`);
 }
 
 const bigliteral = <T extends bigint>(x: T) => t.literal(x, x.toString());
@@ -159,6 +159,14 @@ type AccelCommandS = {
     vec: VecS,
 }
 
+export function Accel(shipId: ShipIdS, vec: VecS): AccelCommandS {
+    return {
+        id: 0n,
+        shipId,
+        vec,
+    }
+}
+
 const DetonateCommand = t.tuple([
     bigliteral(1n),
     ShipId,
@@ -173,7 +181,9 @@ const ShootCommand = t.tuple([
     bigliteral(2n),
     ShipId,
     Vec,
-    t.unknown,
+
+    bigint,
+    //t.unknown,
 ]);
 
 type ShootCommandS = {
@@ -188,9 +198,23 @@ const Command = t.union([
     ShootCommand,
 ]);
 
+type Command = t.TypeOf<typeof Command>;
+
 type CommandS = AccelCommandS | DetonateCommandS | ShootCommandS;
 
-function CommandS(a: t.TypeOf<typeof Command>): CommandS {
+function serCommandS(cs: CommandS): Command {
+    switch (cs.id) {
+        case 0n:
+            return [cs.id, cs.shipId, cs.vec];
+        case 1n:
+            return [cs.id, cs.shipId];
+        case 2n:
+            // TODO last param
+            return [cs.id, cs.shipId, cs.target, 0n];
+    }
+}
+
+function CommandS(a: Command): CommandS {
     switch (a[0]) {
         case 0n:
             return {
@@ -212,8 +236,10 @@ function CommandS(a: t.TypeOf<typeof Command>): CommandS {
     }
 }
 
+const AppliedCommand = t.unknown;
+
 const AppliedCommands = t.array(
-    Command
+    AppliedCommand
 );
 
 const ShipsAndCommands = t.array(
@@ -227,13 +253,13 @@ const ShipsAndCommands = t.array(
 
 type ShipsAndCommandsS = Array<{
     ship: ShipS,
-    commands: Array<CommandS>,
+    commands: Array<unknown>,
 }>;
 
 function ShipsAndCommandsS(a: t.TypeOf<typeof ShipsAndCommands>): ShipsAndCommandsS {
     return a.map(i => ({
         ship: ShipS(i[0]),
-        commands: i[1].map(CommandS),
+        commands: i[1],
     }));
 }
 
@@ -276,7 +302,7 @@ export type GoodGameResponse = t.TypeOf<typeof GoodGameResponse>;
 type GoodGameResponseS = {
     stage: GameStageS,
     info: StaticGameInfoS,
-    state: GameStateS | null,
+    state: GameStateS,
 }
 
 function GoodGameResponseS(gr: GoodGameResponse): GoodGameResponseS {
@@ -315,9 +341,8 @@ function START(playerKey: bigint): Data {
     return listToCons([3n, playerKey, listToCons([x0, x1, x2, x3])]);
 }
 
-function COMMANDS(playerKey: bigint): Data {
-    // TODO args
-    const commands: Array<Data> = [];
+function COMMANDS(playerKey: bigint, cs: Array<CommandS>): Data {
+    const commands: Array<Data> = cs.map(serCommandS).map(listToCons);
     return listToCons([4n, playerKey, listToCons(commands)]);
 }
 
@@ -426,8 +451,8 @@ export class Client {
         return await this.gameRequest(START(this.playerKey), "START");
     }
 
-    async commands(): Promise<GoodGameResponseS> {
-        return await this.gameRequest(COMMANDS(this.playerKey), "COMMANDS");
+    async commands(cs: Array<CommandS>): Promise<GoodGameResponseS> {
+        return await this.gameRequest(COMMANDS(this.playerKey, cs), "COMMANDS");
     }
 }
 
@@ -443,6 +468,7 @@ function test_parse_stage() {
 
 function test_parse_static_info() {
     decode(StaticGameInfo, [ 256n, 1n, [ 448n, 1n, 64n ], [ 16n, 128n ], [] ]);
+    decode(StaticGameInfo, [256n, 0n, [512n, 1n, 64n], [16n, 128n], [1n, 1n, 1n, 1n]]);
 }
 
 function test_parse_vec() {
@@ -484,6 +510,8 @@ function test_parse_gamestate() {
     decode(GameState, gs);
     // TODO it's join response with empty state
     // decode(GameState, []);
+
+    decode(GameState, [1n, [16n, 128n], [[[1n, 0n, [-34n, -48n], [-1n, 0n], [0n, 1n, 1n, 1n], 7n, 64n, 1n], [[0n, [1n, 1n]]]], [[0n, 1n, [32n, 46n], [-1n, -2n], [0n, 1n, 1n, 1n], 7n, 64n, 1n], [[0n, [1n, 1n]]]]]]);
 }
 
 function test_parse_game_response() {
@@ -494,6 +522,15 @@ function test_parse_game_response() {
     //     [ 256n, 1n, [ 448n, 1n, 64n ], [ 16n, 128n ], [] ], // static info
     //     [], // state
     // ]);
+
+    decode(GoodGameResponse,
+    [
+            1n,
+            1n,
+            [256n, 0n, [512n, 1n, 64n], [16n, 128n], [1n, 1n, 1n, 1n]],
+            [1n, [16n, 128n], [[[1n, 0n, [-34n, -48n], [-1n, 0n], [0n, 1n, 1n, 1n], 7n, 64n, 1n], [[0n, [1n, 1n]]]], [[0n, 1n, [32n, 46n], [-1n, -2n], [0n, 1n, 1n, 1n], 7n, 64n, 1n], [[0n, [1n, 1n]]]]]]
+        ]
+    );
 }
 
 function test() {
