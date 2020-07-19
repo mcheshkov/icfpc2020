@@ -1,5 +1,6 @@
 import { Client } from "./client";
 import {Data} from "./modulation";
+import {fork} from "child_process";
 
 function consToList(data: Data): Array<Data> {
     if (data === null) {
@@ -35,11 +36,10 @@ function deepConsToList(data: Data): ListData {
 
 async function main() {
     const serverUrl = process.argv[2];
-    const playerKey = BigInt(process.argv[3]);
 
-    console.log(`ServerUrl: ${serverUrl}; playerKey: ${playerKey}`);
+    console.log(`ServerUrl: ${serverUrl};`);
 
-    const createClient = new Client(serverUrl, playerKey);
+    const createClient = new Client(serverUrl, 0n);
 
     const result = await createClient.create();
     const listResult = deepConsToList(result) as StartResponse;
@@ -51,26 +51,8 @@ async function main() {
     console.log("atKey", atKey);
     console.log("defKey", defKey);
 
-    const atClient = new Client(serverUrl, atKey);
-    const defClient = new Client(serverUrl, defKey);
-
-    const aJoin = atClient.join();
-    const dJoin = defClient.join();
-
-    await aJoin;
-    await dJoin;
-
-    await Promise.all([
-        atClient.start(),
-        defClient.start(),
-    ]);
-
-    for (let i=0; i<256; i++) {
-        await Promise.all([
-            atClient.commands(),
-            defClient.commands(),
-        ]);
-    }
+    const atClient = fork(__dirname + "/bot.js", [serverUrl, String(atKey)]);
+    const defClient = fork(__dirname + "/bot.js", [serverUrl, String(defKey)]);
 }
 
 main()
