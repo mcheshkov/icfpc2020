@@ -1,3 +1,5 @@
+import { Agent as HttpAgent } from "http";
+import { Agent as HttpsAgent } from "https";
 import got from "got";
 
 import {Data, demodulate, modulate} from "./modulation";
@@ -39,7 +41,12 @@ function dataAsJson(data: Data) {
 }
 
 export class Client {
+    protected httpAgent: HttpAgent;
+    protected httpsAgent: HttpsAgent;
+
     constructor(protected serverUrl: string, protected playerKey: bigint) {
+        this.httpAgent = new HttpAgent();
+        this.httpsAgent = new HttpsAgent();
     }
 
     async sendAliens(data: Data): Promise<Data> {
@@ -51,7 +58,13 @@ export class Client {
             if (process.env.hasOwnProperty("ICFPC_API_KEY")) {
                 url += `?apiKey=${process.env["ICFPC_API_KEY"]}`;
             }
-            const response = await got.post(url, {body});
+            const response = await got.post(url, {
+                body,
+                agent: {
+                    http: new HttpAgent(),
+                    https: new HttpsAgent(),
+                },
+            });
             const result = demodulate(response.body)[0];
             console.log(`Receiving :`, dataAsJson(result));
             return result;
