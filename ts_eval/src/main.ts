@@ -2,7 +2,7 @@ import "source-map-support/register";
 
 import {message} from "./messages";
 import {send} from "./send";
-import {Lam, LamCons, LamList, LamNumber, NumCons, unthunk, drawPicture} from "./common";
+import {Lam, LamCons, LamList, LamNumber, NumCons, unthunk, drawPicture, drawSinglePicture} from "./common";
 import {cons, nil, draw} from "./symbols";
 import {galaxy} from "./galaxy";
 import {ListCons} from "./list";
@@ -41,7 +41,7 @@ export function main(ctx: CanvasRenderingContext2D | null) {
     message[30]();
     // message[32](ctx); // sample draw
     // message[33](ctx); // draw checkerboard
-    message[34](ctx); // multiple draw
+    // message[34](ctx); // multiple draw
 
     console.log("Test ok");
 
@@ -204,7 +204,7 @@ export function main(ctx: CanvasRenderingContext2D | null) {
     console.log("newState", dataToString(parsed[1]));
     console.log("data", dataToString(parsed[2]));
 
-    // drawPicture(draw(parseProtocolResponse(first_iter)[2]), ctx);
+    drawSinglePicture(draw(parseProtocolResponse(first_iter)[2]), ctx);
 }
 
 // main(null);

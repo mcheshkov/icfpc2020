@@ -8,7 +8,7 @@ import {
 import {ListCons} from "./list";
 import {
     Lam, assertNum, assertNumNum, NumCons, NewModulate,
-    assertModulate, assertPicture, NewPicture, drawSinglePicture, drawPictures
+    assertModulate, assertPicture, NewPicture, drawSinglePicture, drawPictures,
     unk, unthunk
 } from "./common";
 import {strictEqual} from "assert";
