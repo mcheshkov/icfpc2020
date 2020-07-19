@@ -10,11 +10,12 @@ import {
 } from 'fn_js/build/common';
 import {nil, vec, convertToPicture} from 'fn_js/build/symbols';
 import {ListCons} from 'fn_js/build/list';
+import {modulateLam, demodulate, toLam} from "fn_js/build/modulation";
 
 async function processClick(canvas: CanvasRenderingContext2D, x: number, y: number, state?: any): Promise<LamData> {
     console.log(`Sending click, x: ${x}, y: ${y}`);
     let [newState, imageData] = await interact_galaxy(x, y, state);
-    console.log("State", dataToString(newState));
+    console.log("State", modulateLam(newState));
     // console.log("Image", image);
 
     // console.log("Drawing new image");
@@ -23,6 +24,7 @@ async function processClick(canvas: CanvasRenderingContext2D, x: number, y: numb
 
     return newState;
 }
+
 
 export const initState: LamData = vec(
     NumCons(1n)
@@ -34,6 +36,39 @@ export const initState: LamData = vec(
     )
 ) as LamData;
 
+
+
+/*
+export const initState: LamData = 
+    vec(
+        NumCons(5n)
+    )(
+        vec(
+            ListCons([
+                NumCons(2n),
+                NumCons(0n),
+                ListCons([]), ListCons([]), ListCons([]), ListCons([]), ListCons([]),
+                NumCons(20783n)
+            ]
+            )
+        )(
+            vec(
+                NumCons(9n)
+            )(
+                ListCons([
+                    ListCons([])
+                ])
+            )
+        )
+    ) as LamData;
+*/
+
+/*
+export const initState: LamData = toLam(demodulate(
+""
+)[0]);
+*/
+
 function App() {
     // console.log("App is called");
     const canvasContainer = useRef<HTMLCanvasElement>(null);
@@ -42,7 +77,7 @@ function App() {
 
     let state: LamData = initState;
 
-    // console.log("init state:", dataToString(initState));
+    console.log("init state:", dataToString(initState));
 
     async function init() {
         if (!canvasContainer.current) {
