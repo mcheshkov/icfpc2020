@@ -175,12 +175,14 @@ nil.items = [];
 // ap isnil nil   =   t
 // ap isnil ap ap cons x0 x1   =   f
 export const isnil = unk(function isnil(x0: Lam): Lam {
-    if (x0 == nil) {
-        return t;
-    } else {
-        // TODO proper implementation
-        return f;
-    }
+    return thunk(() => {
+        if (unthunk(x0) == nil) {
+            return t;
+        } else {
+            // TODO proper implementation
+            return f;
+        }
+    });
 });
 
 export const vec = cons;
