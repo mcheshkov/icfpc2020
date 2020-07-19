@@ -30,18 +30,26 @@ function COMMANDS(playerKey: bigint): Data {
     return listToCons([4n, playerKey, listToCons(commands)]);
 }
 
+function dataAsJson(data: Data) {
+    return JSON.stringify(data, (k, v) => typeof v === "bigint" ? v.toString() : v, '\t');
+}
+
 class Client {
     constructor(protected serverUrl: string, protected playerKey: bigint) {
     }
 
     async sendAliens(data: Data): Promise<Data> {
-        console.log(`Sending :`, JSON.stringify(data, null, '\t'));
+        console.log(`Sending :`, dataAsJson(data));
         const body = modulate(data);
 
         try {
-            const response = await got.post(`${this.serverUrl}/aliens/send`, {body});
+            let url = `${this.serverUrl}/aliens/send`;
+            if (process.env.hasOwnProperty("ICFPC_API_KEY")) {
+                url += `?apiKey=${process.env["ICFPC_API_KEY"]}`;
+            }
+            const response = await got.post(url, {body});
             const result = demodulate(response.body)[0];
-            console.log(`Receiving :`, JSON.stringify(result, null, '\t'));
+            console.log(`Receiving :`, dataAsJson(result));
             return result;
         } catch (e) {
             console.log(`Unexpected server response:\n`, e);
