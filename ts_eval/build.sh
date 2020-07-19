@@ -1,2 +1,2 @@
 #!/bin/bash
-node node_modules/.bin/tsc
+node node_modules/typescript/bin/tsc
