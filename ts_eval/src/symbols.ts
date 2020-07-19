@@ -97,9 +97,9 @@ export const i = unk(function i(x0: Lam): Lam {
 export const s = unk(function s(x0: Lam): Lam {
     return unk(function s1(x1) {
         return unk(function s2(x2) {
-            let b = thunk(() => x0(x2));
+            let b = x0(x2);
             let c = thunk(() => x1(x2));
-            return thunk(() => b(c));
+            return b(c);
         });
     });
 });
@@ -108,8 +108,8 @@ export const s = unk(function s(x0: Lam): Lam {
 export const c = unk(function c(x0: Lam): Lam {
     return unk(function c1(x1) {
         function c2(x2: Lam): Lam {
-            let b = thunk(() => x0(x2));
-            return thunk(() => b(x1));
+            let b = x0(x2);
+            return b(x1);
         }
         c2.toString = function() {
             return `c(${x0}, ${x1})`;
@@ -124,7 +124,7 @@ export const b = unk(function b(x0: Lam): Lam {
     return unk(function b1(x1) {
         return unk(function b2(x2) {
             let b = thunk(() => x1(x2));
-            return thunk(() => x0(b));
+            return x0(b);
         });
     });
 });
