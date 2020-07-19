@@ -1,23 +1,17 @@
 import { Client } from "./client";
 
-async function main() {
-    const serverUrl = process.argv[2];
-    const playerKey = BigInt(process.argv[3]);
+export class Bot {
+    protected client: Client;
 
-    console.log(`ServerUrl: ${serverUrl}; playerKey: ${playerKey}`);
+    constructor(serverUrl: string, playerKey: bigint) {
+        this.client = new Client(serverUrl, playerKey);
+    }
 
-    const client = new Client(serverUrl, playerKey);
-
-    await client.join();
-    await client.start();
-    for (let i=0; i<256; i++) {
-        await client.commands();
+    async run() {
+        await this.client.join();
+        await this.client.start();
+        for (let i=0; i<256; i++) {
+            await this.client.commands();
+        }
     }
 }
-
-main()
-.catch((e) => {
-    console.log(e);
-    console.log(e.stack);
-    process.exit(1);
-});
