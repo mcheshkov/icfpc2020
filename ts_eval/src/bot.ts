@@ -27,6 +27,9 @@ function neg(a:VecS) : VecS {
 function clamp(a:bigint, l:bigint, r:bigint): bigint {
     return a < l ? l : a > r ? r : a;
 }
+function sign(a:bigint): bigint {
+    return a < 0n ? -1n : a > 0n ? 1n : 0n;
+}
 
 export class Bot {
     protected client: Client;
@@ -43,6 +46,8 @@ export class Bot {
         let state = startResp.state;
 
         for (let i=0; i<256; i++) {
+            console.log("tick", state.tick);
+
             const myShips = state.shipsAndCommands
                 .filter(scs => scs.ship.role === role)
                 .map(scs => scs.ship.id);
@@ -58,17 +63,43 @@ export class Bot {
                 const dist = norm(pos);
                 const vel = norm(ship.velocity);
 
-                let thrust = tangent;
-
                 if (vel > 7) {
-                    thrust = [0n, 1n];
+                    return Accel(id, [0n, 0n]);
                 }
 
-                thrust = ship.velocity;
-                thrust = [
-                    clamp(ship.velocity[0], -1n, 1n),
-                    clamp(ship.velocity[1], -1n, 1n),
-                ]
+                let thrust = tangent;
+
+                if (state.tick < 8 ) {
+                    if (abs(pos[0]) > abs(pos[1])) {
+                        // gravity now works on X
+                        thrust = [
+                            0n,
+                            -1n*sign(pos[1])
+                        ]
+                    } else if (abs(pos[0]) > abs(pos[1])) {
+                        // gravity now works on Y
+                        thrust = [
+                            -1n*sign(pos[0]),
+                            0n,
+                        ]
+                    } else {
+                        // gravity now works on both
+                        thrust = [
+                            -1n*sign(pos[0]),
+                            -1n*sign(pos[1]),
+                        ]
+                    }
+                }
+
+                // if (vel > 7) {
+                //     thrust = [0n, 1n];
+                // }
+                //
+                // thrust = ship.velocity;
+                // thrust = [
+                //     clamp(ship.velocity[0], -1n, 1n),
+                //     clamp(ship.velocity[1], -1n, 1n),
+                // ]
                 return Accel(id, thrust);
             });
 

@@ -86,12 +86,23 @@ function mkRoleS(a: t.TypeOf<typeof Role>): RoleS {
     }
 }
 
+const ShipParams = t.tuple([
+    bigint,
+    bigint,
+    bigint,
+    bigint,
+]);
+
+export type ShipParamsS = readonly [bigint, bigint, bigint, bigint];
+
 const StaticGameInfo = t.tuple([
     t.unknown,
     // role
     Role,
     t.unknown,
     t.unknown,
+
+    // TODO make ShipParams, but beware - can be empty list
     t.unknown,
 ]);
 
@@ -125,8 +136,9 @@ const Ship = t.tuple([
     Vec,
     // velocity
     Vec,
+    // Looks like ship params, like fuel left
+    ShipParams,
 
-    // t.unknown,
     // t.unknown,
     // t.unknown,
     // t.unknown,
@@ -137,6 +149,7 @@ type ShipS = {
     id: ShipIdS,
     position: VecS,
     velocity: VecS,
+    params: ShipParamsS,
 }
 
 function ShipS(a: t.TypeOf<typeof Ship>): ShipS {
@@ -145,6 +158,7 @@ function ShipS(a: t.TypeOf<typeof Ship>): ShipS {
         id: a[1],
         position: a[2],
         velocity: a[3],
+        params: a[4],
     };
 }
 
@@ -335,7 +349,13 @@ function JOIN(playerKey: bigint): Data {
 
 function START(playerKey: bigint): Data {
     // TODO args
-    const x0 = 1n;
+
+    // В состоянии корабля один из неивестных айтемов тоже всегда содежрит 4 числа, очень похожие на эти
+    // Оно же похоже на 5 парамерт в статик инфо
+    // Первое в состоянии корабля уменьшается после каждого ускорения
+    // И инициализируетяс первым числом тут
+    // Похоже на запас топлива
+    const x0 = 255n;
     const x1 = 1n;
     const x2 = 1n;
     const x3 = 1n;
@@ -426,6 +446,7 @@ export class Client {
         const result = await this.sendAliens(data);
 
         const listResult = deepConsToList(result);
+        // console.log(`${method} raw response: ${dataAsJson(listResult)}`);
         const gameResponse = decode(GameResponse, listResult);
         if (gameResponse[0] !== 1n) {
             throw new Error(`Bad response: ${result}`);
@@ -438,8 +459,10 @@ export class Client {
 
     async join(): Promise<void> {
         const result = await this.sendAliens(JOIN(this.playerKey));
+        // console.log(`JOIN result: ${dataAsJson(result)}`);
 
         const listResult = deepConsToList(result);
+        // console.log(`JOIN raw response: ${dataAsJson(listResult)}`);
         const gameResponse = decode(JoinGameResponse, listResult);
         if (gameResponse[0] !== 1n) {
             throw new Error(`Bad response: ${result}`);
@@ -469,7 +492,6 @@ function test_parse_stage() {
 }
 
 function test_parse_static_info() {
-    decode(StaticGameInfo, [ 256n, 1n, [ 448n, 1n, 64n ], [ 16n, 128n ], [] ]);
     decode(StaticGameInfo, [256n, 0n, [512n, 1n, 64n], [16n, 128n], [1n, 1n, 1n, 1n]]);
 }
 
@@ -478,7 +500,7 @@ function test_parse_vec() {
     decode(Vec, [1n, -17n]);
 }
 
-const s = [0n, 17n, [0n, 1n], [2n, 3n], -1n, -1n, -1n];
+const s = [0n, 17n, [0n, 1n], [2n, 3n], [1n,1n,1n,1n,], -1n, -1n];
 
 function test_parse_ship() {
     decode(Ship, s);
@@ -516,6 +538,12 @@ function test_parse_gamestate() {
     decode(GameState, [1n, [16n, 128n], [[[1n, 0n, [-34n, -48n], [-1n, 0n], [0n, 1n, 1n, 1n], 7n, 64n, 1n], [[0n, [1n, 1n]]]], [[0n, 1n, [32n, 46n], [-1n, -2n], [0n, 1n, 1n, 1n], 7n, 64n, 1n], [[0n, [1n, 1n]]]]]]);
 }
 
+function test_parse_join_response() {
+    decode(JoinGameResponse,
+        [1n, 0n, [256n, 1n, [448n, 1n, 64n], [16n, 128n], []], []]
+    );
+}
+
 function test_parse_game_response() {
     // TODO it's join response with empty state
     // decode(GoodGameResponse, [
@@ -533,6 +561,14 @@ function test_parse_game_response() {
             [1n, [16n, 128n], [[[1n, 0n, [-34n, -48n], [-1n, 0n], [0n, 1n, 1n, 1n], 7n, 64n, 1n], [[0n, [1n, 1n]]]], [[0n, 1n, [32n, 46n], [-1n, -2n], [0n, 1n, 1n, 1n], 7n, 64n, 1n], [[0n, [1n, 1n]]]]]]
         ]
     );
+    decode(
+        GoodGameResponse,
+        [
+            1n,
+            1n,
+            [256n, 1n, [448n, 1n, 64n], [16n, 128n], []],
+            [0n, [16n, 128n], [[[1n, 0n, [-48n, -23n], [0n, 0n], [255n, 1n, 1n, 1n], 0n, 64n, 1n], []], [[0n, 1n, [48n, 23n], [0n, 0n], [255n, 1n, 1n, 1n], 0n, 64n, 1n], []]]]]
+    );
 }
 
 function test() {
@@ -544,6 +580,7 @@ function test() {
     test_parse_command();
     test_parse_ships_and_commands();
     test_parse_gamestate();
+    test_parse_join_response();
     test_parse_game_response();
 }
 
