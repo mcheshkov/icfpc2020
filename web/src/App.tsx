@@ -4,7 +4,7 @@ import {useRef} from 'react';
 import './App.css';
 
 import {interact, LamData} from 'fn_js/build/main';
-import {drawMultiplePicture} from 'fn_js/build/common'
+import {drawMultiplePicture, WIDTH, HEIGHT, PIXEL_SIZE} from 'fn_js/build/common'
 import {nil} from 'fn_js/build/symbols';
 
 function processClick(canvas: CanvasRenderingContext2D, x: number, y: number, state?: any): LamData {
@@ -24,10 +24,6 @@ function App() {
     const canvasContainer = useRef<HTMLCanvasElement>(null);
     let canvas: HTMLCanvasElement;
     let canvasContext: CanvasRenderingContext2D;
-
-    const PIXEL_SIZE = 5;
-    const WIDTH = 300;
-    const HEIGHT = 300;
 
     let state: LamData = nil;
 
@@ -50,8 +46,6 @@ function App() {
     const handleClickEvent = (e: any) => {
         let x = (e.pageX - canvas.offsetLeft - WIDTH/2) / PIXEL_SIZE | 0;
         let y = -(e.pageY - canvas.offsetTop - HEIGHT/2)  / PIXEL_SIZE | 0;
-
-        console.log("Got click", x, y);
 
         state = processClick(canvasContext, x, y, state);
     }
