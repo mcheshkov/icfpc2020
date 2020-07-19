@@ -63,13 +63,18 @@ const StaticGameInfo = t.tuple([
     t.unknown,
 ]);
 
-const Vec = t.unknown;
+const Vec = t.tuple([
+    bigint,
+    bigint,
+]);
+
+const ShipId = bigint;
 
 const Ship = t.tuple([
     // role
     Role,
     // shipId
-    bigint,
+    ShipId,
     // // position
     Vec,
     // velocity
@@ -80,7 +85,29 @@ const Ship = t.tuple([
     t.unknown,
 ]);
 
-const Command = t.unknown;
+const AccelCommand = t.tuple([
+    bigliteral(0n),
+    ShipId,
+    Vec,
+]);
+
+const DetonateCommand = t.tuple([
+    bigliteral(1n),
+    ShipId,
+]);
+
+const ShootCommand = t.tuple([
+    bigliteral(2n),
+    ShipId,
+    Vec,
+    t.unknown,
+]);
+
+const Command = t.union([
+    AccelCommand,
+    DetonateCommand,
+    ShootCommand,
+]);
 
 const AppliedCommands = t.array(
     Command
@@ -95,17 +122,19 @@ const ShipsAndCommands = t.array(
     ])
 );
 
-const GameState = t.tuple([
-    // gameTick
-    // bigint,
-    // t.unknown,
-    // // shipsAndCommands
-    // ShipsAndCommands,
+const EmptyGameState = t.tuple([]);
 
-    // FIXME strange bug
+const FilledGameState = t.tuple([
+    // gameTick
+    bigint,
     t.unknown,
-    t.unknown,
-    t.unknown,
+    // shipsAndCommands
+    ShipsAndCommands,
+]);
+
+const GameState = t.union([
+    EmptyGameState,
+    FilledGameState,
 ]);
 
 const GoodGameResponse = t.tuple([
@@ -252,3 +281,80 @@ export class Client {
         return await this.gameRequest(COMMANDS(this.playerKey), "COMMANDS");
     }
 }
+
+function test_parse_bigint() {
+    decode(bigint, 0n);
+    decode(bigint, 1n);
+    decode(bigint, -17n);
+}
+
+function test_parse_stage() {
+    decode(GameStage, 0n);
+}
+
+function test_parse_static_info() {
+    decode(StaticGameInfo, [ 256n, 1n, [ 448n, 1n, 64n ], [ 16n, 128n ], [] ]);
+}
+
+function test_parse_vec() {
+    decode(Vec, [0n, 0n]);
+    decode(Vec, [1n, -17n]);
+}
+
+const s = [0n, 17n, [0n, 1n], [2n, 3n], -1n, -1n, -1n];
+
+function test_parse_ship() {
+    decode(Ship, s);
+}
+
+const c1 = [0n, 17n, [5n,6n]];
+const c2 = [1n, 17n];
+const c3 = [2n, 17n, [5n,6n], -1n];
+const cs = [c1,c2,c3];
+
+function test_parse_command() {
+    decode(Command, c1);
+    decode(Command, c2);
+    decode(Command, c3);
+
+    decode(AppliedCommands, cs);
+}
+
+const scs = [
+    [s, cs]
+]
+
+
+function test_parse_ships_and_commands(){
+    decode(ShipsAndCommands, scs);
+}
+
+const gs = [123456789n, -1n, scs];
+
+function test_parse_gamestate() {
+    decode(GameState, gs);
+    decode(GameState, []);
+}
+
+function test_parse_game_response() {
+    decode(GoodGameResponse, [
+        1n, // flag
+        0n, // stage
+        [ 256n, 1n, [ 448n, 1n, 64n ], [ 16n, 128n ], [] ], // static info
+        [], // state
+    ]);
+}
+
+function test() {
+    test_parse_bigint();
+    test_parse_stage();
+    test_parse_static_info();
+    test_parse_vec();
+    test_parse_ship();
+    test_parse_command();
+    test_parse_ships_and_commands();
+    test_parse_gamestate();
+    test_parse_game_response();
+}
+
+test();
