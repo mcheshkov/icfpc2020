@@ -233,8 +233,8 @@ export function assertPicture(l:Lam, n: Lam) {
     deepStrictEqual(l_sorted, n_sorted);
 }
 
-export const WIDTH = 300;
-export const HEIGHT = 300;
+export const WIDTH = 1000;
+export const HEIGHT = 1000;
 export const PIXEL_SIZE = 5;
 
 export function drawPicture(picture: Lam, ctx: CanvasRenderingContext2D, color: string) {

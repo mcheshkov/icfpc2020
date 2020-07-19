@@ -3,12 +3,12 @@ import {useRef} from 'react';
 
 import './App.css';
 
-import {interact, initState} from 'fn_js/build/main';
+import {interact} from 'fn_js/build/main';
 import {
     drawMultiplePicture, WIDTH, HEIGHT, PIXEL_SIZE, dataToString, LamData,
     NumCons
 } from 'fn_js/build/common';
-import {nil} from 'fn_js/build/symbols';
+import {nil, vec} from 'fn_js/build/symbols';
 import {ListCons} from 'fn_js/build/list';
 
 function processClick(canvas: CanvasRenderingContext2D, x: number, y: number, state?: any): LamData {
@@ -23,6 +23,16 @@ function processClick(canvas: CanvasRenderingContext2D, x: number, y: number, st
 
     return newState;
 }
+
+export const initState: LamData = vec(
+    NumCons(1n)
+)(
+    vec(
+        ListCons([NumCons(11n)])
+    )(
+        ListCons([NumCons(0n), ListCons([])])
+    )
+) as LamData;
 
 function App() {
     console.log("App is called");
@@ -59,7 +69,7 @@ function App() {
 
     return (
         <div className="App">
-              <canvas ref={canvasContainer} onClick={handleClickEvent} width={300} height={300}/>
+              <canvas ref={canvasContainer} onClick={handleClickEvent} width={WIDTH} height={HEIGHT}/>
         </div>
     );
 }
