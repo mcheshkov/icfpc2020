@@ -254,21 +254,13 @@ export function drawPicture(picture: Lam, ctx: CanvasRenderingContext2D, color: 
     );
 }
 
-export function drawSinglePicture(picture: Lam, ctx: CanvasRenderingContext2D | null) {
-    if (ctx === null) {
-        return;
-    }
-
+export function drawSinglePicture(picture: Lam, ctx: CanvasRenderingContext2D) {
     ctx.clearRect(0, 0, WIDTH, HEIGHT);
 
     drawPicture(picture, ctx, 'rgb(0, 0, 0)');
 }
 
-export function drawMultiplePicture(pictures: Array<Lam>, ctx: CanvasRenderingContext2D | null) {
-    if (ctx === null) {
-        return;
-    }
-
+export function drawMultiplePicture(pictures: Array<Lam>, ctx: CanvasRenderingContext2D) {
     const COLORS = [
         "#001f3f",
         "#0074D9",

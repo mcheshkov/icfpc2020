@@ -3,7 +3,7 @@ import {
     lt, t, f, mod, dem, c, b, s,
     neg, i,
     cons, car, cdr, nil, isnil, vec,
-    draw, checkerboard, multipledraw
+    convertToPicture, checkerboard, multipledraw
 } from "./symbols";
 import {ListCons} from "./list";
 import {
@@ -589,29 +589,29 @@ message[30] = () => {
     }
 }
 
-message[32] = (ctx: CanvasRenderingContext2D | null) => {
+message[32] = (ctx: CanvasRenderingContext2D) => {
     // ap draw ( )   =   |picture1|
-    assertPicture(draw(ListCons([])), NewPicture([]));
+    assertPicture(convertToPicture(ListCons([])), NewPicture([]));
 
     // ap draw ( ap ap vec 1 1 )   =   |picture2|
-    assertPicture(draw(ListCons([vec(NumCons(1n))(NumCons(1n))])), NewPicture([[1n, 1n]]));
+    assertPicture(convertToPicture(ListCons([vec(NumCons(1n))(NumCons(1n))])), NewPicture([[1n, 1n]]));
     // ap draw ( ap ap vec 1 2 )   =   |picture3|
-    assertPicture(draw(ListCons([vec(NumCons(1n))(NumCons(2n))])), NewPicture([[1n, 2n]]));
+    assertPicture(convertToPicture(ListCons([vec(NumCons(1n))(NumCons(2n))])), NewPicture([[1n, 2n]]));
     // ap draw ( ap ap vec 2 5 )   =   |picture4|
-    assertPicture(draw(ListCons([vec(NumCons(2n))(NumCons(5n))])), NewPicture([[2n, 5n]]));
+    assertPicture(convertToPicture(ListCons([vec(NumCons(2n))(NumCons(5n))])), NewPicture([[2n, 5n]]));
     // ap draw ( ap ap vec 1 2 , ap ap vec 3 1 )   =   |picture5|
-    assertPicture(draw(ListCons([
+    assertPicture(convertToPicture(ListCons([
         vec(NumCons(1n))(NumCons(1n)),
         vec(NumCons(3n))(NumCons(1n)),
     ])), NewPicture([[1n, 1n], [3n, 1n]]));
 
-    assertPicture(draw(ListCons([
+    assertPicture(convertToPicture(ListCons([
         vec(NumCons(1n))(NumCons(1n)),
         vec(NumCons(3n))(NumCons(1n)),
     ])), NewPicture([[3n, 1n], [1n, 1n]]));
 
     // ap draw ( ap ap vec 5 3 , ap ap vec 6 3 , ap ap vec 4 4 , ap ap vec 6 4 , ap ap vec 4 5 )   =   |picture6|
-    let picture6 = draw(ListCons([
+    let picture6 = convertToPicture(ListCons([
         vec(NumCons(5n))(NumCons(3n)),
         vec(NumCons(6n))(NumCons(3n)),
         vec(NumCons(4n))(NumCons(4n)),
@@ -627,7 +627,7 @@ message[33] = (ctx: CanvasRenderingContext2D) => {
     // ap ap checkerboard 7 0   =   |picture1|
     let board = unthunk(checkerboard(NumCons(11n))(NumCons(0n)));
     // console.log(board);
-    let picture1 = draw(board);
+    let picture1 = convertToPicture(board);
     drawSinglePicture(picture1, ctx);
 }
 

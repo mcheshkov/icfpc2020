@@ -4,13 +4,102 @@ import {message} from "./messages";
 import {send} from "./send";
 import {
     Lam, LamCons, LamList, LamNumber,
-    NumCons, unthunk, drawSinglePicture, drawPicture, drawMultiplePicture
+    NumCons, unthunk
 } from "./common";
-import {cons, nil, draw} from "./symbols";
+import {cons, nil, convertToPicture} from "./symbols";
 import {galaxy} from "./galaxy";
 import {ListCons} from "./list";
 
-export function main(ctx: CanvasRenderingContext2D | null) {
+export type LamData = Lam & (LamCons|LamList|LamNumber);
+
+console.log("galaxy", galaxy);
+const galaxy_u = unthunk(galaxy);
+console.log("galaxy unthunk", galaxy_u);
+
+const consMap = (list: LamCons, fn: (l:Lam) => Lam): Lam & LamCons => {
+    return cons(fn(list.left))(fn(list.right)) as any;
+}
+
+const collectConsList = (list: LamCons): (Lam & LamList) | null => {
+    const res = [];
+    while (true) {
+        res.push(list.left);
+        const tail = unthunk(list.right);
+        if (tail === nil) {
+            break;
+        } else if (tail.type == "cons") {
+            list = tail;
+        } else {
+            return null;
+        }
+    }
+    return ListCons(res);
+}
+
+const collectData = (data: Lam): Lam & (LamData) => {
+    const l = unthunk(data);
+    if (l.type === "list") {
+        return ListCons(l.items.map(collectData));
+    } else if (l.type === "cons") {
+        let list = collectList(l);
+        if (list.type === "list") {
+            return collectData(list);
+        } else {
+            return consMap(list, collectData);
+        }
+    } else if (l.type === "number") {
+        return l;
+    } else {
+        throw new Error(`Not a data ${l}`);
+    }
+}
+
+const collectList = (list: Lam): Lam & (LamList|LamCons) => {
+    const l = unthunk(list);
+    if (l.type === "list") {
+        return l;
+    } else if (l.type === "cons") {
+        const collected = collectConsList(l);
+        return collected != null ? collected : l;
+    } else {
+        throw new Error("Not a list");
+    }
+}
+
+// (flag, newState, data)
+const parseProtocolResponse = (response: Lam): [Lam & LamNumber, Lam & LamData, Lam & LamData] => {
+    const respList = collectList(response);
+    if (respList.type !== "list") {
+        throw new Error("Not a list in response");
+    }
+    if (respList.items.length < 3) {
+        throw new Error("Not enough elems in response");
+    }
+
+    const [flagLam, stateLam, dataLam] = respList.items;
+    const flag = unthunk(flagLam);
+    if (flag.type !== "number") {
+        throw new Error("Flag is not a number");
+    }
+
+    const state = collectData(stateLam);
+    const data = collectData(dataLam);
+
+    return [flag, state, data];
+};
+
+export function interact(x: number, y: number, state?: LamData): [bigint, LamData, Array<Lam>] {
+    const start_point = cons(NumCons(BigInt(x)))(NumCons(BigInt(y)));
+    state = state === undefined ? nil : state;
+    const res = galaxy_u(state)(start_point);
+
+    let [flag, newState, data] = parseProtocolResponse(res);
+    let pictures = (data as LamList).items.map(convertToPicture);
+
+    return [flag.value, newState, pictures];
+}
+
+export function main() {
     console.log("Fn test");
     message[5]();
     message[6]();
@@ -42,75 +131,16 @@ export function main(ctx: CanvasRenderingContext2D | null) {
     message[28]();
     message[29]();
     message[30]();
-    // message[32](ctx); // sample draw
-    // message[33](ctx); // draw checkerboard
-    // message[34](ctx); // multiple draw
 
     console.log("Test ok");
 
     // real_send();
-
-    console.log("galaxy", galaxy);
-    const galaxy_u = unthunk(galaxy);
-    console.log("galaxy unthunk", galaxy_u);
 
     const start_state = nil;
     const start_point = cons(NumCons(0n))(NumCons(0n));
     const first_iter = galaxy_u(start_state)(start_point);
     console.log("first_iter", first_iter);
     console.log("first_iter unthunk", unthunk(first_iter));
-
-    const collectConsList = (list: LamCons): (Lam & LamList) | null => {
-        const res = [];
-        while (true) {
-            res.push(list.left);
-            const tail = unthunk(list.right);
-            if (tail === nil) {
-                break;
-            } else if (tail.type == "cons") {
-                list = tail;
-            } else {
-                return null;
-            }
-        }
-        return ListCons(res);
-    }
-
-    const collectList = (list: Lam): Lam & (LamList|LamCons) => {
-        const l = unthunk(list);
-        if (l.type === "list") {
-            return l;
-        } else if (l.type === "cons") {
-            const collected = collectConsList(l);
-            return collected != null ? collected : l;
-        } else {
-            throw new Error("Not a list");
-        }
-    }
-
-    const consMap = (list: LamCons, fn: (l:Lam) => Lam): Lam & LamCons => {
-        return cons(fn(list.left))(fn(list.right)) as any;
-    }
-
-    type LamData = Lam & (LamCons|LamList|LamNumber);
-
-    const collectData = (data: Lam): Lam & (LamData) => {
-        const l = unthunk(data);
-        if (l.type === "list") {
-            return ListCons(l.items.map(collectData));
-        } else if (l.type === "cons") {
-            let list = collectList(l);
-            if (list.type === "list") {
-                return collectData(list);
-            } else {
-                return consMap(list, collectData);
-            }
-        } else if (l.type === "number") {
-            return l;
-        } else {
-            throw new Error(`Not a data ${l}`);
-        }
-    }
 
     function dataToString(data: LamData): string {
         function isData(l: Lam): l is Lam & LamData {
@@ -148,28 +178,6 @@ export function main(ctx: CanvasRenderingContext2D | null) {
         }
     }
 
-    // (flag, newState, data)
-    const parseProtocolResponse = (response: Lam): [Lam & LamNumber, Lam & LamData, Lam & LamData] => {
-        const respList = collectList(response);
-        if (respList.type !== "list") {
-            throw new Error("Not a list in response");
-        }
-        if (respList.items.length < 3) {
-            throw new Error("Not enough elems in response");
-        }
-
-        const [flagLam, stateLam, dataLam] = respList.items;
-        const flag = unthunk(flagLam);
-        if (flag.type !== "number") {
-            throw new Error("Flag is not a number");
-        }
-
-        const state = collectData(stateLam);
-        const data = collectData(dataLam);
-
-        return [flag, state, data];
-    };
-
     const interact = (protocol: Lam, state: LamData, vector: LamData): [LamData, LamData] => {
         while (true) {
             const protocol_response = protocol(state)(vector);
@@ -206,12 +214,9 @@ export function main(ctx: CanvasRenderingContext2D | null) {
     console.log("parsed", parsed);
     console.log("newState", dataToString(parsed[1]));
     console.log("data", dataToString(parsed[2]));
-
-    
-
-    let pictures = (parsed[2] as LamList).items.map((x, i) => draw(x));
-
-    drawMultiplePicture(pictures, ctx);
 }
 
-// main(null);
+if (process && process.env && process.env.SHELL) {
+    console.log("Running in shell, call main", process.env);
+    main();
+}

@@ -231,7 +231,7 @@ function list_unpack(pixels: Pixels, l: Lam): Pixels {
     }
 }
 
-export const draw = unk((x: Lam): Lam => {
+export const convertToPicture = unk((x: Lam): Lam => {
     return NewPicture(list_unpack([], x));
 });
 
@@ -257,9 +257,9 @@ export const multipledraw = unk((l: Lam) => {
                     multipledraw
                     x1
             */
-            return cons(draw(unthunk(l.left)))(multipledraw(unthunk(l.right)));
+            return cons(convertToPicture(unthunk(l.left)))(multipledraw(unthunk(l.right)));
         } else if(l.type === "list") {
-            return ListCons(l.items.map(item => draw(unthunk(item))));
+            return ListCons(l.items.map(item => convertToPicture(unthunk(item))));
         } else {
             throw new Error("Bad list in multipledraw:" + l);
             return nil;
