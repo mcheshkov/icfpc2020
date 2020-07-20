@@ -945,24 +945,23 @@ export class Bot {
                 return Shoot(id, target, targetPower);
             });
 
-            const clones = state.tick < 10 ? [] : myShips
-                .map(id => state.shipsAndCommands.find(sc => sc.ship.id === id)!.ship)
-                .filter(ship => ship.params[3] > 1)
-                .map(ship => {
-                    const clone = Clone(ship.id, [0n,0n,0n,1n]);
-                    const move = searchInner(ship.position, ship.velocity, 1, false);
-                    let res: Array<CommandS> = [clone];
-                    if (move) {
-                        res.push(Accel(ship.id, move[0]));
-                    }
-                    return res;
-                })
-                .reduce((acc, item) => [...acc, ...item], []);
+            // const clones = state.tick < 10 ? [] : []; myShips
+            //     .map(id => state.shipsAndCommands.find(sc => sc.ship.id === id)!.ship)
+            //     .filter(ship => ship.params[3] > 1)
+            //     .map(ship => {
+            //         const clone = Clone(ship.id, [0n,0n,0n,1n]);
+            //         const move = searchInner(ship.position, ship.velocity, 1, false);
+            //         let res: Array<CommandS> = [clone];
+            //         if (move && move[0]) {
+            //             res.push(Accel(ship.id, move[0]));
+            //         }
+            //         return res;
+            //     })
+            //     .reduce((acc, item) => [...acc, ...item], []);
 
             const resp = await this.client.commands([
                 ...accels,
                 ...shoots,
-                ...clones,
             ]);
 
             state = resp.state;
