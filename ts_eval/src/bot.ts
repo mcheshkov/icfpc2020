@@ -118,6 +118,7 @@ export class Bot {
         let state = startResp.state;
 
         for (let i=0; i<256; i++) {
+            console.time("tick");
             console.log("tick", state.tick);
 
             if (stage !== GameStageS.InProgress) {
@@ -263,6 +264,8 @@ export class Bot {
 
             state = resp.state;
             stage = resp.stage;
+
+            console.timeEnd("tick");
         }
     }
 }
