@@ -414,7 +414,7 @@ function COMMANDS(playerKey: bigint, cs: Array<CommandS>): Data {
     return listToCons([4n, playerKey, listToCons(commands)]);
 }
 
-function dataAsJson(data: unknown) {
+export function dataAsJson(data: unknown) {
     return JSON.stringify(data, (k, v) => typeof v === "bigint" ? v.toString() : v);
 }
 
