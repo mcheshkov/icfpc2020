@@ -837,7 +837,7 @@ export class Bot {
                     if (orbitActions && orbitActions[Number(state.tick)]) {
                         console.log(`Applying action from precalc`);
                         thrust = neg(orbitActions[Number(state.tick)]);
-                    } else if (state.tick < 6) {
+                    } else if (! orbitActions && state.tick < 6) {
                         if (abs(pos[0]) > abs(pos[1])) {
                             // gravity now works on X
                             // will accel ship by [+-1, 0]
