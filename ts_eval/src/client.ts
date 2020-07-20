@@ -53,7 +53,7 @@ const GameStage = t.union([
     bigliteral(2n),
 ]);
 
-enum GameStageS {
+export enum GameStageS {
     NotStarted,
     InProgress,
     Finished,
