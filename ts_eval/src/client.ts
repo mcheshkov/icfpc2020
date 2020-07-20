@@ -233,7 +233,9 @@ function serCommandS(cs: CommandS): Command {
             return [cs.id, cs.shipId];
         case 2n:
             // TODO last param
-            return [cs.id, cs.shipId, [cs.target[0],cs.target[1]], 0n];
+            // Если последний параметр 0 - выстрелов вообще не производится
+            // Подставил 2 ископипастив из действий оппонена из реплея
+            return [cs.id, cs.shipId, [cs.target[0],cs.target[1]], 2n];
     }
 }
 
@@ -361,11 +363,13 @@ function START(playerKey: bigint): Data {
     // В состоянии корабля один из неивестных айтемов тоже всегда содежрит 4 числа, очень похожие на эти
     // Оно же похоже на 5 парамерт в статик инфо
     // Первое в состоянии корабля уменьшается после каждого ускорения
-    // И инициализируетяс первым числом тут
+    // И инициализируетяс x0 тут
     // Похоже на запас топлива
-    const x0 = 255n;
-    const x1 = 1n;
-    const x2 = 1n;
+
+    // Значения скопировал из игры с оппонентом
+    const x0 = 82n;
+    const x1 = 76n;
+    const x2 = 5n;
     const x3 = 1n;
     return listToCons([3n, playerKey, listToCons([x0, x1, x2, x3])]);
 }
