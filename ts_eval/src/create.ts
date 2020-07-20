@@ -8,6 +8,7 @@ import {Data} from "./modulation";
 import {spawn} from "child_process";
 import fs from "fs";
 import path from "path";
+import {Bot} from "./bot";
 
 function consToList(data: Data): Array<Data> {
     if (data === null) {
@@ -42,17 +43,14 @@ async function main() {
     console.log("atKey", atKey);
     console.log("defKey", defKey);
 
-    const attackerLog = fs.openSync("attacker.log", "w");
-    const defenderLog = fs.openSync("defender.log", "w");
 
-    const atClient = spawn("./run.sh", [serverUrl, String(atKey)], {
-        stdio: ["ignore", attackerLog, attackerLog],
-        shell: true,
-    });
-    const defClient = spawn("./run.sh", [serverUrl, String(defKey)], {
-        stdio: ["ignore", defenderLog, defenderLog],
-        shell: true,
-    });
+    const atBot = new Bot(serverUrl, atKey);
+    const defDot = new Bot(serverUrl, defKey);
+
+    await Promise.all([
+        atBot.run(),
+        defDot.run(),
+    ]);
 }
 
 main()
