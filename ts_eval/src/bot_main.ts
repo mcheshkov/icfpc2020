@@ -1,3 +1,5 @@
+import "source-map-support/register";
+
 import {Bot} from "./bot";
 
 async function main() {

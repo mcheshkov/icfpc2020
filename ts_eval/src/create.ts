@@ -1,6 +1,8 @@
 // Запускать из папки ts_eval; Логи создаются в корневой папке репо
 // ./build.sh && ICFPC_API_KEY=4b5b59dead9e42fbbf203df4e634a2da node build/create.js 'https://icfpc2020-api.testkontur.ru'
 
+import "source-map-support/register";
+
 import {Client, deepConsToList} from "./client";
 import {Data} from "./modulation";
 import {spawn} from "child_process";
