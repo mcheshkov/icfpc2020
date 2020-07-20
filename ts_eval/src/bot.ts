@@ -89,11 +89,11 @@ function simulateGrav(startPos: VecS, startVel: VecS, accs: Array<VecS>, steps:n
 }
 
 function hitThePlanet(pos: VecS) {
-    return norm(pos) < 16;
+    return norm(pos) <= 16;
 }
 
 function hitTheBounds(pos: VecS) {
-    return norm(pos) > 128;
+    return norm(pos) >= 128;
 }
 
 function willHit(startPos: VecS, startVel: VecS, steps:number): boolean {

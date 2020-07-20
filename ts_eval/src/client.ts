@@ -255,7 +255,7 @@ const Command = t.union([
 
 type Command = t.TypeOf<typeof Command>;
 
-type CommandS = AccelCommandS | DetonateCommandS | ShootCommandS | CloneCommandS;
+export type CommandS = AccelCommandS | DetonateCommandS | ShootCommandS | CloneCommandS;
 
 function serCommandS(cs: CommandS): Command {
     switch (cs.id) {
