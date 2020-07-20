@@ -122,7 +122,7 @@ export class Bot {
         const x0 = 82n;
         const x1 = 50n;
         const x2 = 5n;
-        const x3 = 2n;
+        const x3 = 8n;
 
         const startResp = await this.client.start([x0,x1,x2,x3]);
 
