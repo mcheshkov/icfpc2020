@@ -163,28 +163,20 @@ export class Bot {
                     const SEARCH_DEPTH = 4;
 
                     if (state.tick < 6) {
-                        if (abs(pos[0]) > abs(pos[1])) {
-                            // gravity now works on X
-                            // will accel ship by [+-1, 0]
-                            thrust = [
-                                -1n*sign(pos[0]), // fight gravity
-                                sign(pos[1]), // slide on loger arc
-                            ];
-                        } else if (abs(pos[0]) < abs(pos[1])) {
-                            // gravity now works on Y
-                            // will accel ship by [0, +-1]
-                            thrust = [
-                                sign(pos[0]), // slide on loger arc
-                                -1n*sign(pos[1]), // fight gravity
-                            ];
-                        } else {
-                            // gravity now works on both
-                            // will accel ship by [+-1, +-1]
-                            thrust = [
-                                -1n*sign(pos[0]), // fight gravity
-                                -1n*sign(pos[1]), // fight gravity
-                            ]
+                        let gravity = grav(pos);
+                        function sameAxisDirection(a: bigint, b: bigint) {
+                            return sign(a) * sign(b) >= 0;
                         }
+                        function orbitalGravity(gravity: VecS) {
+                            // Выбирает ускорение
+                            let res: VecS = [gravity[1], -gravity[0]];
+                            if (sameAxisDirection(ship.position[0], res[0]) && sameAxisDirection(ship.position[1], res[1])) {
+                                return res;
+                            } else {
+                                return neg(res);
+                            }
+                        }
+                        thrust = neg(orbitalGravity(gravity));
                     } else if (willHit(ship.position, ship.velocity, HIT_DEPTH)) {
                         function* eachAcc() {
                             const deltas = [-1n,0n,1n];
