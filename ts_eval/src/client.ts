@@ -139,10 +139,16 @@ const Ship = t.tuple([
     // Looks like ship params, like fuel left
     ShipParams,
 
-    // t.unknown,
-    // t.unknown,
-    // t.unknown,
+    // Эти два поля похожи на "температуру" и "максимальную температуру" - каждое ускорение, залп или попадание выращивают её
+    // Но пока температура не выше максимальной корабль не тратит дополнительную энергию
+    // при этом температура опускается каждый тик на величину, зависящую от параметров корабля
+    // Т.е. чтобы убить корабль надо наносить ему больше урона чем "охлаждение", перегреть и опустить энергию до 0
+    bigint,
+    bigint,
+    t.unknown,
 ]);
+
+type Ship = t.TypeOf<typeof Ship>;
 
 type ShipS = {
     role: RoleS,
@@ -150,15 +156,19 @@ type ShipS = {
     position: VecS,
     velocity: VecS,
     params: ShipParamsS,
+    temperature: bigint,
+    maxTemperature: bigint,
 }
 
-function ShipS(a: t.TypeOf<typeof Ship>): ShipS {
+function ShipS(a: Ship): ShipS {
     return {
         role: mkRoleS(a[0]),
         id: a[1],
         position: a[2],
         velocity: a[3],
         params: a[4],
+        temperature: a[5],
+        maxTemperature: a[6],
     };
 }
 
@@ -196,22 +206,23 @@ const ShootCommand = t.tuple([
     bigliteral(2n),
     ShipId,
     Vec,
-
+    // Похоже на мощность
     bigint,
-    //t.unknown,
 ]);
 
 type ShootCommandS = {
     id: 2n,
     shipId: ShipIdS,
     target: VecS,
+    power: bigint,
 }
 
-export function Shoot(shipId: ShipIdS, target: VecS): ShootCommandS {
+export function Shoot(shipId: ShipIdS, target: VecS, power: bigint): ShootCommandS {
     return {
         id: 2n,
         shipId,
         target,
+        power,
     }
 }
 
@@ -234,8 +245,9 @@ function serCommandS(cs: CommandS): Command {
         case 2n:
             // TODO last param
             // Если последний параметр 0 - выстрелов вообще не производится
-            // Подставил 2 ископипастив из действий оппонена из реплея
-            return [cs.id, cs.shipId, [cs.target[0],cs.target[1]], 2n];
+            // Похоже на трату энергии на выстрел
+            // Подставил 2 скопипастив из действий оппонена из реплея - получилось скрутить какой-то параметр кораблю опппонента, но непонятно какой, вроде бу температуру
+            return [cs.id, cs.shipId, [cs.target[0],cs.target[1]], cs.power];
     }
 }
 
@@ -257,6 +269,7 @@ function CommandS(a: Command): CommandS {
                 id: 2n,
                 shipId: a[1],
                 target: a[2],
+                power: a[3],
             };
     }
 }
@@ -461,7 +474,7 @@ export class Client {
         // console.log(`${method} raw response: ${dataAsJson(listResult)}`);
         const gameResponse = decode(GameResponse, listResult);
         if (gameResponse[0] !== 1n) {
-            throw new Error(`Bad response: ${result}`);
+            throw new Error(`Bad response: ${dataAsJson(result)}`);
         }
 
         const r = GoodGameResponseS(gameResponse);

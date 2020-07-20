@@ -244,13 +244,15 @@ export class Bot {
             });
 
             const shoots = enemyShips.length === 0 ? [] : myShips.map(id => {
+                const ship = state.shipsAndCommands.find(sc => sc.ship.id === id)!.ship;
+
                 const enemy = enemyShips[0];
                 const enemyShip = state.shipsAndCommands.find(sc => sc.ship.id === enemy)!.ship;
 
                 let target = enemyShip.position;
                 simulateGrav(enemyShip.position, enemyShip.velocity, [], 1, pos => target = pos);
 
-                return Shoot(id, target);
+                return Shoot(id, target, (ship.maxTemperature - ship.temperature)*2n/3n);
             });
 
 
