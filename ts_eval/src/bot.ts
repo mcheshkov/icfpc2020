@@ -1,4 +1,4 @@
-import {Accel, Client, GameStageS, Shoot, VecS} from "./client";
+import {Accel, Client, Clone, GameStageS, Shoot, VecS} from "./client";
 
 function abs(a:bigint): bigint {
     return a<0 ? -1n*a : a;
@@ -111,7 +111,20 @@ export class Bot {
 
     async run() {
         await this.client.join();
-        const startResp = await this.client.start();
+
+        // В состоянии корабля один из неивестных айтемов тоже всегда содежрит 4 числа, очень похожие на эти
+        // Оно же похоже на 5 парамерт в статик инфо
+        // Первое в состоянии корабля уменьшается после каждого ускорения
+        // И инициализируетяс x0 тут
+        // Похоже на запас топлива
+
+        // Значения скопировал из игры с оппонентом
+        const x0 = 82n;
+        const x1 = 50n;
+        const x2 = 5n;
+        const x3 = 2n;
+
+        const startResp = await this.client.start([x0,x1,x2,x3]);
 
         let stage = startResp.stage;
         const role = startResp.info.role;
@@ -253,13 +266,25 @@ export class Bot {
                 let target = enemyShip.position;
                 simulateGrav(enemyShip.position, enemyShip.velocity, [], 1, pos => target = pos);
 
-                return Shoot(id, target, (ship.maxTemperature - ship.temperature)*2n/3n);
+                const maxPower = ship.maxTemperature - ship.temperature;
+                let targetPower = maxPower * 2n/3n;
+                if (targetPower < 10n) {
+                    targetPower = 0n;
+                }
+
+                return Shoot(id, target, targetPower);
             });
+
+            const clones = state.tick < 10 ? [] : myShips
+                .map(id => state.shipsAndCommands.find(sc => sc.ship.id === id)!.ship)
+                .filter(ship => ship.params[3] > 1)
+                .map(ship => Clone(ship.id, [0n,0n,0n,1n]));
 
 
             const resp = await this.client.commands([
                 ...accels,
                 ...shoots,
+                ...clones,
             ]);
 
             state = resp.state;

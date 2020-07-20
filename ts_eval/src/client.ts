@@ -93,7 +93,7 @@ const ShipParams = t.tuple([
     bigint,
 ]);
 
-export type ShipParamsS = readonly [bigint, bigint, bigint, bigint];
+export type ShipParamsS = [bigint, bigint, bigint, bigint];
 
 const StaticGameInfo = t.tuple([
     t.unknown,
@@ -226,15 +226,36 @@ export function Shoot(shipId: ShipIdS, target: VecS, power: bigint): ShootComman
     }
 }
 
+const CloneCommand = t.tuple([
+    bigliteral(3n),
+    ShipId,
+    ShipParams,
+]);
+
+type CloneCommandS = {
+    id: 3n,
+    shipId: ShipIdS,
+    params: ShipParamsS,
+}
+
+export function Clone(shipId: ShipIdS, params: ShipParamsS): CloneCommandS {
+    return {
+        id: 3n,
+        shipId,
+        params,
+    }
+}
+
 const Command = t.union([
     AccelCommand,
     DetonateCommand,
     ShootCommand,
+    CloneCommand,
 ]);
 
 type Command = t.TypeOf<typeof Command>;
 
-type CommandS = AccelCommandS | DetonateCommandS | ShootCommandS;
+type CommandS = AccelCommandS | DetonateCommandS | ShootCommandS | CloneCommandS;
 
 function serCommandS(cs: CommandS): Command {
     switch (cs.id) {
@@ -247,7 +268,9 @@ function serCommandS(cs: CommandS): Command {
             // Если последний параметр 0 - выстрелов вообще не производится
             // Похоже на трату энергии на выстрел
             // Подставил 2 скопипастив из действий оппонена из реплея - получилось скрутить какой-то параметр кораблю опппонента, но непонятно какой, вроде бу температуру
-            return [cs.id, cs.shipId, [cs.target[0],cs.target[1]], cs.power];
+            return [cs.id, cs.shipId, [cs.target[0], cs.target[1]], cs.power];
+        case 3n:
+            return [cs.id, cs.shipId, cs.params];
     }
 }
 
@@ -270,6 +293,12 @@ function CommandS(a: Command): CommandS {
                 shipId: a[1],
                 target: a[2],
                 power: a[3],
+            };
+        case 3n:
+            return {
+                id: 3n,
+                shipId: a[1],
+                params: a[2],
             };
     }
 }
@@ -370,25 +399,18 @@ function JOIN(playerKey: bigint): Data {
     return listToCons([2n, playerKey, unknownParam]);
 }
 
-function START(playerKey: bigint): Data {
-    // TODO args
-
-    // В состоянии корабля один из неивестных айтемов тоже всегда содежрит 4 числа, очень похожие на эти
-    // Оно же похоже на 5 парамерт в статик инфо
-    // Первое в состоянии корабля уменьшается после каждого ускорения
-    // И инициализируетяс x0 тут
-    // Похоже на запас топлива
-
-    // Значения скопировал из игры с оппонентом
-    const x0 = 82n;
-    const x1 = 76n;
-    const x2 = 5n;
-    const x3 = 1n;
-    return listToCons([3n, playerKey, listToCons([x0, x1, x2, x3])]);
+function START(playerKey: bigint, params: ShipParamsS): Data {
+    return listToCons([3n, playerKey, listToCons(params)]);
 }
 
 function COMMANDS(playerKey: bigint, cs: Array<CommandS>): Data {
-    const commands: Array<Data> = cs.map(serCommandS).map(listToCons);
+    const commands: Array<Data> = cs.map(serCommandS).map(c => {
+        if (c[0] === 3n) {
+            return listToCons([c[0], c[1], listToCons(c[2])]);
+        } else {
+            return listToCons(c);
+        }
+    });
     return listToCons([4n, playerKey, listToCons(commands)]);
 }
 
@@ -427,7 +449,7 @@ export class Client {
     }
 
     async sendAliens(data: Data): Promise<Data> {
-        // console.log(`Sending :`, dataAsJson(data));
+        console.log(`Sending :`, dataAsJson(data));
         const body = modulate(data);
 
         try {
@@ -496,8 +518,8 @@ export class Client {
         // TODO JoinGameResponse
     }
 
-    async start(): Promise<GoodGameResponseS> {
-        return await this.gameRequest(START(this.playerKey), "START");
+    async start(params: ShipParamsS): Promise<GoodGameResponseS> {
+        return await this.gameRequest(START(this.playerKey, params), "START");
     }
 
     async commands(cs: Array<CommandS>): Promise<GoodGameResponseS> {
