@@ -1,4 +1,4 @@
-import {Accel, Client, Shoot, VecS} from "./client";
+import {Accel, Client, GameStageS, Shoot, VecS} from "./client";
 
 function abs(a:bigint): bigint {
     return a<0 ? -1n*a : a;
@@ -113,11 +113,16 @@ export class Bot {
         await this.client.join();
         const startResp = await this.client.start();
 
+        let stage = startResp.stage;
         const role = startResp.info.role;
         let state = startResp.state;
 
         for (let i=0; i<256; i++) {
             console.log("tick", state.tick);
+
+            if (stage !== GameStageS.InProgress) {
+                return;
+            }
 
             const myShips = state.shipsAndCommands
                 .filter(scs => scs.ship.role === role)
@@ -255,6 +260,7 @@ export class Bot {
             ]);
 
             state = resp.state;
+            stage = resp.stage;
         }
     }
 }
