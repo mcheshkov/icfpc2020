@@ -155,11 +155,6 @@ export class Bot {
                 const pos = ship.position;
                 const tangent: VecS = [pos[1], -pos[0]];
                 const dist = norm(pos);
-                const vel = norm(ship.velocity);
-
-                if (vel > 7) {
-                    return Accel(id, [0n, 0n]);
-                }
 
                 let thrust = tangent;
 
