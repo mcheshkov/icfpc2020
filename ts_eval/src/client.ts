@@ -207,6 +207,14 @@ type ShootCommandS = {
     target: VecS,
 }
 
+export function Shoot(shipId: ShipIdS, target: VecS): ShootCommandS {
+    return {
+        id: 2n,
+        shipId,
+        target,
+    }
+}
+
 const Command = t.union([
     AccelCommand,
     DetonateCommand,

@@ -1,4 +1,4 @@
-import {Accel, Client, VecS} from "./client";
+import {Accel, Client, Shoot, VecS} from "./client";
 
 function abs(a:bigint): bigint {
     return a<0 ? -1n*a : a;
@@ -56,28 +56,49 @@ function grav(pos: VecS): VecS {
     }
 }
 
+function simulateStep(pos: VecS, vel: VecS, acc: VecS): {pos:VecS, vel:VecS} {
+    let totalAcc: VecS = [0n,0n];
+    totalAcc = add(totalAcc, grav(pos));
+    totalAcc = add(totalAcc, acc);
+    vel = add(vel, totalAcc);
+    pos = add(pos, vel);
+
+    return {
+        pos, vel
+    };
+}
+
 function simulateGrav(startPos: VecS, startVel: VecS, accs: Array<VecS>, steps:number, cb: (pos: VecS) => void) {
     let pos = startPos;
     let vel = startVel;
 
     for (let i=0; i<steps; i++) {
-        let totalAcc: VecS = [0n,0n];
-        totalAcc = add(totalAcc, grav(pos));
+        let acc: VecS;
         if (accs.length > 0) {
-            let [acc, ...tail] = accs;
-            totalAcc = add(totalAcc, acc);
-            accs = tail;
+            acc = accs[0];
+            accs.shift();
+        } else {
+            acc = [0n,0n]
         }
-        vel = add(vel, totalAcc);
-        pos = add(pos, vel);
 
+        let res = simulateStep(pos, vel, acc);
+        pos = res.pos;
+        vel = res.vel;
         cb(pos);
     }
 }
 
+function hitThePlanet(pos: VecS) {
+    return norm(pos) < 16;
+}
+
+function hitTheBounds(pos: VecS) {
+    return norm(pos) > 128;
+}
+
 function willHit(startPos: VecS, startVel: VecS, steps:number): boolean {
     let result = false;
-    simulateGrav(startPos, startVel, [], steps, pos => result = result || (norm(pos) < 16));
+    simulateGrav(startPos, startVel, [], steps, pos => result = result || hitThePlanet(pos) || hitTheBounds(pos));
     return result;
 }
 
@@ -102,6 +123,10 @@ export class Bot {
                 .filter(scs => scs.ship.role === role)
                 .map(scs => scs.ship.id);
 
+            const enemyShips = state.shipsAndCommands
+                .filter(scs => scs.ship.role !== role)
+                .map(scs => scs.ship.id);
+
             // Хочу выйти на орбиту и крутится
             // похоже гравитация действует только вдоль одной оси - той, вдоль которой расстояние БОЛЬШЕ, типа бесконечная (кубическая) норма
             // в ускорение можно передатьва ТОЛЬКО +-1
@@ -120,7 +145,10 @@ export class Bot {
                 let thrust = tangent;
 
                 function orbit() {
-                    if (state.tick < 8) {
+                    const HIT_DEPTH = 128;
+                    const SEARCH_DEPTH = 5;
+
+                    if (state.tick < 6) {
                         if (abs(pos[0]) > abs(pos[1])) {
                             // gravity now works on X
                             // will accel ship by [+-1, 0]
@@ -143,10 +171,49 @@ export class Bot {
                                 -1n*sign(pos[1]), // fight gravity
                             ]
                         }
-                    } else if (willHit(ship.position, ship.velocity, 4)) {
-                        // Это не работает - ускорители не могут преодолеть гравитацию, и скорость не уменьшается, надо искать другой манёвр
-                        const g = grav(ship.position);
-                        thrust = g; // point thruster to gravity direction
+                    } else if (willHit(ship.position, ship.velocity, HIT_DEPTH)) {
+                        function* eachAcc() {
+                            const deltas = [-1n,0n,1n];
+                            for (const ax of deltas) {
+                                for (const ay of deltas) {
+                                    const acc: VecS = [ax, ay]
+                                    yield acc;
+                                }
+                            }
+                        }
+                        function searchInner(pos: VecS, vel: VecS, n: number): Array<VecS> {
+                            if (n === 0) {
+                                return [];
+                            }
+
+                            for (const acc of eachAcc()) {
+                                const res = simulateStep(pos, vel, acc);
+                                if (! willHit(res.pos, res.vel, HIT_DEPTH)) {
+                                    return [acc];
+                                }
+
+                                const deeper = searchInner(res.pos, res.vel, n-1);
+
+                                if (deeper.length > 0) {
+                                    return [acc, ...deeper];
+                                }
+                            }
+
+                            return [];
+                        }
+                        function search(): Array<VecS> {
+                            return searchInner(ship.position, ship.velocity, SEARCH_DEPTH);
+                        }
+
+                        const searchResult = search();
+                        console.log("SEARCH RESULT", searchResult);
+                        if (searchResult.length > 0) {
+                            thrust = neg(searchResult[0]);
+                        } else {
+                            // Это не работает - ускорители не могут преодолеть гравитацию, и скорость не уменьшается, надо искать другой манёвр
+                            const g = grav(ship.position);
+                            thrust = g; // point thruster to gravity direction
+                        }
                     }
                 }
 
@@ -156,8 +223,8 @@ export class Bot {
                     thrust = g; // point thruster to gravity direction
                 }
 
-                //orbit();
-                standStill();
+                orbit();
+                // standStill();
 
                 // if (vel > 7) {
                 //     thrust = [0n, 1n];
@@ -171,9 +238,20 @@ export class Bot {
                 return Accel(id, thrust);
             });
 
+            const shoots = enemyShips.length === 0 ? [] : myShips.map(id => {
+                const enemy = enemyShips[0];
+                const enemyShip = state.shipsAndCommands.find(sc => sc.ship.id === enemy)!.ship;
+
+                let target = enemyShip.position;
+                simulateGrav(enemyShip.position, enemyShip.velocity, [], 1, pos => target = pos);
+
+                return Shoot(id, target);
+            });
+
 
             const resp = await this.client.commands([
-                ...accels
+                ...accels,
+                ...shoots,
             ]);
 
             state = resp.state;
