@@ -151,7 +151,7 @@ export class Bot {
 
                 function orbit() {
                     const HIT_DEPTH = 128;
-                    const SEARCH_DEPTH = 5;
+                    const SEARCH_DEPTH = 4;
 
                     if (state.tick < 6) {
                         if (abs(pos[0]) > abs(pos[1])) {
